@@ -100,7 +100,7 @@ import {
   getPropsHeaders,
   getEventHeaders,
   getSlotHeaders
-} from '@/plugins/component-documentation/utils/docGenerator.ts';
+} from '../utils/docGenerator.ts';
 import DocsDataTable from './DocsDataTable.vue';
 
 // Define props directly without TypeScript
