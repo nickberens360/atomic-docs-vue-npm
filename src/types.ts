@@ -35,9 +35,10 @@ export type NavItem = ComponentNavItem | DirectoryNavItem;
 // Configuration options interface
 export interface ComponentDocOptions {
   enableDocs?: boolean;
-  componentModules?: Record<string, () => Promise<any>>;
-  exampleModules?: Record<string, () => Promise<any>>;
-  // Add any other configuration options you need
+  componentModules: Record<string, () => Promise<any>>; // Now required
+  exampleModules: Record<string, () => Promise<any>>; // Now required
+  componentsDirName: string; // Now required
+  examplesDirName: string;
 }
 
 // Plugin interface
