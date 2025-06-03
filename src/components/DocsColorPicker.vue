@@ -5,12 +5,12 @@
       <div 
         class="docs-color-preview" 
         :style="{ backgroundColor: modelValue }"
-      ></div>
+      />
       <input 
         v-model="colorValue" 
         class="docs-color-input"
         @change="updateColor"
-      />
+      >
     </div>
 
     <!-- Color canvas -->
@@ -20,35 +20,38 @@
         class="docs-saturation-canvas"
         @mousedown="startSaturationDrag"
         @touchstart="startSaturationDrag"
-      ></canvas>
+      />
       <div 
         class="docs-saturation-pointer" 
         :style="{ 
           left: `${saturationPointerPosition.x}%`, 
           top: `${saturationPointerPosition.y}%` 
         }"
-      ></div>
+      />
     </div>
 
     <!-- Hue slider -->
     <div class="docs-hue-container">
       <div 
-        class="docs-hue-track"
         ref="hueTrack"
+        class="docs-hue-track"
         @mousedown="startHueDrag"
         @touchstart="startHueDrag"
-      ></div>
+      />
       <div 
         class="docs-hue-thumb" 
         :style="{ left: `${huePosition}%` }"
-      ></div>
+      />
     </div>
 
     <!-- Alpha slider (optional) -->
-    <div v-if="showAlpha" class="docs-alpha-container">
+    <div
+      v-if="showAlpha"
+      class="docs-alpha-container"
+    >
       <div 
-        class="docs-alpha-track"
         ref="alphaTrack"
+        class="docs-alpha-track"
         @mousedown="startAlphaDrag"
         @touchstart="startAlphaDrag"
       >
@@ -57,18 +60,18 @@
           :style="{ 
             backgroundImage: `linear-gradient(to right, transparent, ${getRgbaColor(currentHue, 1, 1, 1)})` 
           }"
-        ></div>
+        />
       </div>
       <div 
         class="docs-alpha-thumb" 
         :style="{ left: `${alphaPosition}%` }"
-      ></div>
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch, computed } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 
 interface Props {
   modelValue: string;

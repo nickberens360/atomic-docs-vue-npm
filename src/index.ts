@@ -91,3 +91,7 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
 export default componentDocsPlugin; // Default export for app.use()
 export { routesConfig as routes }; // Named export for routes
 export { default as DocsSlider } from './components/DocsSlider.vue';
+export { default as DocsColorPicker } from './components/DocsColorPicker.vue';
+export { default as DocsMenu } from './components/DocsMenu.vue';
+export { default as DocsChip } from './components/DocsChip.vue';
+
