@@ -27,6 +27,8 @@ export default defineConfig({
           'vue-router': 'VueRouter',
           vuetify: 'Vuetify',
         },
+        // This ensures the default export is the main export for UMD/CJS
+        exports: 'named',
         // Asset file names for CSS, images etc. if your components have them
         assetFileNames: (assetInfo) => {
           if (assetInfo.name === 'style.css') return 'vue-component-docs-plugin.css';
