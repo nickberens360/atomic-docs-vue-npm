@@ -91,7 +91,7 @@
 
 <script setup lang="ts">
 
-import { ref, computed } from 'vue';
+import { ref, computed, inject } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import DocsAppBar from '../components/DocsAppBar.vue';
 import DocsAppNavigationDrawer from '../components/DocsAppNavigationDrawer.vue';

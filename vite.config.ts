@@ -1,10 +1,14 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import path from 'path';
+import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    vue(),
+    cssInjectedByJsPlugin()
+  ],
   build: {
     sourcemap: true, // Optional: include source maps for easier debugging
     lib: {
@@ -18,24 +22,26 @@ export default defineConfig({
     rollupOptions: {
       // make sure to externalize deps that shouldn't be bundled
       // into your library
-      external: ['vue', 'vue-router', 'vuetify'],
+      external: ['vue', 'vue-router'],
       output: {
         // Provide global variables to use in the UMD build
         // for externalized deps
         globals: {
           vue: 'Vue',
           'vue-router': 'VueRouter',
-          vuetify: 'Vuetify',
         },
         // This ensures the default export is the main export for UMD/CJS
-        exports: 'named',
-        // Asset file names for CSS, images etc. if your components have them
+        exports: 'named', // Keeping this as 'named' per your provided file
+        // assetFileNames is less relevant for CSS when cssCodeSplit is false,
+        // but can still be used for other assets like images or fonts if any.
         assetFileNames: (assetInfo) => {
-          if (assetInfo.name === 'style.css') return 'vue-component-docs-plugin.css';
+          // This condition for 'style.css' will no longer be met if CSS is inlined.
+          // if (assetInfo.name === 'style.css') return 'vue-component-docs-plugin.css';
           return assetInfo.name ?? 'assets/[name]-[hash][extname]';
         },
       },
     },
+    cssCodeSplit: false, // <--- This line inlines CSS into the JS bundles
   },
   resolve: {
     alias: {

@@ -1,5 +1,6 @@
 import { App, Plugin, Component } from 'vue';
-import ExampleComponent from './components/DocsExampleComponent.vue'; // Adjust path if needed
+import ExampleComponent from './components/DocsExampleComponent.vue';
+import DocsComponentIndex from './views/DocsComponentIndex.vue';
 import { ComponentDocPlugin, ComponentDocOptions } from './types';
 import routesConfig from './routes'; // Import routes with a clear name
 
@@ -40,8 +41,8 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
       // Note: import.meta.glob is Vite-specific. If consumers don't use Vite,
       // this part might need adjustment or clear documentation.
       // For a library, it's often better if the consumer provides these modules.
-      const componentModules = options?.componentModules || import.meta.glob('@/components/**/*.vue');
-      const exampleModules = options?.exampleModules || import.meta.glob('@/component-examples/**/*.vue');
+      const componentModules = options?.componentModules;
+      const exampleModules = options?.exampleModules;
       const enableDocs = options?.enableDocs ?? (process.env.NODE_ENV === 'development'); // Enable by default in dev
 
       // Add early return if docs are disabled
@@ -103,7 +104,8 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
       app.provide('componentDocPlugin', plugin);
       // Ensure DocsExampleComponent.vue is correctly imported and registered
       // If it's a .vue file, Vue will handle it as a component object.
-      app.component('ExampleComponentUsage', ExampleComponent as Component);
+      app.component('ExampleComponentUsage', ExampleComponent as Component)
+        .component('DocsComponentIndex', DocsComponentIndex as Component);
       console.log('Component documentation plugin installed successfully.');
 
     } catch (error) {
@@ -115,4 +117,4 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
 
 export default componentDocsPlugin; // Default export for app.use()
 export { routesConfig as routes }; // Named export for routes
-// convertPathToExampleName is already exported above
+export { default as DocsSlider } from './components/DocsSlider.vue';
