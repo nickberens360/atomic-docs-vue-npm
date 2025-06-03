@@ -41,4 +41,5 @@ Thumbs.db
 
 # Logs
 logs
-*.log
+*.log*.BAK
+*.BAK
