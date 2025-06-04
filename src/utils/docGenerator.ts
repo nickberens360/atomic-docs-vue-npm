@@ -31,7 +31,7 @@ interface PropItem {
   default: string;
 }
 
-interface Header {
+export interface Header {
   title: string;
   key: string;
 }
