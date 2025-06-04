@@ -38,6 +38,9 @@
       "optional": true
     }
   },
+  "dependencies": {
+    "prismjs": "^1.30.0"
+  },
   "devDependencies": {
     "@testing-library/vue": "^8.1.0",
     "@vitejs/plugin-vue": "^5.2.4",

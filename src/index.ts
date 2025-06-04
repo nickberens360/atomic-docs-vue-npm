@@ -38,6 +38,7 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
       const componentsDirName = options?.componentsDirName;
       const exampleModules = options?.exampleModules;
       const examplesDirName = options?.examplesDirName;
+      const rawComponentSourceModules = options?.rawComponentSourceModules; // New option
       const enableDocs = options?.enableDocs ?? (process.env.NODE_ENV === 'development'); // Enable by default in dev
 
       // Add early return if docs are disabled
@@ -65,6 +66,7 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
         componentsDirName,
         examplesDirName,
         exampleModules,
+        rawComponentSourceModules, // Add the new property
         options
       };
 
@@ -86,4 +88,3 @@ export { default as DocsSlider } from './components/DocsSlider.vue';
 export { default as DocsColorPicker } from './components/DocsColorPicker.vue';
 export { default as DocsMenu } from './components/DocsMenu.vue';
 export { default as DocsChip } from './components/DocsChip.vue';
-

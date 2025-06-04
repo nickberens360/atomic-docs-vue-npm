@@ -18,6 +18,15 @@
     >
       <slot name="actions" />
     </div>
+    <div
+      v-if="templateSource"
+      class="template-source-section"
+    >
+      <h2 class="example-component__heading">
+        Template Source
+      </h2>
+      <pre><code v-html="highlightedTemplateSource"></code></pre>
+    </div>
 
     <h2 class="example-component__heading">
       Props
@@ -94,7 +103,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, inject, ref, onMounted } from 'vue';
 import {
   generatePropsItems,
   getPropsHeaders,
@@ -102,6 +111,47 @@ import {
   getSlotHeaders
 } from '../utils/docGenerator';
 import DocsDataTable from './DocsDataTable.vue';
+import { ComponentDocPlugin } from '../types';
+// Import Prism.js
+import Prism from 'prismjs';
+// Import Prism.js CSS theme
+import 'prismjs/themes/prism.css';
+// Import HTML language support
+import 'prismjs/components/prism-markup';
+
+// Inject the plugin
+const componentDocPlugin = inject('componentDocPlugin') as ComponentDocPlugin;
+const templateSource = ref<string | null>(null);
+
+// Computed property for highlighted template source
+const highlightedTemplateSource = computed(() => {
+  if (!templateSource.value) return '';
+  return Prism.highlight(templateSource.value, Prism.languages.markup, 'html');
+});
+
+// Function to extract template content from raw source
+function extractTemplateContent(source: string): string | null {
+  const templateMatch = source.match(/<template[^>]*>([\s\S]*?)<\/template>/);
+  return templateMatch ? templateMatch[0] : null;
+}
+
+// Load and process the raw component source
+onMounted(async () => {
+  if (props.relativePath && componentDocPlugin?.rawComponentSourceModules) {
+    // Find the matching raw source module
+    const rawSourcePath = Object.keys(componentDocPlugin.rawComponentSourceModules)
+      .find(path => path.includes(props.relativePath));
+
+    if (rawSourcePath) {
+      try {
+        const rawSource = await componentDocPlugin.rawComponentSourceModules[rawSourcePath]();
+        templateSource.value = extractTemplateContent(rawSource);
+      } catch (error) {
+        console.error('Failed to load raw component source:', error);
+      }
+    }
+  }
+});
 
 // Define props directly without TypeScript
 const props = defineProps({
@@ -124,6 +174,10 @@ const props = defineProps({
   propItems: {
     type: Array,
     default: () => []
+  },
+  relativePath: {
+    type: String,
+    default: ''
   }
 });
 
@@ -161,5 +215,25 @@ const slotHeaders = computed(() => {
     margin-top: 48px;
     margin-bottom: 24px;
   }
+}
+
+.template-source-section {
+  margin-top: 24px;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  padding-top: 16px;
+}
+
+.template-source-section pre {
+  background-color: #f5f5f5;
+  padding: 16px;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin: 0;
+}
+
+.template-source-section code {
+  font-family: monospace;
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 </style>

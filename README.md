@@ -12,22 +12,31 @@ A Vue 3 plugin designed to automatically generate documentation for your compone
 
 * **Dedicated Documentation UI:** Provides a view within your application (typically at `/component-docs`) to browse and interact with component documentation.
 
+* **Template Source Display:** Shows the raw template source code of your components with syntax highlighting using Prism.js. This helps developers understand the component's structure and usage.
+
 * **Helper Components:** Includes UI components like sliders and color pickers to facilitate interactive examples.
 
 * **Configurable:** Offers options to customize directory names and enable/disable the documentation UI.
 
 ## Installation
 
-npm install vue-component-docs-pluginoryarn add vue-component-docs-pluginorpnpm add vue-component-docs-plugin
+```bash
+npm install vue-component-docs-plugin
+# or
+yarn add vue-component-docs-plugin
+# or
+pnpm add vue-component-docs-plugin
+```
 ## Dependencies
 
 This plugin has the following `peerDependencies`, which you should already have in your Vue 3 project:
 
 * `vue`: ^3.2.0
-
 * `vue-router`: ^4.0.0
 
-It also utilizes `vue-docgen-api` internally for parsing component information.
+It also includes the following dependencies:
+
+* `prismjs`: For syntax highlighting of component template source code
 
 ## Setup
 
@@ -35,12 +44,56 @@ It also utilizes `vue-docgen-api` internally for parsing component information.
 
    In your main application file (e.g., `main.ts` or `main.js`):
 
-import { createApp } from 'vue';import App from './App.vue';import router from './router'; // Your Vue router instanceimport componentDocsPlugin, { routes as componentDocsRoutes } from 'vue-component-docs-plugin';// Import your component and example modules// Vite's import.meta.glob is a common way to do this:const componentModules = import.meta.glob('@/components//*.vue');const exampleModules = import.meta.glob('@/component-examples//*.vue'); // Or your example directoryconst app = createApp(App);app.use(router);// Register the component documentation pluginapp.use(componentDocsPlugin, {enableDocs: process.env.NODE_ENV === 'development', // Recommended: enable only in devcomponentsDirName: 'components', // Name of your main components directory (relative to alias)componentModules: componentModules, // Pass the imported component modulesexamplesDirName: 'component-examples', // Name of your examples directory (relative to alias)exampleModules: exampleModules, // Pass the imported example modules});app.mount('#app');
+```typescript
+import { createApp } from 'vue';
+import App from './App.vue';
+import router from './router'; // Your Vue router instance
+import componentDocsPlugin, { routes as componentDocsRoutes } from 'vue-component-docs-plugin';
+
+// Import your component and example modules
+// Vite's import.meta.glob is a common way to do this:
+const componentModules = import.meta.glob('@/components/**/*.vue');
+const exampleModules = import.meta.glob('@/component-examples/**/*.vue'); // Or your example directory
+
+// New import for raw component sources
+const rawComponentSourceModules = import.meta.glob('@/components/**/*.vue', { as: 'raw' });
+
+const app = createApp(App);
+app.use(router);
+
+// Register the component documentation plugin
+app.use(componentDocsPlugin, {
+  enableDocs: process.env.NODE_ENV === 'development', // Recommended: enable only in dev
+  componentsDirName: 'components', // Name of your main components directory (relative to alias)
+  componentModules: componentModules, // Pass the imported component modules
+  examplesDirName: 'component-examples', // Name of your examples directory (relative to alias)
+  exampleModules: exampleModules, // Pass the imported example modules
+  rawComponentSourceModules: rawComponentSourceModules, // New option for displaying raw source code
+});
+
+app.mount('#app');
+```
 2. **Add Documentation Routes to Your Router:**
 
 You need to integrate the plugin's routes into your Vue Router setup.
 
-// In your router/index.ts or router.jsimport { createRouter, createWebHistory } from 'vue-router';import { routes as componentDocsRoutes } from 'vue-component-docs-plugin';const routes = [// ... your existing application routes...componentDocsRoutes, // Add the plugin's routes];const router = createRouter({history: createWebHistory(process.env.BASE_URL),routes,});export default router;
+```typescript
+// In your router/index.ts or router.js
+import { createRouter, createWebHistory } from 'vue-router';
+import { routes as componentDocsRoutes } from 'vue-component-docs-plugin';
+
+const routes = [
+  // ... your existing application routes...
+  componentDocsRoutes, // Add the plugin's routes
+];
+
+const router = createRouter({
+  history: createWebHistory(process.env.BASE_URL),
+  routes,
+});
+
+export default router;
+```
 The documentation will typically be available at the `/component-docs` path in your application.
 
 3. **Project Structure (Assumptions & Configuration):**
@@ -108,6 +161,7 @@ When calling `app.use(componentDocsPlugin, options)`, you can pass the following
 | `componentsDirName` | `string` | Yes | `""` | The name of your main components directory (e.g., "components") relative to your source alias (e.g., `@`). | 
 | `exampleModules` | `Record<string, () => Promise<any>>` | Yes | `undefined` | An object of example modules, typically generated using `import.meta.glob('@/your-examples-dir/**/*.vue')`. | 
 | `examplesDirName` | `string` | Yes | `""` | The name of your examples directory (e.g., "component-examples") relative to your source alias. | 
+| `rawComponentSourceModules` | `Record<string, () => Promise<string>>` | No | `undefined` | An object of raw component source modules, typically generated using `import.meta.glob('@/your-components-dir/**/*.vue', { as: 'raw' })`. Used to display the template source code. |
 
 ## Provided UI Components
 
@@ -123,6 +177,11 @@ The plugin also exports a few UI components that you can use within your applica
 
 You can import them directly from the plugin:
 
+```typescript
+import { DocsSlider, DocsColorPicker, DocsMenu, DocsChip } from 'vue-component-docs-plugin';
+```
+
+These components can be used in your examples or anywhere in your application.
 
 ## Testing
 

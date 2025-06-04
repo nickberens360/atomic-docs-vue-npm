@@ -14,7 +14,7 @@
       </span>
     </div>
     <Suspense>
-      <Component :is="currentComponent" />
+      <Component :is="currentComponent" :relativePath="props.relativePath" />
 
       <template #fallback>
         Loading...

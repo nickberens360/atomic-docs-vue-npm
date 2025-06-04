@@ -39,6 +39,7 @@ export interface ComponentDocOptions {
   exampleModules: Record<string, () => Promise<any>>; // Now required
   componentsDirName: string; // Now required
   examplesDirName: string;
+  rawComponentSourceModules?: Record<string, () => Promise<string>>; // New option for raw source
 }
 
 // Plugin interface
@@ -48,5 +49,6 @@ export interface ComponentDocPlugin {
   exampleModules: Record<string, () => Promise<any>>;
   componentsDirName: string;
   examplesDirName: string;
+  rawComponentSourceModules?: Record<string, () => Promise<string>>; // New property
   options?: ComponentDocOptions;
 }
