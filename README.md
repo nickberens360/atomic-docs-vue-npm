@@ -2,13 +2,35 @@
 
 A Vue 3 plugin designed to automatically generate documentation for your components, making it easier to visualize and interact with them during development.
 
+## Quick Start
+
+```bash
+# Install the plugin
+npm install vue-component-docs-plugin
+
+# In your main.ts or main.js
+import componentDocsPlugin from 'vue-component-docs-plugin';
+
+// Register the plugin
+app.use(componentDocsPlugin, {
+  componentModules: import.meta.glob('@/components/**/*.vue'),
+  rawComponentSourceModules: import.meta.glob('@/components/**/*.vue', { query: '?raw', import: 'default' }),
+  exampleModules: import.meta.glob('@/component-examples/**/*.vue'),
+  componentsDirName: 'components',
+  examplesDirName: 'component-examples',
+  enableDocs: true,
+});
+
+// Access your component docs at /component-docs
+```
+
 ## Features
 
 * **Automatic Component Discovery:** Finds `.vue` components within your specified components directory.
 
 * **Interactive Examples:** Allows you to create usage examples for each component.
 
-* **Props, Events & Slots Display:** (Partially Implemented) Aims to parse and display information about component props. *Note: Event and slot parsing is currently under development.*
+* **Props, Events & Slots Display:** Parses and displays information about component props, events, and slots.
 
 * **Dedicated Documentation UI:** Provides a view within your application (typically at `/component-docs`) to browse and interact with component documentation.
 
@@ -56,7 +78,7 @@ const componentModules = import.meta.glob('@/components/**/*.vue');
 const exampleModules = import.meta.glob('@/component-examples/**/*.vue'); // Or your example directory
 
 // New import for raw component sources
-const rawComponentSourceModules = import.meta.glob('@/components/**/*.vue', { as: 'raw' });
+const rawComponentSourceModules = import.meta.glob('@/components/**/*.vue', { query: '?raw', import: 'default' });
 
 const app = createApp(App);
 app.use(router);
@@ -121,34 +143,94 @@ You **must** provide the `componentModules` and `exampleModules` options, which 
 3. **Write the Example using `<ExampleComponentUsage>`:**
    The plugin provides a global component `ExampleComponentUsage` to structure your examples.
 
-   <!-- Description slot: Explain what the component does -->
-   <template #description>
-     <p>This is a versatile button component that supports various colors and emits a click event.</p>
-   </template>
+```vue
+<ExampleComponentUsage>
+  <!-- Default slot: Render your component here -->
+  <template #default>
+    <MyButton :color="buttonColor" @click="clickCount++">
+      {{ buttonLabel }}
+    </MyButton>
+  </template>
 
-   <!-- Actions slot: Add controls to interact with your component's props -->
-   <template #actions>
-     <div>
-       <label for="labelInput">Button Label:</label>
-       <input type="text" id="labelInput" v-model="buttonLabel" />
-     </div>
-     <div>
-       <label for="colorSelect">Button Color:</label>
-       <select id="colorSelect" v-model="buttonColor">
-         <option value="blue">Blue</option>
-         <option value="green">Green</option>
-         <option value="red">Red</option>
-       </select>
-     </div>
-     <p>Last clicked: {{ clickCount }} times</p>
-   </template>
- </ExampleComponentUsage>
+  <!-- Description slot: Explain what the component does -->
+  <template #description>
+    <p>This is a versatile button component that supports various colors and emits a click event.</p>
+  </template>
+
+  <!-- Actions slot: Add controls to interact with your component's props -->
+  <template #actions>
+    <div>
+      <label for="labelInput">Button Label:</label>
+      <input type="text" id="labelInput" v-model="buttonLabel" />
+    </div>
+    <div>
+      <label for="colorSelect">Button Color:</label>
+      <select id="colorSelect" v-model="buttonColor">
+        <option value="blue">Blue</option>
+        <option value="green">Green</option>
+        <option value="red">Red</option>
+      </select>
+    </div>
+    <p>Last clicked: {{ clickCount }} times</p>
+  </template>
+</ExampleComponentUsage>
+```
 
 * **`#default` slot:** This is where you render an instance of the component you are documenting.
 
 * **`#description` slot:** Provide a brief explanation of the component's purpose and functionality.
 
 * **`#actions` slot:** This is crucial for interactivity. Add input fields, selects, or other controls that modify the props of your component example in real-time. This helps users understand how different props affect the component.
+
+4. **Complete Example File:**
+
+Here's a complete example file showing the entire component example, including the script section:
+
+```vue
+<script setup>
+import { ref } from 'vue';
+import ExampleComponentUsage from 'vue-component-docs-plugin';
+import MyButton from '@/components/ui/MyButton.vue';
+
+// Reactive properties for the example
+const buttonLabel = ref('Click Me');
+const buttonColor = ref('blue');
+const clickCount = ref(0);
+</script>
+
+<template>
+  <ExampleComponentUsage>
+    <!-- Default slot: Render your component here -->
+    <template #default>
+      <MyButton :color="buttonColor" @click="clickCount++">
+        {{ buttonLabel }}
+      </MyButton>
+    </template>
+
+    <!-- Description slot: Explain what the component does -->
+    <template #description>
+      <p>This is a versatile button component that supports various colors and emits a click event.</p>
+    </template>
+
+    <!-- Actions slot: Add controls to interact with your component's props -->
+    <template #actions>
+      <div>
+        <label for="labelInput">Button Label:</label>
+        <input type="text" id="labelInput" v-model="buttonLabel" />
+      </div>
+      <div>
+        <label for="colorSelect">Button Color:</label>
+        <select id="colorSelect" v-model="buttonColor">
+          <option value="blue">Blue</option>
+          <option value="green">Green</option>
+          <option value="red">Red</option>
+        </select>
+      </div>
+      <p>Last clicked: {{ clickCount }} times</p>
+    </template>
+  </ExampleComponentUsage>
+</template>
+```
 
 ## Plugin Configuration Options
 
@@ -165,23 +247,83 @@ When calling `app.use(componentDocsPlugin, options)`, you can pass the following
 
 ## Provided UI Components
 
-The plugin also exports a few UI components that you can use within your application or for creating more complex examples:
+The plugin exports several helper UI components that you can use within your examples or anywhere in your application to create interactive controls:
 
-* `DocsSlider`
+### DocsSlider
 
-* `DocsColorPicker`
+A slider component for numeric values:
 
-* `DocsMenu`
+```vue
+<DocsSlider 
+  v-model="opacity" 
+  :min="0" 
+  :max="1" 
+  :step="0.1" 
+  label="Opacity" 
+/>
+```
 
-* `DocsChip`
+Props:
+- `v-model`: The bound value (required)
+- `min`: Minimum value (default: 0)
+- `max`: Maximum value (default: 100)
+- `step`: Step increment (default: 1)
+- `label`: Label text (default: '')
 
-You can import them directly from the plugin:
+### DocsColorPicker
+
+A simple color picker component:
+
+```vue
+<DocsColorPicker 
+  v-model="backgroundColor" 
+  label="Background Color" 
+/>
+```
+
+Props:
+- `v-model`: The bound color value (required)
+- `label`: Label text (default: '')
+
+### DocsMenu
+
+A dropdown menu component:
+
+```vue
+<DocsMenu 
+  v-model="selectedOption" 
+  :options="['Option 1', 'Option 2', 'Option 3']" 
+  label="Select an option" 
+/>
+```
+
+Props:
+- `v-model`: The selected value (required)
+- `options`: Array of options (required)
+- `label`: Label text (default: '')
+
+### DocsChip
+
+A chip/tag component:
+
+```vue
+<DocsChip 
+  label="Feature" 
+  color="blue" 
+/>
+```
+
+Props:
+- `label`: Chip text (required)
+- `color`: Chip color (default: 'gray')
+
+You can import these components directly from the plugin:
 
 ```typescript
 import { DocsSlider, DocsColorPicker, DocsMenu, DocsChip } from 'vue-component-docs-plugin';
 ```
 
-These components can be used in your examples or anywhere in your application.
+These components are designed to be simple and lightweight, focusing on functionality rather than styling, so they can easily fit into any design system.
 
 ## Testing
 
@@ -205,10 +347,61 @@ Vitest UI provides a graphical interface for running and debugging tests.
 
 3. Use the interface to run specific tests, view results, and debug.
 
+## Troubleshooting
+
+### Common Issues
+
+#### Components Not Showing Up in Documentation
+
+1. **Check Path Configuration:**
+   - Ensure your `componentsDirName` and `examplesDirName` match your actual directory structure.
+   - Verify that your path alias (e.g., `@`) is correctly configured in your build tool.
+
+2. **Verify Glob Patterns:**
+   - Make sure your `import.meta.glob` patterns are correctly targeting your component files.
+   - Try logging the `componentModules` and `exampleModules` objects to see if they contain the expected files.
+
+3. **Example File Naming:**
+   - Ensure your example files follow the same path structure as your components.
+   - Example: If your component is at `src/components/ui/Button.vue`, your example should be at `src/component-examples/ui/Button.vue`.
+
+#### Raw Source Code Not Displaying
+
+1. **Check Raw Source Configuration:**
+   - Ensure you're using the correct syntax for importing raw sources: `{ query: '?raw', import: 'default' }`.
+   - Verify that your build tool supports this syntax (works with Vite, may need adjustments for other bundlers).
+
+2. **Bundler Configuration:**
+   - If using Webpack, you may need a different approach to import raw sources. Consider using a raw-loader.
+
+#### Route Integration Issues
+
+1. **Check Router Configuration:**
+   - Make sure you've correctly integrated the plugin's routes into your Vue Router configuration.
+   - Verify that there are no route conflicts with existing routes in your application.
+
+2. **404 Errors:**
+   - If you're getting 404 errors when accessing `/component-docs`, check that the route is correctly registered and that your router is properly configured.
+
+## Visual Documentation
+
+Adding screenshots or GIFs of your component documentation UI can significantly enhance this README and help users understand the plugin's capabilities. Consider including visuals that demonstrate:
+
+- The component documentation UI in action
+- Example of a documented component with interactive controls
+- The source code display feature
+- The Vitest UI interface
+
+## Version Information
+
+Current version: 1.0.0
+
+For a complete list of changes, please refer to the [CHANGELOG](https://github.com/nickberens360/atomic-docs-npm/blob/main/CHANGELOG.md) file.
+
 ## Contributing
 
-Contributions are welcome! Please feel free to submit issues or pull requests on the [GitHub repository](https://github.com/nickberens360/atomic-docs-vue-npm).
+Contributions are welcome! Please feel free to submit issues or pull requests on the [GitHub repository](https://github.com/nickberens360/atomic-docs-npm).
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/nickberens360/atomic-docs-vue-npm/blob/main/LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/nickberens360/atomic-docs-npm/blob/main/LICENSE) file for details.
