@@ -4,14 +4,6 @@ import DocsComponentIndex from './views/DocsComponentIndex.vue';
 import { ComponentDocPlugin, ComponentDocOptions } from './types';
 import routesConfig from './routes'; // Import routes with a clear name
 
-// /**
-//  * Safely gets first key from modules object
-//  */
-// function getFirstModulePath(modules: Record<string, unknown>): string | null {
-//   const keys = Object.keys(modules);
-//   return keys.length > 0 ? keys[0] : null;
-// }
-
 /**
  * Converts path to example name - preserves original logic exactly
  */
