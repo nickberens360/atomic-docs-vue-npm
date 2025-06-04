@@ -1,46 +1,155 @@
-# Component Documentation Plugin
+# Vue Component Docs Plugin
 
-This plugin is intended to provide a framework for documenting usage of components. Any `.vue` file found within the `/components` directory will be added to the list of components to document. The component index page can be found at the route `/component-docs` when running the project in development mode.
+A Vue 3 plugin designed to automatically generate documentation for your components, making it easier to visualize and interact with them during development.
 
-## How to document a component
+## Features
 
-- Add a file of the same relative path as your component to the `/component-examples` directory. So if you are trying to document a component found in `/components/app/PageHeader.vue` then you would create the file `/component-examples/app/PageHeader.vue` and add your example usage to that file.
-- Utilize the plugin's `<ExampleComponentUsage></ExampleComponentUsage>` component to wrap your examples. This component provides a default slot for your example, as well as an `actions` slot for any controls you want to add for the example, and a `description` slot for describing what your component does and how it works.
-- Make sure that you are documenting the available props and slots for your component and ideally providing an interface for developers to interact with those props. e.g. if your component has a prop called `backgroundColor` then you would provide and input or select box that would update that prop in real time.
+* **Automatic Component Discovery:** Finds `.vue` components within your specified components directory.
 
+* **Interactive Examples:** Allows you to create usage examples for each component.
 
-## Configuration
+* **Props, Events & Slots Display:** (Partially Implemented) Aims to parse and display information about component props. *Note: Event and slot parsing is currently under development.*
 
-Currently this plugin makes some assumptions about project folder structure. Components to be documented should be in the `components` directory at the root of the `@` alias for the project and the documentation for those components should be in the `component-examples` directory at the root of the `@` alias for the project.
+* **Dedicated Documentation UI:** Provides a view within your application (typically at `/component-docs`) to browse and interact with component documentation.
 
-You will need to add the documentation routes to your router, the can be imported from the plugin's `routes.ts` file.
+* **Helper Components:** Includes UI components like sliders and color pickers to facilitate interactive examples.
 
+* **Configurable:** Offers options to customize directory names and enable/disable the documentation UI.
+
+## Installation
+
+npm install vue-component-docs-pluginoryarn add vue-component-docs-pluginorpnpm add vue-component-docs-plugin
 ## Dependencies
 
-- Vuetify
-- VueRouter
-- Vite
+This plugin has the following `peerDependencies`, which you should already have in your Vue 3 project:
+
+* `vue`: ^3.2.0
+
+* `vue-router`: ^4.0.0
+
+It also utilizes `vue-docgen-api` internally for parsing component information.
+
+## Setup
+
+1. **Register the Plugin in your Vue App:**
+
+   In your main application file (e.g., `main.ts` or `main.js`):
+
+import { createApp } from 'vue';import App from './App.vue';import router from './router'; // Your Vue router instanceimport componentDocsPlugin, { routes as componentDocsRoutes } from 'vue-component-docs-plugin';// Import your component and example modules// Vite's import.meta.glob is a common way to do this:const componentModules = import.meta.glob('@/components//*.vue');const exampleModules = import.meta.glob('@/component-examples//*.vue'); // Or your example directoryconst app = createApp(App);app.use(router);// Register the component documentation pluginapp.use(componentDocsPlugin, {enableDocs: process.env.NODE_ENV === 'development', // Recommended: enable only in devcomponentsDirName: 'components', // Name of your main components directory (relative to alias)componentModules: componentModules, // Pass the imported component modulesexamplesDirName: 'component-examples', // Name of your examples directory (relative to alias)exampleModules: exampleModules, // Pass the imported example modules});app.mount('#app');
+2. **Add Documentation Routes to Your Router:**
+
+You need to integrate the plugin's routes into your Vue Router setup.
+
+// In your router/index.ts or router.jsimport { createRouter, createWebHistory } from 'vue-router';import { routes as componentDocsRoutes } from 'vue-component-docs-plugin';const routes = [// ... your existing application routes...componentDocsRoutes, // Add the plugin's routes];const router = createRouter({history: createWebHistory(process.env.BASE_URL),routes,});export default router;
+The documentation will typically be available at the `/component-docs` path in your application.
+
+3. **Project Structure (Assumptions & Configuration):**
+
+By default, the plugin assumes:
+
+* Your components are located in a directory specified by `componentsDirName` (e.g., `src/components`).
+
+* Your component examples are in a directory specified by `examplesDirName` (e.g., `src/component-examples`).
+
+* You are using a path alias (like `@`) that points to your `src` directory.
+
+You **must** provide the `componentModules` and `exampleModules` options, which are typically generated using `import.meta.glob` as shown in the setup example. These allow the plugin to dynamically load your components and their examples.
+
+## Documenting a Component
+
+1. **Create Your Component:**
+   Place your component in the directory specified by `componentsDirName` (e.g., `src/components/MyButton.vue`).
+
+2. **Create an Example File:**
+   Create a corresponding example file in the directory specified by `examplesDirName`. The path within this directory should mirror the path of the component.
+
+* For `src/components/ui/MyButton.vue`, the example would be `src/component-examples/ui/MyButton.vue`.
+
+3. **Write the Example using `<ExampleComponentUsage>`:**
+   The plugin provides a global component `ExampleComponentUsage` to structure your examples.
+
+   <!-- Description slot: Explain what the component does -->
+   <template #description>
+     <p>This is a versatile button component that supports various colors and emits a click event.</p>
+   </template>
+
+   <!-- Actions slot: Add controls to interact with your component's props -->
+   <template #actions>
+     <div>
+       <label for="labelInput">Button Label:</label>
+       <input type="text" id="labelInput" v-model="buttonLabel" />
+     </div>
+     <div>
+       <label for="colorSelect">Button Color:</label>
+       <select id="colorSelect" v-model="buttonColor">
+         <option value="blue">Blue</option>
+         <option value="green">Green</option>
+         <option value="red">Red</option>
+       </select>
+     </div>
+     <p>Last clicked: {{ clickCount }} times</p>
+   </template>
+ </ExampleComponentUsage>
+
+* **`#default` slot:** This is where you render an instance of the component you are documenting.
+
+* **`#description` slot:** Provide a brief explanation of the component's purpose and functionality.
+
+* **`#actions` slot:** This is crucial for interactivity. Add input fields, selects, or other controls that modify the props of your component example in real-time. This helps users understand how different props affect the component.
+
+## Plugin Configuration Options
+
+When calling `app.use(componentDocsPlugin, options)`, you can pass the following options:
+
+| Option | Type | Required | Default | Description | 
+| ----- | ----- | ----- | ----- | ----- | 
+| `enableDocs` | `boolean` | No | `process.env.NODE_ENV === 'development'` | Toggles the documentation UI. Recommended to be enabled only during development. | 
+| `componentModules` | `Record<string, () => Promise<any>>` | Yes | `undefined` | An object of component modules, typically generated using `import.meta.glob('@/your-components-dir/**/*.vue')`. | 
+| `componentsDirName` | `string` | Yes | `""` | The name of your main components directory (e.g., "components") relative to your source alias (e.g., `@`). | 
+| `exampleModules` | `Record<string, () => Promise<any>>` | Yes | `undefined` | An object of example modules, typically generated using `import.meta.glob('@/your-examples-dir/**/*.vue')`. | 
+| `examplesDirName` | `string` | Yes | `""` | The name of your examples directory (e.g., "component-examples") relative to your source alias. | 
+
+## Provided UI Components
+
+The plugin also exports a few UI components that you can use within your application or for creating more complex examples:
+
+* `DocsSlider`
+
+* `DocsColorPicker`
+
+* `DocsMenu`
+
+* `DocsChip`
+
+You can import them directly from the plugin:
+
 
 ## Testing
 
-This plugin uses Vitest for testing components. The following test commands are available:
+This plugin uses Vitest for testing. The following test commands are available (run from the plugin's root directory if you are developing the plugin itself):
 
-- `npm test` - Run all tests once
-- `npm run test:watch` - Run tests in watch mode (tests rerun when files change)
-- `npm run test:coverage` - Run tests with coverage report
-- `npm run test:ui` - Run tests with the Vitest UI interface
+* `npm test` or `pnpm test`: Run all tests once.
+
+* `npm run test:watch` or `pnpm test:watch`: Run tests in watch mode.
+
+* `npm run test:coverage` or `pnpm test:coverage`: Run tests with a coverage report.
+
+* `npm run test:ui` or `pnpm test:ui`: Run tests with the Vitest UI interface.
 
 ### Vitest UI
 
-Vitest UI provides a graphical interface for running and debugging tests. To use it:
+Vitest UI provides a graphical interface for running and debugging tests.
 
-1. Run `npm run test:ui` in the component-documentation directory
-2. A browser window will open with the Vitest UI interface
-3. Use the interface to run specific tests, view test results, and debug failures
+1. Run `npm run test:ui` (or `pnpm test:ui`).
 
-The UI provides features like:
-- Interactive test explorer
-- Real-time test feedback
-- Detailed error reporting
-- Test filtering
-- Time travel debugging
+2. A browser window will open with the Vitest UI.
+
+3. Use the interface to run specific tests, view results, and debug.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit issues or pull requests on the [GitHub repository](https://github.com/nickberens360/atomic-docs-vue-npm).
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/nickberens360/atomic-docs-vue-npm/blob/main/LICENSE) file for details.
