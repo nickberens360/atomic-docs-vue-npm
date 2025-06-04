@@ -112,6 +112,17 @@
             </div>
           </div>
         </template>
+
+        <template #tab-3>
+          <div class="tab-content">
+            <div
+              v-if="styleSource"
+              class="style-source-section"
+            >
+              <pre><code v-html="highlightedStyleSource" /></pre>
+            </div>
+          </div>
+        </template>
       </DocsTabs>
     </div>
     <div
@@ -141,17 +152,20 @@ import 'prismjs/themes/prism.css';
 // Import language support
 import 'prismjs/components/prism-markup';
 import 'prismjs/components/prism-javascript';
+import 'prismjs/components/prism-css';
 
 // Inject the plugin
 const componentDocPlugin = inject('componentDocPlugin') as ComponentDocPlugin;
 const templateSource = ref<string | null>(null);
 const scriptSource = ref<string | null>(null);
+const styleSource = ref<string | null>(null);
 
 // Example data for DocsTabs
 const tabsExample = [
   { title: 'API' },
   { title: 'Template' },
   { title: 'Script' },
+  { title: 'Styles' },
 ];
 
 // Computed property for highlighted template source
@@ -166,6 +180,12 @@ const highlightedScriptSource = computed(() => {
   return Prism.highlight(scriptSource.value, Prism.languages.javascript, 'javascript');
 });
 
+// Computed property for highlighted style source
+const highlightedStyleSource = computed(() => {
+  if (!styleSource.value) return '';
+  return Prism.highlight(styleSource.value, Prism.languages.css, 'css');
+});
+
 // Function to extract template content from raw source
 function extractTemplateContent(source: string): string | null {
   const templateMatch = source.match(/<template[^>]*>([\s\S]*?)<\/template>/);
@@ -176,6 +196,12 @@ function extractTemplateContent(source: string): string | null {
 function extractScriptContent(source: string): string | null {
   const scriptMatch = source.match(/<script[^>]*>([\s\S]*?)<\/script>/);
   return scriptMatch ? scriptMatch[0] : null;
+}
+
+// Function to extract style content from raw source
+function extractStyleContent(source: string): string | null {
+  const styleMatch = source.match(/<style[^>]*>([\s\S]*?)<\/style>/);
+  return styleMatch ? styleMatch[0] : null;
 }
 
 // Load and process the raw component source
@@ -190,6 +216,7 @@ onMounted(async () => {
         const rawSource = await componentDocPlugin.rawComponentSourceModules[rawSourcePath]();
         templateSource.value = extractTemplateContent(rawSource);
         scriptSource.value = extractScriptContent(rawSource);
+        styleSource.value = extractStyleContent(rawSource);
       } catch (error) {
         console.error('Failed to load raw component source:', error);
       }
@@ -262,14 +289,16 @@ const slotHeaders = computed(() => {
 }
 
 .template-source-section,
-.script-source-section {
+.script-source-section,
+.style-source-section {
   margin-top: 24px;
   border-top: 1px solid rgba(0, 0, 0, 0.12);
   padding-top: 16px;
 }
 
 .template-source-section pre,
-.script-source-section pre {
+.script-source-section pre,
+.style-source-section pre {
   background-color: #f5f5f5;
   padding: 16px;
   border-radius: 4px;
@@ -278,7 +307,8 @@ const slotHeaders = computed(() => {
 }
 
 .template-source-section code,
-.script-source-section code {
+.script-source-section code,
+.style-source-section code {
   font-family: monospace;
   white-space: pre-wrap;
   word-break: break-all;
