@@ -12,7 +12,7 @@
       >
         <span class="docs-accordion__title">{{ section.title }}</span>
         <span class="docs-accordion__icon">
-          {{ activeSection === index ? '▼' : '▶' }}
+          {{ activeSection === index ? '−' : '+' }}
         </span>
       </button>
       <div
@@ -71,12 +71,10 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .docs-accordion {
-  margin: 24px 0;
+  margin: 16px 0;
 
   &__section {
-    margin-bottom: 8px;
-    border: 1px solid rgba(0, 0, 0, 0.12);
-    border-radius: 4px;
+    margin-bottom: 4px;
     overflow: hidden;
   }
 
@@ -85,41 +83,41 @@ onMounted(() => {
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding: 12px 16px;
-    background-color: #f5f5f5;
+    padding: 8px 12px;
     border: none;
     text-align: left;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-    
+    transition: color 0.2s ease;
+
     &:hover {
-      background-color: #e0e0e0;
+      color: var(--docs-primary-color, #1976d2);
     }
-    
+
     &--active {
-      background-color: #e0e0e0;
+      color: var(--docs-primary-color, #1976d2);
     }
   }
 
   &__title {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
-    color: rgba(0, 0, 0, 0.87);
+    color: inherit;
   }
 
   &__icon {
-    font-size: 12px;
-    color: rgba(0, 0, 0, 0.6);
+    font-size: 10px;
+    color: inherit;
+    opacity: 0.7;
   }
 
   &__content {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.3s ease;
-    
+    transition: max-height 0.2s ease;
+
     &--active {
       max-height: 1000px; // Arbitrary large value
-      padding: 16px;
+      padding: 4px 12px 8px;
     }
   }
 }
@@ -127,15 +125,15 @@ onMounted(() => {
 @media (max-width: 600px) {
   .docs-accordion {
     &__header {
-      padding: 8px 12px;
+      padding: 6px 8px;
     }
-    
+
     &__title {
       font-size: 12px;
     }
-    
+
     &__content--active {
-      padding: 12px;
+      padding: 4px 8px 6px;
     }
   }
 }

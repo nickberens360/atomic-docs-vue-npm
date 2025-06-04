@@ -25,7 +25,8 @@
               class="docs-nav-link"
               active-class="docs-nav-link--active"
             >
-              Color System
+              <span class="docs-icon docs-file-icon">📄</span>
+              <span class="docs-title">Color System</span>
             </router-link>
           </div>
         </template>
@@ -113,7 +114,7 @@ watch(() => props.isRailOpen, (newValue) => {
 
 .docs-navigation-content {
   transition: opacity 0.2s ease, visibility 0.2s ease;
-  padding: 8px;
+  padding: 4px;
 }
 
 .docs-navigation-card {
@@ -127,12 +128,14 @@ watch(() => props.isRailOpen, (newValue) => {
 }
 
 .docs-nav-link {
-  display: block;
-  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
   color: rgba(0, 0, 0, 0.87);
   text-decoration: none;
   border-radius: 4px;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s;
+  font-size: 14px;
 
   &:hover {
     background-color: rgba(0, 0, 0, 0.04);
@@ -142,5 +145,14 @@ watch(() => props.isRailOpen, (newValue) => {
     background-color: rgba(0, 0, 0, 0.08);
     font-weight: 500;
   }
+}
+
+.docs-icon {
+  font-size: 16px;
+  margin-right: 8px;
+}
+
+.docs-title {
+  flex: 1;
 }
 </style>
