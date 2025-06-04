@@ -88,3 +88,4 @@ export { default as DocsSlider } from './components/DocsSlider.vue';
 export { default as DocsColorPicker } from './components/DocsColorPicker.vue';
 export { default as DocsMenu } from './components/DocsMenu.vue';
 export { default as DocsChip } from './components/DocsChip.vue';
+export { default as DocsTabs } from './components/DocsTabs.vue';

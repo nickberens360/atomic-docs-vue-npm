@@ -12,103 +12,114 @@
       </slot>
     </div>
     <slot name="default" />
+
+    <div class="docs-tabs-example">
+      <DocsTabs :tabs="tabsExample">
+        <template #tab-0>
+          <div class="tab-content">
+            <h2 class="example-component__heading">
+              Props
+            </h2>
+            <slot name="props">
+              <DocsDataTable
+                :headers="propHeaders"
+                :items="computedPropItems"
+                hide-default-footer
+              >
+                <template
+                  v-for="header in propHeaders"
+                  :key="header.key"
+                  #[`item.${header.key}`]="slotProps"
+                >
+                  <slot
+                    :name="`item.${header.key}`"
+                    v-bind="slotProps"
+                  >
+                    {{ slotProps.value }}
+                  </slot>
+                </template>
+              </DocsDataTable>
+            </slot>
+
+            <h2 class="example-component__heading">
+              Events
+            </h2>
+            <slot name="events">
+              <DocsDataTable
+                :headers="eventHeaders"
+                :items="eventItems"
+                hide-default-footer
+              >
+                <template
+                  v-for="header in eventHeaders"
+                  :key="header.key"
+                  #[`item.${header.key}`]="slotProps"
+                >
+                  <slot
+                    :name="`item.${header.key}`"
+                    v-bind="slotProps"
+                  >
+                    {{ slotProps.value }}
+                  </slot>
+                </template>
+              </DocsDataTable>
+            </slot>
+
+            <h2 class="example-component__heading">
+              Slots
+            </h2>
+            <slot name="slots">
+              <DocsDataTable
+                :headers="slotHeaders"
+                :items="slotItems"
+                hide-default-footer
+              >
+                <template
+                  v-for="header in slotHeaders"
+                  :key="header.key"
+                  #[`item.${header.key}`]="slotProps"
+                >
+                  <slot
+                    :name="`item.${header.key}`"
+                    v-bind="slotProps"
+                  >
+                    {{ slotProps.value }}
+                  </slot>
+                </template>
+              </DocsDataTable>
+            </slot>
+          </div>
+        </template>
+
+        <template #tab-1>
+          <div class="tab-content">
+            <div
+              v-if="templateSource"
+              class="template-source-section"
+            >
+              <pre><code v-html="highlightedTemplateSource" /></pre>
+            </div>
+          </div>
+        </template>
+
+        <template #tab-2>
+          <div class="tab-content">
+            <div
+              v-if="scriptSource"
+              class="script-source-section"
+            >
+              <pre><code v-html="highlightedScriptSource" /></pre>
+            </div>
+          </div>
+        </template>
+      </DocsTabs>
+    </div>
     <div
       v-if="$slots.actions"
       class="mt-6"
     >
       <slot name="actions" />
     </div>
-    <div
-      v-if="templateSource"
-      class="template-source-section"
-    >
-      <h2 class="example-component__heading">
-        Template Source
-      </h2>
-      <pre><code v-html="highlightedTemplateSource"></code></pre>
-    </div>
-
-    <div
-      v-if="scriptSource"
-      class="script-source-section"
-    >
-      <h2 class="example-component__heading">
-        Script Source
-      </h2>
-      <pre><code v-html="highlightedScriptSource"></code></pre>
-    </div>
-
-    <h2 class="example-component__heading">
-      Props
-    </h2>
-    <slot name="props">
-      <DocsDataTable
-        :headers="propHeaders"
-        :items="computedPropItems"
-        hide-default-footer
-      >
-        <template
-          v-for="header in propHeaders"
-          :key="header.key"
-          #[`item.${header.key}`]="slotProps"
-        >
-          <slot
-            :name="`item.${header.key}`"
-            v-bind="slotProps"
-          >
-            {{ slotProps.value }}
-          </slot>
-        </template>
-      </DocsDataTable>
-    </slot>
-
-    <h2 class="example-component__heading">
-      Events
-    </h2>
-    <slot name="events">
-      <DocsDataTable
-        :headers="eventHeaders"
-        :items="eventItems"
-        hide-default-footer
-      >
-        <template
-          v-for="header in eventHeaders"
-          :key="header.key"
-          #[`item.${header.key}`]="slotProps"
-        >
-          <slot
-            :name="`item.${header.key}`"
-            v-bind="slotProps"
-          >
-            {{ slotProps.value }}
-          </slot>
-        </template>
-      </DocsDataTable>
-    </slot>
-
-    <h2 class="example-component__heading">
-      Slots
-    </h2>
-    <slot name="slots">
-      <DocsDataTable
-        :headers="slotHeaders"
-        :items="slotItems"
-        hide-default-footer
-      >
-        <template
-          v-for="header in slotHeaders"
-          :key="header.key"
-          #[`item.${header.key}`]="slotProps"
-        >
-          <slot
-            :name="`item.${header.key}`"
-            v-bind="slotProps"
-          >
-            {{ slotProps.value }}
-          </slot>
-        </template>
-      </DocsDataTable>
-    </slot>
   </div>
 </template>
 
@@ -121,6 +132,7 @@ import {
   getSlotHeaders
 } from '../utils/docGenerator';
 import DocsDataTable from './DocsDataTable.vue';
+import DocsTabs from './DocsTabs.vue';
 import { ComponentDocPlugin } from '../types';
 // Import Prism.js
 import Prism from 'prismjs';
@@ -134,6 +146,13 @@ import 'prismjs/components/prism-javascript';
 const componentDocPlugin = inject('componentDocPlugin') as ComponentDocPlugin;
 const templateSource = ref<string | null>(null);
 const scriptSource = ref<string | null>(null);
+
+// Example data for DocsTabs
+const tabsExample = [
+  { title: 'API' },
+  { title: 'Template' },
+  { title: 'Script' },
+];
 
 // Computed property for highlighted template source
 const highlightedTemplateSource = computed(() => {
@@ -263,5 +282,64 @@ const slotHeaders = computed(() => {
   font-family: monospace;
   white-space: pre-wrap;
   word-break: break-all;
+}
+
+.docs-tabs-example {
+  margin-bottom: 32px;
+
+  h3 {
+    margin-bottom: 16px;
+  }
+
+  p {
+    margin-bottom: 16px;
+  }
+
+  .tab-content {
+    padding: 16px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+
+    h4 {
+      margin-bottom: 12px;
+    }
+
+    ul {
+      margin-left: 20px;
+
+      li {
+        margin-bottom: 8px;
+      }
+    }
+  }
+
+  .code-example {
+    background-color: #f5f5f5;
+    padding: 16px;
+    border-radius: 4px;
+    margin-top: 16px;
+
+    pre {
+      margin: 0;
+
+      code {
+        font-family: monospace;
+      }
+    }
+  }
+
+  .example-button {
+    padding: 8px 16px;
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 16px;
+
+    &:hover {
+      background-color: #1565c0;
+    }
+  }
 }
 </style>

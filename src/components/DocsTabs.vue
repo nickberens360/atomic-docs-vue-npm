@@ -1,11 +1,11 @@
 <template>
   <div class="docs-tabs">
-    <div class="docs-tabs__header">
+    <div class="docs-tabs__headers">
       <button
         v-for="(tab, index) in tabs"
         :key="index"
-        class="docs-tabs__tab"
-        :class="{ 'docs-tabs__tab--active': activeTab === index }"
+        class="docs-tabs__tab-button"
+        :class="{ 'docs-tabs__tab-button--active': activeTab === index }"
         @click="setActiveTab(index)"
       >
         {{ tab.title }}
@@ -15,92 +15,104 @@
       <div
         v-for="(tab, index) in tabs"
         :key="index"
-        class="docs-tabs__panel"
-        :class="{ 'docs-tabs__panel--active': activeTab === index }"
+        class="docs-tabs__tab-content"
+        :class="{ 'docs-tabs__tab-content--active': activeTab === index }"
       >
-        <slot :name="tab.name || `tab-${index}`">
-          {{ tab.content }}
-        </slot>
+        <slot :name="`tab-${index}`"></slot>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, onMounted, useSlots, computed } from 'vue';
 
-const props = defineProps({
-  tabs: {
-    type: Array as () => Array<{
-      title: string;
-      name?: string;
-      content?: string;
-    }>,
-    required: true,
-  },
-  modelValue: {
-    type: Number,
-    default: 0,
-  },
+interface Tab {
+  title: string;
+}
+
+interface Props {
+  tabs: Tab[];
+  defaultTab?: number;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  defaultTab: 0
 });
 
-const emit = defineEmits(['update:modelValue']);
+const activeTab = ref(props.defaultTab);
+const slots = useSlots();
 
-const activeTab = computed({
-  get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value),
-});
-
+// Method to set the active tab
 const setActiveTab = (index: number) => {
   activeTab.value = index;
 };
+
+// Check if slots exist for each tab
+const hasSlotContent = computed(() => {
+  return props.tabs.map((_, index) => !!slots[`tab-${index}`]);
+});
+
+// Set the first tab with content as active if the default tab has no content
+onMounted(() => {
+  if (!hasSlotContent.value[activeTab.value]) {
+    const firstTabWithContent = hasSlotContent.value.findIndex(has => has);
+    if (firstTabWithContent !== -1) {
+      activeTab.value = firstTabWithContent;
+    }
+  }
+});
 </script>
 
 <style scoped lang="scss">
 .docs-tabs {
-  margin: 16px 0;
-  
-  &__header {
+  margin: 24px 0;
+
+  &__headers {
     display: flex;
     border-bottom: 1px solid rgba(0, 0, 0, 0.12);
     margin-bottom: 16px;
   }
-  
-  &__tab {
+
+  &__tab-button {
     padding: 12px 16px;
     background: none;
     border: none;
     cursor: pointer;
     font-size: 14px;
     font-weight: 500;
-    color: inherit;
-    position: relative;
-    transition: color 0.3s ease;
+    color: rgba(0, 0, 0, 0.6);
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
     
     &:hover {
-      color: var(--v-primary-base);
+      color: rgba(0, 0, 0, 0.87);
     }
     
     &--active {
-      color: var(--v-primary-base);
-      
-      &::after {
-        content: '';
-        position: absolute;
-        bottom: -1px;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background-color: var(--v-primary-base);
-      }
+      color: rgba(0, 0, 0, 0.87);
+      border-bottom-color: #1976d2; // Primary color, can be adjusted to match your theme
     }
   }
-  
-  &__panel {
+
+  &__tab-content {
     display: none;
     
     &--active {
       display: block;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .docs-tabs {
+    &__headers {
+      flex-wrap: wrap;
+    }
+    
+    &__tab-button {
+      padding: 8px 12px;
+      font-size: 12px;
     }
   }
 }
