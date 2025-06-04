@@ -10,11 +10,19 @@
     @mouseleave="handleMouseLeave"
   >
     <div class="docs-navigation-content">
-      <div 
-        class="docs-navigation-card"
-      >
-        <DocsComponentNavigation />
-      </div>
+      <DocsAccordion :sections="[
+        { title: 'Components' },
+        { title: 'Colors' }
+      ]">
+        <template #section-0>
+          <DocsComponentNavigation />
+        </template>
+
+        <template #section-1>
+          <!-- Placeholder for Colors section -->
+          <div>Colors content placeholder</div>
+        </template>
+      </DocsAccordion>
     </div>
   </aside>
 </template>
@@ -22,6 +30,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import DocsComponentNavigation from "./DocsComponentNavigation.vue";
+import DocsAccordion from "./DocsAccordion.vue";
 
 // Define props
 const props = defineProps<{

@@ -132,7 +132,10 @@
             >
               <pre><code v-html="highlightedCompiledSource" /></pre>
             </div>
-            <div v-else class="compiled-source-section">
+            <div
+              v-else
+              class="compiled-source-section"
+            >
               <p>No compiled code available for this component.</p>
             </div>
           </div>
@@ -331,15 +334,6 @@ const slotHeaders = computed(() => {
     margin-top: 48px;
     margin-bottom: 24px;
   }
-}
-
-.template-source-section,
-.script-source-section,
-.style-source-section,
-.compiled-source-section {
-  margin-top: 24px;
-  border-top: 1px solid rgba(0, 0, 0, 0.12);
-  padding-top: 16px;
 }
 
 .template-source-section pre,
