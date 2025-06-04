@@ -19,8 +19,15 @@
         </template>
 
         <template #section-1>
-          <!-- Placeholder for Colors section -->
-          <div>Colors content placeholder</div>
+          <div class="docs-nav-item">
+            <router-link 
+              to="/component-docs/colors" 
+              class="docs-nav-link"
+              active-class="docs-nav-link--active"
+            >
+              Color System
+            </router-link>
+          </div>
         </template>
       </DocsAccordion>
     </div>
@@ -113,5 +120,27 @@ watch(() => props.isRailOpen, (newValue) => {
   background-color: transparent;
   border-radius: 4px;
   height: 100%;
+}
+
+.docs-nav-item {
+  margin: 4px 0;
+}
+
+.docs-nav-link {
+  display: block;
+  padding: 8px 12px;
+  color: rgba(0, 0, 0, 0.87);
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  &--active {
+    background-color: rgba(0, 0, 0, 0.08);
+    font-weight: 500;
+  }
 }
 </style>

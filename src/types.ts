@@ -40,6 +40,10 @@ export interface ComponentDocOptions {
   componentsDirName: string; // Now required
   examplesDirName: string;
   rawComponentSourceModules?: Record<string, () => Promise<string>>; // New option for raw source
+  colors?: Array<{
+    name: string;
+    color: string;
+  }>;
 }
 
 // Plugin interface

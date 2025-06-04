@@ -20,6 +20,11 @@ const routes: RouteRecordRaw[] = [
           relativePath: route.query.relativePath as string | undefined,
           componentName: (route.params as unknown as ComponentDocRouteParams).componentName
         })
+      },
+      {
+        path: 'colors',
+        name: 'colors',
+        component: () => import('./views/DocsColorsView.vue')
       }
     ]
   }
