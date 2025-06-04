@@ -123,6 +123,20 @@
             </div>
           </div>
         </template>
+
+        <template #tab-4>
+          <div class="tab-content">
+            <div
+              v-if="compiledSource"
+              class="compiled-source-section"
+            >
+              <pre><code v-html="highlightedCompiledSource" /></pre>
+            </div>
+            <div v-else class="compiled-source-section">
+              <p>No compiled code available for this component.</p>
+            </div>
+          </div>
+        </template>
       </DocsTabs>
     </div>
     <div
@@ -145,6 +159,8 @@ import {
 import DocsDataTable from './DocsDataTable.vue';
 import DocsTabs from './DocsTabs.vue';
 import { ComponentDocPlugin } from '../types';
+// Import Vue compiler
+import { parse, compile } from '@vue/compiler-dom';
 // Import Prism.js
 import Prism from 'prismjs';
 // Import Prism.js CSS theme
@@ -159,6 +175,7 @@ const componentDocPlugin = inject('componentDocPlugin') as ComponentDocPlugin;
 const templateSource = ref<string | null>(null);
 const scriptSource = ref<string | null>(null);
 const styleSource = ref<string | null>(null);
+const compiledSource = ref<string | null>(null);
 
 // Example data for DocsTabs
 const tabsExample = [
@@ -166,6 +183,7 @@ const tabsExample = [
   { title: 'Template' },
   { title: 'Script' },
   { title: 'Styles' },
+  { title: 'Compiled' },
 ];
 
 // Computed property for highlighted template source
@@ -186,6 +204,12 @@ const highlightedStyleSource = computed(() => {
   return Prism.highlight(styleSource.value, Prism.languages.css, 'css');
 });
 
+// Computed property for highlighted compiled source
+const highlightedCompiledSource = computed(() => {
+  if (!compiledSource.value) return '';
+  return Prism.highlight(compiledSource.value, Prism.languages.javascript, 'javascript');
+});
+
 // Function to extract template content from raw source
 function extractTemplateContent(source: string): string | null {
   const templateMatch = source.match(/<template[^>]*>([\s\S]*?)<\/template>/);
@@ -204,6 +228,24 @@ function extractStyleContent(source: string): string | null {
   return styleMatch ? styleMatch[0] : null;
 }
 
+// Function to generate the compiled code
+function generateCompiledCode(source: string): string | null {
+  try {
+    // Extract template content
+    const templateMatch = source.match(/<template[^>]*>([\s\S]*?)<\/template>/);
+    if (!templateMatch || !templateMatch[1]) return null;
+
+    const template = templateMatch[1];
+    const ast = parse(template);
+    const { code } = compile(ast);
+
+    return `// Compiled Template Render Function\n${code}`;
+  } catch (error) {
+    console.error('Failed to compile component:', error);
+    return `// Error compiling component: ${error}`;
+  }
+}
+
 // Load and process the raw component source
 onMounted(async () => {
   if (props.relativePath && componentDocPlugin?.rawComponentSourceModules) {
@@ -217,6 +259,9 @@ onMounted(async () => {
         templateSource.value = extractTemplateContent(rawSource);
         scriptSource.value = extractScriptContent(rawSource);
         styleSource.value = extractStyleContent(rawSource);
+
+        // Generate compiled code
+        compiledSource.value = generateCompiledCode(rawSource);
       } catch (error) {
         console.error('Failed to load raw component source:', error);
       }
@@ -290,7 +335,8 @@ const slotHeaders = computed(() => {
 
 .template-source-section,
 .script-source-section,
-.style-source-section {
+.style-source-section,
+.compiled-source-section {
   margin-top: 24px;
   border-top: 1px solid rgba(0, 0, 0, 0.12);
   padding-top: 16px;
@@ -298,7 +344,8 @@ const slotHeaders = computed(() => {
 
 .template-source-section pre,
 .script-source-section pre,
-.style-source-section pre {
+.style-source-section pre,
+.compiled-source-section pre {
   background-color: #f5f5f5;
   padding: 16px;
   border-radius: 4px;
@@ -308,7 +355,8 @@ const slotHeaders = computed(() => {
 
 .template-source-section code,
 .script-source-section code,
-.style-source-section code {
+.style-source-section code,
+.compiled-source-section code {
   font-family: monospace;
   white-space: pre-wrap;
   word-break: break-all;
