@@ -19,7 +19,7 @@
       <slot name="actions" />
     </div>
 
-    <h2 class="my-4">
+    <h2 class="example-component__heading">
       Props
     </h2>
     <slot name="props">
@@ -43,7 +43,7 @@
       </DocsDataTable>
     </slot>
 
-    <h2 class="my-4">
+    <h2 class="example-component__heading">
       Events
     </h2>
     <slot name="events">
@@ -67,7 +67,7 @@
       </DocsDataTable>
     </slot>
 
-    <h2 class="my-4">
+    <h2 class="example-component__heading">
       Slots
     </h2>
     <slot name="slots">
@@ -100,7 +100,7 @@ import {
   getPropsHeaders,
   getEventHeaders,
   getSlotHeaders
-} from '../utils/docGenerator.ts';
+} from '../utils/docGenerator';
 import DocsDataTable from './DocsDataTable.vue';
 
 // Define props directly without TypeScript
@@ -152,3 +152,14 @@ const slotHeaders = computed(() => {
   return getSlotHeaders();
 });
 </script>
+
+<style scoped lang="scss">
+.example-component {
+  &__heading {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-top: 48px;
+    margin-bottom: 24px;
+  }
+}
+</style>
