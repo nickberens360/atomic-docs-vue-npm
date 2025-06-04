@@ -14,7 +14,11 @@
       </span>
     </div>
     <Suspense>
-      <Component :is="currentComponent" />
+      <Component 
+        :is="currentComponent" 
+        :template-code="templateCode"
+        :source-code="sourceCode"
+      />
 
       <template #fallback>
         Loading...
@@ -24,10 +28,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject } from 'vue';
+import { computed, inject, ref } from 'vue';
 import DocsComponentNotDocumented from '../components/DocsComponentNotDocumented.vue';
 import DocsContainer from '../components/DocsContainer.vue';
 import { ComponentDocPlugin } from '../types';
+import { extractTemplateCode } from '../utils/docGenerator';
 
 // Define a custom type for component definitions
 type ComponentType = any;
@@ -61,6 +66,35 @@ await Promise.all(importComponentPromises);
 const props = defineProps<Props>();
 
 const componentName = computed<string>(() => props.relativePath.split('/').pop()?.replace('.vue', '') || '');
+
+// Create refs to store template and source code
+const templateCode = ref<string>('');
+const sourceCode = ref<string>('');
+
+// Extract template code from the component file
+const extractComponentTemplate = async () => {
+  try {
+    if (props.relativePath) {
+      // Construct the full path to the component file
+      // This assumes the component files are in a directory structure that matches the relativePath
+      // You may need to adjust this based on your actual file structure
+      const componentPath = `${process.env.NODE_ENV === 'development' ? '' : ''}${props.relativePath}`;
+
+      // Extract template code using vue-docgen-api with a longer timeout (10 seconds)
+      const { templateCode: template, sourceCode: source } = await extractTemplateCode(componentPath, 10000);
+      templateCode.value = template;
+      sourceCode.value = source;
+    }
+  } catch (error) {
+    console.error('Error extracting template code:', error);
+    // Set fallback values for template and source code
+    templateCode.value = `<!-- Unable to extract template code for ${props.relativePath}. -->`;
+    sourceCode.value = `/* Unable to extract source code for ${props.relativePath}. */`;
+  }
+};
+
+// Call the function to extract template code
+extractComponentTemplate();
 
 const currentComponent = computed<ComponentType>(() => {
   if (exampleComponents[props.componentName]) {

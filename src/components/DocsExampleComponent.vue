@@ -90,6 +90,13 @@
         </template>
       </DocsDataTable>
     </slot>
+
+    <h2 class="example-component__heading">
+      Template
+    </h2>
+    <slot name="template">
+      <pre><code>{{ templateCode }}</code></pre>
+    </slot>
   </div>
 </template>
 
@@ -124,6 +131,14 @@ const props = defineProps({
   propItems: {
     type: Array,
     default: () => []
+  },
+  templateCode: {
+    type: String,
+    default: ''
+  },
+  sourceCode: {
+    type: String,
+    default: ''
   }
 });
 

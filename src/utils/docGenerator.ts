@@ -1,3 +1,5 @@
+import { parse } from 'vue-docgen-api';
+
 interface PropType {
   name: string;
 }
@@ -181,4 +183,66 @@ export function generateComponentDocumentation(options: ComponentDocumentationOp
       // items: generateSlotItems(slotDefinitions)
     }
   };
+}
+
+
+/**
+ * Creates a promise that rejects after a specified timeout
+ * @param ms Timeout in milliseconds
+ * @returns A promise that rejects after the timeout
+ */
+function timeout(ms: number): Promise<never> {
+  return new Promise((_, reject) => {
+    setTimeout(() => reject(new Error(`Operation timed out after ${ms}ms`)), ms);
+  });
+}
+
+// Simple cache to store parsed component info
+const templateCache: Record<string, { templateCode: string, sourceCode: string }> = {};
+
+/**
+ * Extracts template code from a component file using vue-docgen-api
+ * @param filePath Path to the component file
+ * @param timeoutMs Timeout in milliseconds (default: 5000)
+ * @returns Promise with the template code and source code
+ */
+export async function extractTemplateCode(
+  filePath: string, 
+  timeoutMs: number = 5000
+): Promise<{ templateCode: string, sourceCode: string }> {
+  // Check if we have a cached result for this file path
+  if (templateCache[filePath]) {
+    return templateCache[filePath];
+  }
+
+  try {
+    // Race between the parse operation and a timeout
+    const componentInfo = await Promise.race([
+      parse(filePath),
+      timeout(timeoutMs)
+    ]);
+
+    // Extract template and source code
+    const templateCode = componentInfo.template || '';
+    const sourceCode = componentInfo.source || '';
+
+    // Cache the result
+    const result = { templateCode, sourceCode };
+    templateCache[filePath] = result;
+
+    return result;
+  } catch (error) {
+    console.error('Error extracting template code:', error);
+
+    // Provide a fallback message that indicates there was an issue
+    const fallback = {
+      templateCode: `<!-- Unable to extract template code for ${filePath}. -->`,
+      sourceCode: `/* Unable to extract source code for ${filePath}. */`
+    };
+
+    // Cache the fallback to avoid repeated failures
+    templateCache[filePath] = fallback;
+
+    return fallback;
+  }
 }

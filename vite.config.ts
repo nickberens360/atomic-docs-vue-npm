@@ -2,10 +2,12 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import path from 'path';
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js';
+import { viteCommonjs } from '@originjs/vite-plugin-commonjs'; // Import the commonjs plugin
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
+    viteCommonjs(), // Add the commonjs plugin HERE
     vue(),
     cssInjectedByJsPlugin()
   ],
@@ -47,5 +49,15 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+    // Add conditions to help resolve packages like esm-resolve
+    // 'node' condition might be helpful for CJS packages.
+    // Vite's default conditions usually include 'import', 'module'.
+    // Adding 'node' or ensuring 'require' can be handled (often via the commonjs plugin) is key.
+    conditions: ['node', 'import', 'module'],
+  },
+  // Explicitly include problematic CJS dependencies in optimizeDeps
+  // This can help Vite's pre-bundling process handle them correctly.
+  optimizeDeps: {
+    include: ['esm-resolve', 'vue-docgen-api'],
   },
 });
