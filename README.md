@@ -12,7 +12,7 @@ A Vue 3 plugin designed to automatically generate documentation for your compone
 
 * **Dedicated Documentation UI:** Provides a view within your application (typically at `/component-docs`) to browse and interact with component documentation.
 
-* **Template Source Display:** Shows the raw template source code of your components with syntax highlighting using Prism.js. This helps developers understand the component's structure and usage.
+* **Source Code Display:** Shows the raw template and script source code of your components with syntax highlighting using Prism.js. This helps developers understand the component's structure, logic, and usage.
 
 * **Helper Components:** Includes UI components like sliders and color pickers to facilitate interactive examples.
 
@@ -36,7 +36,7 @@ This plugin has the following `peerDependencies`, which you should already have 
 
 It also includes the following dependencies:
 
-* `prismjs`: For syntax highlighting of component template source code
+* `prismjs`: For syntax highlighting of component template and script source code
 
 ## Setup
 
