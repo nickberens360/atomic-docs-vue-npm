@@ -182,11 +182,11 @@ const compiledSource = ref<string | null>(null);
 
 // Example data for DocsTabs
 const tabsExample = [
-  { title: 'API' },
-  { title: 'Template' },
-  { title: 'Script' },
-  { title: 'Styles' },
-  { title: 'Compiled' },
+  { title: '📚API' },
+  { title: '🖼️Template' },
+  { title: '🚀Script' },
+  { title: '🎨Styles' },
+  { title: '📦Compiled' },
 ];
 
 // Computed property for highlighted template source
