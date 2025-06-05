@@ -1,6 +1,8 @@
 <template>
   <div class="docs-colors">
-    <h2 class="docs-colors-title">Color System</h2>
+    <h2 class="docs-colors-title">
+      Color System
+    </h2>
     <p class="docs-colors-description">
       These are the colors defined in your design system.
     </p>
@@ -14,10 +16,14 @@
         <div 
           class="docs-color-preview" 
           :style="{ backgroundColor: colorItem.color }"
-        ></div>
+        />
         <div class="docs-color-info">
-          <div class="docs-color-name">{{ colorItem.name }}</div>
-          <div class="docs-color-value">{{ colorItem.color }}</div>
+          <div class="docs-color-name">
+            {{ colorItem.name }}
+          </div>
+          <div class="docs-color-value">
+            {{ colorItem.color }}
+          </div>
         </div>
       </div>
     </div>
@@ -77,7 +83,6 @@ const colors = computed(() => {
 
 .docs-color-name {
   font-weight: 500;
-  text-transform: capitalize;
   margin-bottom: 4px;
 }
 

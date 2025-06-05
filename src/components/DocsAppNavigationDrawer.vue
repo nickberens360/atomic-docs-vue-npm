@@ -10,10 +10,12 @@
     @mouseleave="handleMouseLeave"
   >
     <div class="docs-navigation-content">
-      <DocsAccordion :sections="[
-        { title: 'Components' },
-        { title: 'Colors' }
-      ]">
+      <DocsAccordion
+        :sections="[
+          { title: 'Components' },
+          { title: 'Colors' }
+        ]"
+      >
         <template #section-0>
           <DocsComponentNavigation />
         </template>
@@ -154,5 +156,6 @@ watch(() => props.isRailOpen, (newValue) => {
 
 .docs-title {
   flex: 1;
+  color: black;
 }
 </style>
