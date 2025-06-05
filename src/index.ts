@@ -1,15 +1,15 @@
+// src/index.ts
 import { App, Plugin, Component } from 'vue';
 import ExampleComponent from './components/DocsExampleComponent.vue';
 import DocsComponentIndex from './views/DocsComponentIndex.vue';
 import { ComponentDocPlugin, ComponentDocOptions } from './types';
-import routesConfig from './routes'; // Import routes with a clear name
+import routesConfig from './routes';
 
-/**
- * Converts path to example name - preserves original logic exactly
- */
+// Import the Vite plugin and its options type
+import { rawSourcesPlugin, RawSourcesPluginOptions as RawSourcesVitePluginOptions } from './vite-raw-sources-plugin';
+
 export function convertPathToExampleName(path: string): string {
   if (!path) return '';
-
   try {
     return 'Example' + path.replace(/ /g, '-')
       .replace(/\.vue/g, '')
@@ -28,9 +28,10 @@ export function convertPathToExampleName(path: string): string {
 
 const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
   install(app: App, options: ComponentDocOptions = {
-    componentModules: undefined,
+    // Default options...
+    componentModules: undefined, // Marking as possibly undefined
     componentsDirName: "",
-    exampleModules: undefined,
+    exampleModules: undefined, // Marking as possibly undefined
     examplesDirName: ""
   }) {
     try {
@@ -38,26 +39,27 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
       const componentsDirName = options?.componentsDirName;
       const exampleModules = options?.exampleModules;
       const examplesDirName = options?.examplesDirName;
-      const rawComponentSourceModules = options?.rawComponentSourceModules; // New option
-      const enableDocs = options?.enableDocs ?? (process.env.NODE_ENV === 'development'); // Enable by default in dev
+      // rawComponentSourceModules is now effectively superseded by the vite-raw-sources-plugin for DocsExampleComponent
+      // but we can keep it in options if it's used elsewhere or for other purposes.
+      const rawComponentSourceModules = options?.rawComponentSourceModules;
+      const enableDocs = options?.enableDocs ?? (process.env.NODE_ENV === 'development');
 
-      // Add early return if docs are disabled
       if (!enableDocs) {
         console.log('Component documentation plugin is disabled.');
         return;
       }
       console.log('Component documentation plugin initializing...');
       if (!componentModules) {
-        throw new Error('componentModules is required');
+        throw new Error('componentModules option is required for componentDocsPlugin.');
       }
       if (!exampleModules) {
-        throw new Error('exampleModules is required');
+        throw new Error('exampleModules option is required for componentDocsPlugin.');
       }
       if (!options.componentsDirName) {
-        throw new Error('componentsDirName is required');
+        throw new Error('componentsDirName option is required for componentDocsPlugin.');
       }
       if (!options.examplesDirName) {
-        throw new Error('examplesDirName is required');
+        throw new Error('examplesDirName option is required for componentDocsPlugin.');
       }
 
       const plugin: ComponentDocPlugin = {
@@ -66,7 +68,7 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
         componentsDirName,
         examplesDirName,
         exampleModules,
-        rawComponentSourceModules, // Add the new property
+        rawComponentSourceModules,
         options
       };
 
@@ -77,13 +79,17 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
 
     } catch (error) {
       console.error('Component docs plugin failed to initialize:', error);
-      // Don't throw - allow app to continue
     }
   }
 };
 
-export default componentDocsPlugin; // Default export for app.use()
+export default componentDocsPlugin; // Default export for Vue plugin
 export { routesConfig as routes }; // Named export for routes
+
+// Export the Vite plugin and its options type for consumers
+export { rawSourcesPlugin, RawSourcesVitePluginOptions as RawSourcesPluginOptions };
+
+// Export other components
 export { default as DocsSlider } from './components/DocsSlider.vue';
 export { default as DocsColorPicker } from './components/DocsColorPicker.vue';
 export { default as DocsMenu } from './components/DocsMenu.vue';

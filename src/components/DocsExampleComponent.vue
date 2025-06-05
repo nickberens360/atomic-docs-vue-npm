@@ -99,6 +99,9 @@
             >
               <pre><code v-html="highlightedTemplateSource" /></pre>
             </div>
+            <div v-else>
+              <p>No template source available or loaded for '{{ props.relativePath }}'.</p>
+            </div>
           </div>
         </template>
 
@@ -110,6 +113,9 @@
             >
               <pre><code v-html="highlightedScriptSource" /></pre>
             </div>
+            <div v-else>
+              <p>No script source available or loaded for '{{ props.relativePath }}'.</p>
+            </div>
           </div>
         </template>
 
@@ -120,6 +126,9 @@
               class="style-source-section"
             >
               <pre><code v-html="highlightedStyleSource" /></pre>
+            </div>
+            <div v-else>
+              <p>No style source available or loaded for '{{ props.relativePath }}'.</p>
             </div>
           </div>
         </template>
@@ -152,7 +161,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref, onMounted } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 import {
   generatePropsItems,
   getPropsHeaders,
@@ -161,118 +170,24 @@ import {
 } from '../utils/docGenerator';
 import DocsDataTable from './DocsDataTable.vue';
 import DocsTabs from './DocsTabs.vue';
-import { ComponentDocPlugin } from '../types';
+
+// Import from the new virtual module
+import { rawSourcesMap } from 'virtual:raw-component-sources';
+
 // Import Vue compiler
 import { parse, compile } from '@vue/compiler-dom';
 // Import Prism.js
 import Prism from 'prismjs';
-// Import Prism.js CSS theme
-import 'prismjs/themes/prism.css';
-// Import language support
+import 'prismjs/themes/prism.css'; // Consider if this should be globally imported
 import 'prismjs/components/prism-markup';
 import 'prismjs/components/prism-javascript';
 import 'prismjs/components/prism-css';
 
-// Inject the plugin
-const componentDocPlugin = inject('componentDocPlugin') as ComponentDocPlugin;
 const templateSource = ref<string | null>(null);
 const scriptSource = ref<string | null>(null);
 const styleSource = ref<string | null>(null);
 const compiledSource = ref<string | null>(null);
 
-// Example data for DocsTabs
-const tabsExample = [
-  { title: '📚API' },
-  { title: '🖼️Template' },
-  { title: '🚀Script' },
-  { title: '🎨Styles' },
-  { title: '📦Compiled' },
-];
-
-// Computed property for highlighted template source
-const highlightedTemplateSource = computed(() => {
-  if (!templateSource.value) return '';
-  return Prism.highlight(templateSource.value, Prism.languages.markup, 'html');
-});
-
-// Computed property for highlighted script source
-const highlightedScriptSource = computed(() => {
-  if (!scriptSource.value) return '';
-  return Prism.highlight(scriptSource.value, Prism.languages.javascript, 'javascript');
-});
-
-// Computed property for highlighted style source
-const highlightedStyleSource = computed(() => {
-  if (!styleSource.value) return '';
-  return Prism.highlight(styleSource.value, Prism.languages.css, 'css');
-});
-
-// Computed property for highlighted compiled source
-const highlightedCompiledSource = computed(() => {
-  if (!compiledSource.value) return '';
-  return Prism.highlight(compiledSource.value, Prism.languages.javascript, 'javascript');
-});
-
-// Function to extract template content from raw source
-function extractTemplateContent(source: string): string | null {
-  const templateMatch = source.match(/<template[^>]*>([\s\S]*?)<\/template>/);
-  return templateMatch ? templateMatch[0] : null;
-}
-
-// Function to extract script content from raw source
-function extractScriptContent(source: string): string | null {
-  const scriptMatch = source.match(/<script[^>]*>([\s\S]*?)<\/script>/);
-  return scriptMatch ? scriptMatch[0] : null;
-}
-
-// Function to extract style content from raw source
-function extractStyleContent(source: string): string | null {
-  const styleMatch = source.match(/<style[^>]*>([\s\S]*?)<\/style>/);
-  return styleMatch ? styleMatch[0] : null;
-}
-
-// Function to generate the compiled code
-function generateCompiledCode(source: string): string | null {
-  try {
-    // Extract template content
-    const templateMatch = source.match(/<template[^>]*>([\s\S]*?)<\/template>/);
-    if (!templateMatch || !templateMatch[1]) return null;
-
-    const template = templateMatch[1];
-    const ast = parse(template);
-    const { code } = compile(ast);
-
-    return `// Compiled Template Render Function\n${code}`;
-  } catch (error) {
-    console.error('Failed to compile component:', error);
-    return `// Error compiling component: ${error}`;
-  }
-}
-
-// Load and process the raw component source
-onMounted(async () => {
-  if (props.relativePath && componentDocPlugin?.rawComponentSourceModules) {
-    // Find the matching raw source module
-    const rawSourcePath = Object.keys(componentDocPlugin.rawComponentSourceModules)
-      .find(path => path.includes(props.relativePath));
-
-    if (rawSourcePath) {
-      try {
-        const rawSource = await componentDocPlugin.rawComponentSourceModules[rawSourcePath]();
-        templateSource.value = extractTemplateContent(rawSource);
-        scriptSource.value = extractScriptContent(rawSource);
-        styleSource.value = extractStyleContent(rawSource);
-
-        // Generate compiled code
-        compiledSource.value = generateCompiledCode(rawSource);
-      } catch (error) {
-        console.error('Failed to load raw component source:', error);
-      }
-    }
-  }
-});
-
-// Define props directly without TypeScript
 const props = defineProps({
   component: {
     type: Object,
@@ -300,33 +215,105 @@ const props = defineProps({
   }
 });
 
-// Computed properties
+watchEffect(() => {
+  if (props.relativePath && rawSourcesMap.hasOwnProperty(props.relativePath)) {
+    const rawSource = rawSourcesMap[props.relativePath];
+    templateSource.value = extractTemplateContent(rawSource);
+    scriptSource.value = extractScriptContent(rawSource);
+    styleSource.value = extractStyleContent(rawSource);
+    compiledSource.value = generateCompiledCode(rawSource);
+  } else {
+    templateSource.value = null;
+    scriptSource.value = null;
+    styleSource.value = null;
+    compiledSource.value = null;
+    // Optional: log if a path is given but not found, for debugging
+    // if (props.relativePath) {
+    //   console.warn(`[DocsExampleComponent] Raw source not found for path: '${props.relativePath}'. Available paths:`, Object.keys(rawSourcesMap));
+    // }
+  }
+});
+
+const tabsExample = [
+  { title: '📚API' },
+  { title: '🖼️Template' },
+  { title: '🚀Script' },
+  { title: '🎨Styles' },
+  { title: '📦Compiled' },
+];
+
+const highlightedTemplateSource = computed(() => {
+  if (!templateSource.value) return '';
+  try {
+    return Prism.highlight(templateSource.value, Prism.languages.html || Prism.languages.markup, 'html');
+  } catch (e) { return templateSource.value; } // Fallback
+});
+
+const highlightedScriptSource = computed(() => {
+  if (!scriptSource.value) return '';
+  try {
+    return Prism.highlight(scriptSource.value, Prism.languages.javascript, 'javascript');
+  } catch (e) { return scriptSource.value; }
+});
+
+const highlightedStyleSource = computed(() => {
+  if (!styleSource.value) return '';
+  try {
+    return Prism.highlight(styleSource.value, Prism.languages.css, 'css');
+  } catch (e) { return styleSource.value; }
+});
+
+const highlightedCompiledSource = computed(() => {
+  if (!compiledSource.value) return '';
+  try {
+    return Prism.highlight(compiledSource.value, Prism.languages.javascript, 'javascript');
+  } catch (e) { return compiledSource.value; }
+});
+
+function extractTemplateContent(source: string): string | null {
+  const match = source.match(/<template[^>]*>([\s\S]*?)<\/template>/);
+  return match ? match[0].trim() : null; // Return the whole tag
+}
+
+function extractScriptContent(source: string): string | null {
+  const match = source.match(/<script[^>]*>([\s\S]*?)<\/script>/);
+  return match ? match[0].trim() : null; // Return the whole tag
+}
+
+function extractStyleContent(source: string): string | null {
+  const match = source.match(/<style[^>]*>([\s\S]*?)<\/style>/);
+  return match ? match[0].trim() : null; // Return the whole tag
+}
+
+function generateCompiledCode(source: string): string | null {
+  try {
+    const templateContentMatch = source.match(/<template[^>]*>([\s\S]*?)<\/template>/);
+    if (!templateContentMatch || !templateContentMatch[1]) return '';
+
+    const template = templateContentMatch[1];
+    const ast = parse(template); // Parse only the content of the template
+    const { code } = compile(ast, { source: template, mode: 'module' }); // Or 'function' mode
+    return `// Compiled Template Render Function (client-side approximation)\n${code}`;
+  } catch (error) {
+    console.error('Failed to compile component template:', error);
+    return `// Error compiling component template: ${error instanceof Error ? error.message : String(error)}`;
+  }
+}
+
 const computedPropItems = computed(() => {
-  // Use the propItems prop if it's provided and not empty
-  if (props.propItems && props.propItems.length > 0) {
-    return props.propItems;
-  }
-  // Otherwise, generate the props from the component if it's provided
-  if (props.component) {
-    return generatePropsItems(props.component);
-  }
+  if (props.propItems && props.propItems.length > 0) return props.propItems;
+  if (props.component) return generatePropsItems(props.component);
   return [];
 });
 
-const propHeaders = computed(() => {
-  return getPropsHeaders();
-});
+const propHeaders = computed(() => getPropsHeaders());
+const eventHeaders = computed(() => getEventHeaders());
+const slotHeaders = computed(() => getSlotHeaders());
 
-const eventHeaders = computed(() => {
-  return getEventHeaders();
-});
-
-const slotHeaders = computed(() => {
-  return getSlotHeaders();
-});
 </script>
 
 <style scoped lang="scss">
+/* Styles remain the same */
 .example-component {
   &__heading {
     font-size: 1.2em;
@@ -352,8 +339,8 @@ const slotHeaders = computed(() => {
 .style-source-section code,
 .compiled-source-section code {
   font-family: monospace;
-  white-space: pre-wrap;
-  word-break: break-all;
+  white-space: pre-wrap; /* Allow wrapping */
+  word-break: break-all; /* Break long words if necessary */
 }
 
 .docs-tabs-example {
@@ -382,35 +369,6 @@ const slotHeaders = computed(() => {
       li {
         margin-bottom: 8px;
       }
-    }
-  }
-
-  .code-example {
-    background-color: #f5f5f5;
-    padding: 16px;
-    border-radius: 4px;
-    margin-top: 16px;
-
-    pre {
-      margin: 0;
-
-      code {
-        font-family: monospace;
-      }
-    }
-  }
-
-  .example-button {
-    padding: 8px 16px;
-    background-color: #1976d2;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 16px;
-
-    &:hover {
-      background-color: #1565c0;
     }
   }
 }

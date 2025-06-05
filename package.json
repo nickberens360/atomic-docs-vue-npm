@@ -15,6 +15,8 @@
     "dist",
     "README.md",
     "LICENSE",
+    "src/vite-raw-sources-plugin.ts",
+    "src/shims-virtual.d.ts",
     "src/routes.ts",
     "src/types.ts",
     "src/components"
@@ -39,7 +41,8 @@
     }
   },
   "dependencies": {
-    "prismjs": "^1.30.0"
+    "prismjs": "^1.30.0",
+    "glob": "^10.0.0"
   },
   "devDependencies": {
     "@testing-library/vue": "^8.1.0",
@@ -51,6 +54,7 @@
     "canvas": "^3.1.0",
     "jsdom": "^26.1.0",
     "path": "^0.12.7",
+    "@types/glob": "^8.0.0",
     "typescript": "^5.0.0",
     "vite": "^5.2.0",
     "vite-plugin-css-injected-by-js": "^3.5.0",
