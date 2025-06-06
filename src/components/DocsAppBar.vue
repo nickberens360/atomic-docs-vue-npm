@@ -193,6 +193,7 @@ onUnmounted(() => {
 
 .docs-nav-icon {
   font-size: 24px;
+  color: var(--atomic-docs-text-primary, rgba(0, 0, 0, 0.87));
 }
 
 .docs-title-text {
