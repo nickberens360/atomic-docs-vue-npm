@@ -13,7 +13,10 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(item, index) in items" :key="index">
+        <tr
+          v-for="(item, index) in items"
+          :key="index"
+        >
           <td 
             v-for="header in headers" 
             :key="`${index}-${header.key}`"
@@ -31,12 +34,10 @@
           </td>
         </tr>
       </tbody>
-      <tfoot v-if="!hideDefaultFooter">
+      <tfoot v-if="!hideDefaultFooter && $slots.footer">
         <tr>
           <td :colspan="headers.length">
-            <slot name="footer">
-              <!-- Default footer content -->
-            </slot>
+            <slot name="footer" />
           </td>
         </tr>
       </tfoot>
@@ -77,6 +78,8 @@ const props = withDefaults(defineProps<Props>(), {
 .docs-table {
   width: 100%;
   border-collapse: collapse;
+  background-color: white;
+  margin-bottom: 0;
   
   th, td {
     padding: 12px 16px;
