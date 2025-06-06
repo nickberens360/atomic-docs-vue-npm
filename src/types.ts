@@ -44,6 +44,7 @@ export interface ComponentDocOptions {
     name: string;
     color: string;
   }>;
+  componentFont?: string; // Option for configuring the font in documented components
 }
 
 // Plugin interface

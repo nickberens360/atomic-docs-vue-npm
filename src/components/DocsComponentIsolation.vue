@@ -5,7 +5,17 @@
 </template>
 
 <script setup lang="ts">
-// Simple component that provides style isolation for its content
+import { inject, computed } from 'vue';
+import { ComponentDocPlugin } from '../types';
+
+// Inject the plugin to access the configuration
+const componentDocPlugin = inject<ComponentDocPlugin>('componentDocPlugin');
+
+// Get the configured font or use a default system font stack if not provided
+const componentFont = computed(() => {
+  return componentDocPlugin?.options?.componentFont || 
+    '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"';
+});
 </script>
 
 <style scoped lang="scss">
@@ -16,7 +26,7 @@
 
   /* Remove the atomic-docs class influence */
   color: initial;
-  font-family: initial;
+  font-family: v-bind(componentFont);
   font-size: initial;
   line-height: initial;
 
