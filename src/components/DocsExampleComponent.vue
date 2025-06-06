@@ -93,45 +93,53 @@
 
         <template #tab-1>
           <div class="tab-content">
-            <div
-              v-if="templateSource"
-              class="template-source-section"
-            >
-              <pre><code v-html="highlightedTemplateSource" /></pre>
-            </div>
+            <DocsSourceCode 
+              v-if="templateSource" 
+              :source="templateSource" 
+              language="markup" 
+            />
           </div>
         </template>
 
         <template #tab-2>
           <div class="tab-content">
+            <DocsSourceCode 
+              v-if="scriptSource" 
+              :source="scriptSource" 
+              language="javascript" 
+            />
             <div
-              v-if="scriptSource"
+              v-else
               class="script-source-section"
             >
-              <pre><code v-html="highlightedScriptSource" /></pre>
+              <p>No script code available for this component.</p>
             </div>
           </div>
         </template>
 
         <template #tab-3>
           <div class="tab-content">
+            <DocsSourceCode 
+              v-if="styleSource" 
+              :source="styleSource" 
+              language="css" 
+            />
             <div
-              v-if="styleSource"
+              v-else
               class="style-source-section"
             >
-              <pre><code v-html="highlightedStyleSource" /></pre>
+              <p>No style code available for this component.</p>
             </div>
           </div>
         </template>
 
         <template #tab-4>
           <div class="tab-content">
-            <div
-              v-if="compiledSource"
-              class="compiled-source-section"
-            >
-              <pre><code v-html="highlightedCompiledSource" /></pre>
-            </div>
+            <DocsSourceCode 
+              v-if="compiledSource" 
+              :source="compiledSource" 
+              language="javascript" 
+            />
             <div
               v-else
               class="compiled-source-section"
@@ -161,6 +169,7 @@ import {
 } from '../utils/docGenerator';
 import DocsDataTable from './DocsDataTable.vue';
 import DocsTabs from './DocsTabs.vue';
+import DocsSourceCode from './DocsSourceCode.vue';
 import { ComponentDocPlugin } from '../types';
 // Import Vue compiler
 import { parse, compile } from '@vue/compiler-dom';
@@ -189,29 +198,6 @@ const tabsExample = [
   { title: '📦Compiled' },
 ];
 
-// Computed property for highlighted template source
-const highlightedTemplateSource = computed(() => {
-  if (!templateSource.value) return '';
-  return Prism.highlight(templateSource.value, Prism.languages.markup, 'html');
-});
-
-// Computed property for highlighted script source
-const highlightedScriptSource = computed(() => {
-  if (!scriptSource.value) return '';
-  return Prism.highlight(scriptSource.value, Prism.languages.javascript, 'javascript');
-});
-
-// Computed property for highlighted style source
-const highlightedStyleSource = computed(() => {
-  if (!styleSource.value) return '';
-  return Prism.highlight(styleSource.value, Prism.languages.css, 'css');
-});
-
-// Computed property for highlighted compiled source
-const highlightedCompiledSource = computed(() => {
-  if (!compiledSource.value) return '';
-  return Prism.highlight(compiledSource.value, Prism.languages.javascript, 'javascript');
-});
 
 // Function to extract template content from raw source
 function extractTemplateContent(source: string): string | null {
@@ -336,25 +322,6 @@ const slotHeaders = computed(() => {
   }
 }
 
-.template-source-section pre,
-.script-source-section pre,
-.style-source-section pre,
-.compiled-source-section pre {
-  background-color: var(--atomic-docs-surface-color, #f5f5f5);
-  padding: var(--atomic-docs-spacing-md, 16px);
-  border-radius: var(--atomic-docs-border-radius-sm, 4px);
-  overflow-x: auto;
-  margin: 0;
-}
-
-.template-source-section code,
-.script-source-section code,
-.style-source-section code,
-.compiled-source-section code {
-  font-family: var(--atomic-docs-font-family-mono, monospace);
-  white-space: pre-wrap;
-  word-break: break-all;
-}
 
 .docs-tabs-example {
   margin-bottom: var(--atomic-docs-spacing-xl, 32px);

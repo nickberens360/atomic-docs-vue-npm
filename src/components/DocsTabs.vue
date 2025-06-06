@@ -66,38 +66,38 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .docs-tabs {
-  margin: 24px 0;
+  margin: var(--atomic-docs-spacing-lg, 24px) 0;
 
   &__headers {
     display: flex;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-    margin-bottom: 16px;
+    border-bottom: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.12));
+    margin-bottom: var(--atomic-docs-spacing-md, 16px);
   }
 
   &__tab-button {
-    padding: 12px 16px;
+    padding: var(--atomic-docs-spacing-sm, 12px) var(--atomic-docs-spacing-md, 16px);
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 14px;
+    font-size: var(--atomic-docs-font-size-sm, 14px);
     font-weight: 500;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
     border-bottom: 2px solid transparent;
     transition: all 0.3s ease;
-    
+
     &:hover {
-      color: rgba(0, 0, 0, 0.87);
+      color: var(--atomic-docs-text-primary, rgba(0, 0, 0, 0.87));
     }
-    
+
     &--active {
-      color: rgba(0, 0, 0, 0.87);
-      border-bottom-color: #1976d2; // Primary color, can be adjusted to match your theme
+      color: var(--atomic-docs-text-primary, rgba(0, 0, 0, 0.87));
+      border-bottom-color: var(--atomic-docs-primary-color, #1976d2);
     }
   }
 
   &__tab-content {
     display: none;
-    
+
     &--active {
       display: block;
     }
@@ -109,10 +109,10 @@ onMounted(() => {
     &__headers {
       flex-wrap: wrap;
     }
-    
+
     &__tab-button {
-      padding: 8px 12px;
-      font-size: 12px;
+      padding: var(--atomic-docs-spacing-sm, 8px) var(--atomic-docs-spacing-sm, 12px);
+      font-size: var(--atomic-docs-font-size-xs, 12px);
     }
   }
 }
