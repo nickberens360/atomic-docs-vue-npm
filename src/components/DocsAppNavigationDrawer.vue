@@ -1,6 +1,6 @@
 <template>
-  <aside 
-    class="docs-navigation-drawer" 
+  <aside
+    class="docs-navigation-drawer"
     :class="{
       'docs-navigation-drawer--open': props.isNavDrawerOpen,
       'docs-navigation-drawer--rail': props.isRailOpen,
@@ -22,8 +22,8 @@
 
         <template #section-1>
           <div class="docs-nav-item">
-            <router-link 
-              to="/component-docs/colors" 
+            <router-link
+              to="/component-docs/colors"
               class="docs-nav-link"
               active-class="docs-nav-link--active"
             >
@@ -156,6 +156,5 @@ watch(() => props.isRailOpen, (newValue) => {
 
 .docs-title {
   flex: 1;
-  color: black;
 }
 </style>

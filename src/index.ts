@@ -3,6 +3,8 @@ import ExampleComponent from './components/DocsExampleComponent.vue';
 import DocsComponentIndex from './views/DocsComponentIndex.vue';
 import { ComponentDocPlugin, ComponentDocOptions } from './types';
 import routesConfig from './routes'; // Import routes with a clear name
+// Import base styles
+import './styles';
 
 /**
  * Converts path to example name - preserves original logic exactly

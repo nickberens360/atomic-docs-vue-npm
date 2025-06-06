@@ -1,6 +1,9 @@
 <template>
-  <div class="docs-container" :class="{ 'docs-container--fluid': fluid }">
-    <slot></slot>
+  <div
+    class="docs-container"
+    :class="{ 'docs-container--fluid': fluid }"
+  >
+    <slot />
   </div>
 </template>
 
@@ -18,6 +21,7 @@ defineProps<Props>();
   padding: 12px;
   margin-right: auto;
   margin-left: auto;
+  background: white;
   
   // Default container with max-width
   max-width: 1280px;

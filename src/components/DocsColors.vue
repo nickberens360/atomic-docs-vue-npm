@@ -6,7 +6,7 @@
     <p class="docs-colors-description">
       These are the colors defined in your design system.
     </p>
-    
+
     <div class="docs-colors-grid">
       <div 
         v-for="(colorItem, index) in colors" 
@@ -45,30 +45,30 @@ const colors = computed(() => {
 
 <style scoped lang="scss">
 .docs-colors {
-  padding: 24px;
+  padding: var(--atomic-docs-spacing-lg, 24px);
 }
 
 .docs-colors-title {
-  font-size: 24px;
+  font-size: var(--atomic-docs-font-size-xl, 24px);
   font-weight: 500;
-  margin-bottom: 16px;
+  margin-bottom: var(--atomic-docs-spacing-md, 16px);
 }
 
 .docs-colors-description {
-  margin-bottom: 24px;
-  color: rgba(0, 0, 0, 0.6);
+  margin-bottom: var(--atomic-docs-spacing-lg, 24px);
+  color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
 }
 
 .docs-colors-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
+  gap: var(--atomic-docs-spacing-md, 16px);
 }
 
 .docs-color-card {
-  border-radius: 8px;
+  border-radius: var(--atomic-docs-border-radius-md, 8px);
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--atomic-docs-shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .docs-color-preview {
@@ -77,18 +77,18 @@ const colors = computed(() => {
 }
 
 .docs-color-info {
-  padding: 16px;
-  background-color: white;
+  padding: var(--atomic-docs-spacing-md, 16px);
+  background-color: var(--atomic-docs-background-color, white);
 }
 
 .docs-color-name {
   font-weight: 500;
-  margin-bottom: 4px;
+  margin-bottom: var(--atomic-docs-spacing-xs, 4px);
 }
 
 .docs-color-value {
-  font-family: monospace;
-  font-size: 14px;
-  color: rgba(0, 0, 0, 0.6);
+  font-family: var(--atomic-docs-font-family-mono, monospace);
+  font-size: var(--atomic-docs-font-size-sm, 14px);
+  color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
 }
 </style>

@@ -1,6 +1,9 @@
 <template>
   <Teleport to="body">
-    <div v-if="isDocsEnabled">
+    <div
+      v-if="isDocsEnabled"
+      class="atomic-docs"
+    >
       <DocsAppBar
         :is-dark="isDark" 
         @toggle-theme="toggleTheme"
@@ -106,6 +109,8 @@ import DocsTextField from '../components/DocsTextField.vue';
 import DocsIcon from '../components/DocsIcon.vue';
 import DocsMenu from '../components/DocsMenu.vue';
 import { ComponentDocPlugin } from '../types';
+// Import base styles
+import '../styles';
 
 // Import the ComponentItem interface from the types used in ComponentNavigation
 interface ComponentItem {
@@ -156,7 +161,7 @@ function handleNavClick(arg: ComponentItem): void {
 <style>
 body {
   display: unset !important;
-  font-family: inherit !important;
+  background: white;
 }
 #app {
   display: none !important;
@@ -191,8 +196,8 @@ body {
 }
 
 .docs-divider {
-  background-color: var(--docs-primary-color, #1976d2);
-  margin-top: 16px;
-  margin-bottom: 16px;
+  background-color: var(--atomic-docs-primary-color, #1976d2);
+  margin-top: var(--atomic-docs-spacing-md, 16px);
+  margin-bottom: var(--atomic-docs-spacing-md, 16px);
 }
 </style>

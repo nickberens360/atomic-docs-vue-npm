@@ -1,6 +1,6 @@
 <template>
   <main class="docs-main">
-    <slot></slot>
+    <slot />
   </main>
 </template>
 

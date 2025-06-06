@@ -329,10 +329,10 @@ const slotHeaders = computed(() => {
 <style scoped lang="scss">
 .example-component {
   &__heading {
-    font-size: 1.2em;
+    font-size: var(--atomic-docs-font-size-lg, 1.2em);
     font-weight: bold;
-    margin-top: 48px;
-    margin-bottom: 24px;
+    margin-top: var(--atomic-docs-spacing-xl, 48px);
+    margin-bottom: var(--atomic-docs-spacing-lg, 24px);
   }
 }
 
@@ -340,9 +340,9 @@ const slotHeaders = computed(() => {
 .script-source-section pre,
 .style-source-section pre,
 .compiled-source-section pre {
-  background-color: #f5f5f5;
-  padding: 16px;
-  border-radius: 4px;
+  background-color: var(--atomic-docs-surface-color, #f5f5f5);
+  padding: var(--atomic-docs-spacing-md, 16px);
+  border-radius: var(--atomic-docs-border-radius-sm, 4px);
   overflow-x: auto;
   margin: 0;
 }
@@ -351,63 +351,63 @@ const slotHeaders = computed(() => {
 .script-source-section code,
 .style-source-section code,
 .compiled-source-section code {
-  font-family: monospace;
+  font-family: var(--atomic-docs-font-family-mono, monospace);
   white-space: pre-wrap;
   word-break: break-all;
 }
 
 .docs-tabs-example {
-  margin-bottom: 32px;
+  margin-bottom: var(--atomic-docs-spacing-xl, 32px);
 
   h3 {
-    margin-bottom: 16px;
+    margin-bottom: var(--atomic-docs-spacing-md, 16px);
   }
 
   p {
-    margin-bottom: 16px;
+    margin-bottom: var(--atomic-docs-spacing-md, 16px);
   }
 
   .tab-content {
-    padding: 16px;
-    background-color: #f9f9f9;
-    border-radius: 4px;
+    padding: var(--atomic-docs-spacing-md, 16px);
+    background-color: var(--atomic-docs-surface-color, #f9f9f9);
+    border-radius: var(--atomic-docs-border-radius-sm, 4px);
 
     h4 {
-      margin-bottom: 12px;
+      margin-bottom: var(--atomic-docs-spacing-sm, 12px);
     }
 
     ul {
-      margin-left: 20px;
+      margin-left: var(--atomic-docs-spacing-md, 20px);
 
       li {
-        margin-bottom: 8px;
+        margin-bottom: var(--atomic-docs-spacing-sm, 8px);
       }
     }
   }
 
   .code-example {
-    background-color: #f5f5f5;
-    padding: 16px;
-    border-radius: 4px;
-    margin-top: 16px;
+    background-color: var(--atomic-docs-surface-color, #f5f5f5);
+    padding: var(--atomic-docs-spacing-md, 16px);
+    border-radius: var(--atomic-docs-border-radius-sm, 4px);
+    margin-top: var(--atomic-docs-spacing-md, 16px);
 
     pre {
       margin: 0;
 
       code {
-        font-family: monospace;
+        font-family: var(--atomic-docs-font-family-mono, monospace);
       }
     }
   }
 
   .example-button {
-    padding: 8px 16px;
-    background-color: #1976d2;
+    padding: var(--atomic-docs-spacing-sm, 8px) var(--atomic-docs-spacing-md, 16px);
+    background-color: var(--atomic-docs-primary-color, #1976d2);
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--atomic-docs-border-radius-sm, 4px);
     cursor: pointer;
-    margin-top: 16px;
+    margin-top: var(--atomic-docs-spacing-md, 16px);
 
     &:hover {
       background-color: #1565c0;
