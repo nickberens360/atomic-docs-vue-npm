@@ -1,5 +1,8 @@
 <template>
-  <div v-if="navItems.type === 'directory'" class="docs-recursive-list-group">
+  <div
+    v-if="navItems.type === 'directory'"
+    class="docs-recursive-list-group"
+  >
     <div 
       class="docs-recursive-list-header" 
       @click="toggleExpanded($event)"
@@ -8,7 +11,10 @@
       <span class="docs-title">{{ navItems.label }}</span>
       <span class="docs-expand-icon">{{ expanded ? '▲' : '▼' }}</span>
     </div>
-    <div v-if="expanded" class="docs-recursive-list-children">
+    <div
+      v-if="expanded"
+      class="docs-recursive-list-children"
+    >
       <template
         v-for="(child, i) in sortedChildren"
         :key="i"
@@ -42,7 +48,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import DocsRecursiveNavItem from './DocsRecursiveNavItem.vue';
+// import DocsRecursiveNavItem from './DocsRecursiveNavItem.vue';
 import { ComponentNavItem, DirectoryNavItem, NavItem } from '../types';
 
 // Define props
