@@ -167,20 +167,16 @@ import {
   getEventHeaders,
   getSlotHeaders
 } from '../utils/docGenerator';
+import {
+  extractTemplateContent,
+  extractScriptContent,
+  extractStyleContent,
+  generateCompiledCode
+} from '../utils/sourceCodeExtractors';
 import DocsDataTable from './DocsDataTable.vue';
 import DocsTabs from './DocsTabs.vue';
 import DocsSourceCode from './DocsSourceCode.vue';
 import { ComponentDocPlugin } from '../types';
-// Import Vue compiler
-import { parse, compile } from '@vue/compiler-dom';
-// Import Prism.js
-import Prism from 'prismjs';
-// Import Prism.js CSS theme
-import 'prismjs/themes/prism.css';
-// Import language support
-import 'prismjs/components/prism-markup';
-import 'prismjs/components/prism-javascript';
-import 'prismjs/components/prism-css';
 
 // Inject the plugin
 const componentDocPlugin = inject('componentDocPlugin') as ComponentDocPlugin;
@@ -199,42 +195,6 @@ const tabsExample = [
 ];
 
 
-// Function to extract template content from raw source
-function extractTemplateContent(source: string): string | null {
-  const templateMatch = source.match(/<template[^>]*>([\s\S]*?)<\/template>/);
-  return templateMatch ? templateMatch[0] : null;
-}
-
-// Function to extract script content from raw source
-function extractScriptContent(source: string): string | null {
-  const scriptMatch = source.match(/<script[^>]*>([\s\S]*?)<\/script>/);
-  return scriptMatch ? scriptMatch[0] : null;
-}
-
-// Function to extract style content from raw source
-function extractStyleContent(source: string): string | null {
-  const styleMatch = source.match(/<style[^>]*>([\s\S]*?)<\/style>/);
-  return styleMatch ? styleMatch[0] : null;
-}
-
-// Function to generate the compiled code
-function generateCompiledCode(source: string): string | null {
-  try {
-    // Extract template content
-    const templateMatch = source.match(/<template[^>]*>([\s\S]*?)<\/template>/);
-    if (!templateMatch || !templateMatch[1]) return null;
-
-    const template = templateMatch[1];
-    const ast = parse(template);
-    const { code } = compile(ast);
-
-    return `// Compiled Template Render Function\n${code}`;
-  } catch (error) {
-    console.error('Failed to compile component:', error);
-    return `// Error compiling component: ${error}`;
-  }
-}
-
 // Load and process the raw component source
 onMounted(async () => {
   if (props.relativePath && componentDocPlugin?.rawComponentSourceModules) {
@@ -245,6 +205,8 @@ onMounted(async () => {
     if (rawSourcePath) {
       try {
         const rawSource = await componentDocPlugin.rawComponentSourceModules[rawSourcePath]();
+
+        // Use the imported extractor functions directly
         templateSource.value = extractTemplateContent(rawSource);
         scriptSource.value = extractScriptContent(rawSource);
         styleSource.value = extractStyleContent(rawSource);
