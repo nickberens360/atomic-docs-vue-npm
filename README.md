@@ -62,13 +62,37 @@ You can customize the appearance of the Atomic Docs plugin by overriding the CSS
   --atomic-docs-primary-color: #ff5722;
   --atomic-docs-background-color: #f8f8f8;
   --atomic-docs-text-primary: #333333;
-  
+
   /* Override spacing variables */
   --atomic-docs-spacing-md: 20px;
-  
+
   /* Override font variables */
   --atomic-docs-font-family: 'Your Font', sans-serif;
   --atomic-docs-font-size-md: 18px;
+}
+```
+
+### Theme Support
+
+The plugin supports both light and dark themes:
+
+- Light theme is the default
+- Dark theme can be toggled using the theme switch in the app bar
+- Both themes use the same CSS variables with different values
+
+You can customize each theme separately:
+
+```css
+/* Customize the light theme */
+.atomic-docs.docs-app-theme--light {
+  --atomic-docs-primary-color: #ff5722;
+  --atomic-docs-background-color: #f8f8f8;
+}
+
+/* Customize the dark theme */
+.atomic-docs.docs-app-theme--dark {
+  --atomic-docs-primary-color: #ff9800;
+  --atomic-docs-background-color: #1a1a1a;
 }
 ```
 

@@ -3,6 +3,7 @@
     <div
       v-if="isDocsEnabled"
       class="atomic-docs"
+      :class="themeClass"
     >
       <DocsAppBar
         :is-dark="isDark" 
@@ -136,7 +137,7 @@ const isNavDrawerOpen = ref(true);
 // Function to toggle theme
 function toggleTheme(value: boolean) {
   isDark.value = value;
-  // Apply theme changes to document or CSS variables
+  // The theme class will be automatically applied through the computed property
 }
 
 // Function to toggle drawer
@@ -148,6 +149,11 @@ function toggleDrawer() {
 // Computed property to check if the current route is 'componentDocs'
 const isComponentDocsRoute = computed(() => {
   return (route.name as any) === 'componentDocs';
+});
+
+// Computed property for theme class
+const themeClass = computed(() => {
+  return isDark.value ? 'docs-app-theme--dark' : 'docs-app-theme--light';
 });
 
 function handleNavClick(arg: ComponentItem): void {

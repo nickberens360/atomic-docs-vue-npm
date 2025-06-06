@@ -117,14 +117,7 @@ function toggleTheme(value: boolean | null) {
   // Emit the theme change event
   emit('toggle-theme', isDarkValue);
 
-  // Apply theme class to document body
-  if (isDarkValue) {
-    document.body.classList.add('docs-app-theme--dark')
-    document.body.classList.remove('docs-app-theme--light')
-  } else {
-    document.body.classList.add('docs-app-theme--light')
-    document.body.classList.remove('docs-app-theme--dark')
-  }
+  // No direct DOM manipulation - theme will be handled by class binding in parent
 }
 
 // Add event listeners for menu
@@ -144,14 +137,7 @@ onMounted(() => {
     searchContainer.addEventListener('mouseleave', handleMouseLeave);
   }
 
-  // Initialize theme class based on current theme setting
-  if (props.isDark) {
-    document.body.classList.add('docs-app-theme--dark');
-    document.body.classList.remove('docs-app-theme--light');
-  } else {
-    document.body.classList.add('docs-app-theme--light');
-    document.body.classList.remove('docs-app-theme--dark');
-  }
+  // No direct DOM manipulation for theme initialization
 });
 
 // Remove event listeners when component is unmounted

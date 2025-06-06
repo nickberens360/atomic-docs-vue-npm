@@ -20,14 +20,14 @@
   --atomic-docs-text-primary: rgba(0, 0, 0, 0.87);
   --atomic-docs-text-secondary: rgba(0, 0, 0, 0.6);
   --atomic-docs-border-color: rgba(0, 0, 0, 0.12);
-  
+
   /* Spacing variables */
   --atomic-docs-spacing-xs: 4px;
   --atomic-docs-spacing-sm: 8px;
   --atomic-docs-spacing-md: 16px;
   --atomic-docs-spacing-lg: 24px;
   --atomic-docs-spacing-xl: 32px;
-  
+
   /* Font variables */
   --atomic-docs-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   --atomic-docs-font-family-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
@@ -36,107 +36,130 @@
   --atomic-docs-font-size-md: 16px;
   --atomic-docs-font-size-lg: 20px;
   --atomic-docs-font-size-xl: 24px;
-  
+
   /* Border radius */
   --atomic-docs-border-radius-sm: 4px;
   --atomic-docs-border-radius-md: 8px;
   --atomic-docs-border-radius-lg: 16px;
-  
+
   /* Shadow */
   --atomic-docs-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
   --atomic-docs-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
   --atomic-docs-shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.14);
-  
+
   /* Z-index */
   --atomic-docs-z-index-drawer: 100;
   --atomic-docs-z-index-appbar: 200;
   --atomic-docs-z-index-modal: 300;
-  
+
   /* Base styles that apply to all elements within the atomic-docs namespace */
   color: var(--atomic-docs-text-primary);
   font-family: var(--atomic-docs-font-family);
   font-size: var(--atomic-docs-font-size-md);
   line-height: 1.5;
   box-sizing: border-box;
-  
+
   /* Reset box-sizing for all elements within the atomic-docs namespace */
   *, *::before, *::after {
     box-sizing: inherit;
   }
-  
+
   /* Reset margins and paddings */
   h1, h2, h3, h4, h5, h6, p, ul, ol, dl, figure, blockquote {
     margin: 0;
     padding: 0;
   }
-  
+
   /* Basic heading styles */
   h1 {
     font-size: var(--atomic-docs-font-size-xl);
     font-weight: 500;
     margin-bottom: var(--atomic-docs-spacing-lg);
   }
-  
+
   h2 {
     font-size: var(--atomic-docs-font-size-lg);
     font-weight: 500;
     margin-bottom: var(--atomic-docs-spacing-md);
   }
-  
+
   h3 {
     font-size: var(--atomic-docs-font-size-md);
     font-weight: 500;
     margin-bottom: var(--atomic-docs-spacing-sm);
   }
-  
+
   /* Basic text styles */
   p {
     margin-bottom: var(--atomic-docs-spacing-md);
   }
-  
+
   /* Links */
   a {
     color: var(--atomic-docs-primary-color);
     text-decoration: none;
   }
-  
+
   a:hover {
     text-decoration: underline;
   }
-  
+
   /* Code blocks */
   pre, code {
     font-family: var(--atomic-docs-font-family-mono);
     background-color: var(--atomic-docs-surface-color);
     border-radius: var(--atomic-docs-border-radius-sm);
   }
-  
+
   pre {
     padding: var(--atomic-docs-spacing-md);
     overflow-x: auto;
     margin-bottom: var(--atomic-docs-spacing-md);
   }
-  
+
   code {
     padding: 2px 4px;
   }
-  
+
   /* Tables */
   table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: var(--atomic-docs-spacing-md);
   }
-  
+
   th, td {
     padding: var(--atomic-docs-spacing-sm);
     border-bottom: 1px solid var(--atomic-docs-border-color);
     text-align: left;
   }
-  
+
   th {
     font-weight: 500;
   }
+}
+
+/* Theme classes */
+.atomic-docs.docs-app-theme--light {
+  /* Light theme variables */
+  --atomic-docs-primary-color: #1976d2;
+  --atomic-docs-secondary-color: #424242;
+  --atomic-docs-background-color: #ffffff;
+  --atomic-docs-surface-color: #f5f5f5;
+  --atomic-docs-text-primary: rgba(0, 0, 0, 0.87);
+  --atomic-docs-text-secondary: rgba(0, 0, 0, 0.6);
+  --atomic-docs-border-color: rgba(0, 0, 0, 0.12);
+}
+
+.atomic-docs.docs-app-theme--dark {
+  /* Dark theme variables */
+  --atomic-docs-primary-color: #90caf9;
+  --atomic-docs-secondary-color: #a0a0a0;
+  --atomic-docs-background-color: #121212;
+  --atomic-docs-surface-color: #1e1e1e;
+  --atomic-docs-text-primary: rgba(255, 255, 255, 0.87);
+  --atomic-docs-text-secondary: rgba(255, 255, 255, 0.6);
+  --atomic-docs-border-color: rgba(255, 255, 255, 0.12);
 }
 
 /* Utility classes */
