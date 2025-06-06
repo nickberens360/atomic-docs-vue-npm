@@ -71,10 +71,10 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .docs-accordion {
-  margin: 16px 0;
+  margin: var(--atomic-docs-spacing-md, 16px) 0;
 
   &__section {
-    margin-bottom: 4px;
+    margin-bottom: var(--atomic-docs-spacing-xs, 4px);
     overflow: hidden;
   }
 
@@ -83,29 +83,34 @@ onMounted(() => {
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding: 8px 12px;
+    padding: var(--atomic-docs-spacing-sm, 8px) var(--atomic-docs-spacing-sm, 12px);
     border: none;
     text-align: left;
     cursor: pointer;
-    transition: color 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    color: var(--atomic-docs-text-primary, rgba(0, 0, 0, 0.87));
+    background-color: var(--atomic-docs-surface-color, #f5f5f5);
+    border-radius: var(--atomic-docs-border-radius-sm, 4px);
 
     &:hover {
-      color: var(--docs-primary-color, #1976d2);
+      color: var(--atomic-docs-primary-color, #1976d2);
+      background-color: var(--atomic-docs-hover-color, rgba(0, 0, 0, 0.04));
     }
 
     &--active {
-      color: var(--docs-primary-color, #1976d2);
+      color: var(--atomic-docs-primary-color, #1976d2);
+      background-color: var(--atomic-docs-active-color, rgba(0, 0, 0, 0.08));
     }
   }
 
   &__title {
-    font-size: 13px;
+    font-size: var(--atomic-docs-font-size-xs, 13px);
     font-weight: 500;
     color: inherit;
   }
 
   &__icon {
-    font-size: 10px;
+    font-size: var(--atomic-docs-font-size-xs, 10px);
     color: inherit;
     opacity: 0.7;
   }
@@ -117,7 +122,7 @@ onMounted(() => {
 
     &--active {
       max-height: 1000px; // Arbitrary large value
-      padding: 4px 12px 8px;
+      padding: var(--atomic-docs-spacing-xs, 4px) var(--atomic-docs-spacing-sm, 12px) var(--atomic-docs-spacing-sm, 8px);
     }
   }
 }
@@ -125,15 +130,15 @@ onMounted(() => {
 @media (max-width: 600px) {
   .docs-accordion {
     &__header {
-      padding: 6px 8px;
+      padding: 6px var(--atomic-docs-spacing-sm, 8px);
     }
 
     &__title {
-      font-size: 12px;
+      font-size: var(--atomic-docs-font-size-xs, 12px);
     }
 
     &__content--active {
-      padding: 4px 8px 6px;
+      padding: var(--atomic-docs-spacing-xs, 4px) var(--atomic-docs-spacing-sm, 8px) 6px;
     }
   }
 }

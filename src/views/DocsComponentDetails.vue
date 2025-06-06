@@ -73,36 +73,36 @@ const currentComponent = computed<ComponentType>(() => {
 
 <style lang="scss" scoped>
 ::deep(.example-component code) {
-  background-color: #e3e3e3;
-  color: red;
+  background-color: var(--atomic-docs-surface-color, #e3e3e3);
+  color: var(--atomic-docs-error-color, red);
   font-size: 0.8em;
-  padding: 2px;
-  border-radius: 1px;
+  padding: var(--atomic-docs-spacing-xs, 2px);
+  border-radius: var(--atomic-docs-border-radius-sm, 1px);
 }
 ::deep(.example-component mark) {
   background-color: transparent;
-  color: #9E9E9E;
+  color: var(--atomic-docs-text-secondary, #9E9E9E);
 }
 
 .docs-chip {
   display: inline-flex;
   align-items: center;
-  padding: 0 8px;
+  padding: 0 var(--atomic-docs-spacing-sm, 8px);
   height: 24px;
-  font-size: 12px;
-  border-radius: 16px;
-  background-color: rgba(0, 0, 0, 0.08);
-  color: rgba(0, 0, 0, 0.87);
+  font-size: var(--atomic-docs-font-size-xs, 12px);
+  border-radius: var(--atomic-docs-border-radius-lg, 16px);
+  background-color: var(--atomic-docs-hover-color, rgba(0, 0, 0, 0.08));
+  color: var(--atomic-docs-text-primary, rgba(0, 0, 0, 0.87));
   white-space: nowrap;
 }
 
 .component-header {
   display: flex;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: var(--atomic-docs-spacing-md, 16px);
 }
 
 .component-title {
-  margin-right: 8px;
+  margin-right: var(--atomic-docs-spacing-sm, 8px);
 }
 </style>

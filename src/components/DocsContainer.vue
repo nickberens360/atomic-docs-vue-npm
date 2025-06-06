@@ -18,22 +18,22 @@ defineProps<Props>();
 <style scoped lang="scss">
 .docs-container {
   width: 100%;
-  padding: 12px;
+  padding: var(--atomic-docs-spacing-sm, 12px);
   margin-right: auto;
   margin-left: auto;
-  background: white;
-  
+  background: var(--atomic-docs-background-color, white);
+
   // Default container with max-width
   max-width: 1280px;
-  
+
   // Fluid container takes full width
   &--fluid {
     max-width: 100%;
   }
-  
+
   // Responsive padding
   @media (min-width: 960px) {
-    padding: 24px;
+    padding: var(--atomic-docs-spacing-lg, 24px);
   }
 }
 </style>

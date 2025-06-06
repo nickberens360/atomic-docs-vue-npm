@@ -1,5 +1,5 @@
 <template>
-  <div class="docs-data-table text-body-4 bg-surface">
+  <div class="docs-data-table text-body-4">
     <table class="docs-table">
       <thead>
         <tr>
@@ -70,41 +70,41 @@ const props = withDefaults(defineProps<Props>(), {
 <style lang="scss" scoped>
 .docs-data-table {
   width: 100%;
-  border-radius: 4px;
+  border-radius: var(--atomic-docs-border-radius-sm, 4px);
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--atomic-docs-shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .docs-table {
   width: 100%;
   border-collapse: collapse;
-  background-color: white;
+  background-color: var(--atomic-docs-background-color, white);
   margin-bottom: 0;
-  
+
   th, td {
     padding: 12px 16px;
     text-align: left;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    border-bottom: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.12));
   }
-  
+
   th {
     font-weight: 500;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
     white-space: nowrap;
   }
-  
+
   tr:last-child td {
     border-bottom: none;
   }
-  
+
   .text-start {
     text-align: left;
   }
-  
+
   .text-center {
     text-align: center;
   }
-  
+
   .text-end {
     text-align: right;
   }

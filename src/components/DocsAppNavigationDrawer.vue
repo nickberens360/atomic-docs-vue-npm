@@ -78,8 +78,8 @@ watch(() => props.isRailOpen, (newValue) => {
   left: 0;
   bottom: 0;
   width: 256px;
-  background-color: var(--docs-background-color, #f5f5f5);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: var(--atomic-docs-background-color, #f5f5f5);
+  box-shadow: var(--atomic-docs-shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.1));
   transition: transform 0.3s ease, width 0.3s ease;
   overflow-y: auto;
   z-index: 100;
@@ -121,7 +121,7 @@ watch(() => props.isRailOpen, (newValue) => {
 
 .docs-navigation-card {
   background-color: transparent;
-  border-radius: 4px;
+  border-radius: var(--atomic-docs-border-radius-sm, 4px);
   height: 100%;
 }
 
@@ -133,18 +133,18 @@ watch(() => props.isRailOpen, (newValue) => {
   display: flex;
   align-items: center;
   padding: 8px 16px;
-  color: rgba(0, 0, 0, 0.87);
+  color: var(--atomic-docs-text-primary, rgba(0, 0, 0, 0.87));
   text-decoration: none;
-  border-radius: 4px;
+  border-radius: var(--atomic-docs-border-radius-sm, 4px);
   transition: background-color 0.2s;
   font-size: 14px;
 
   &:hover {
-    background-color: rgba(0, 0, 0, 0.04);
+    background-color: var(--atomic-docs-hover-color, rgba(0, 0, 0, 0.04));
   }
 
   &--active {
-    background-color: rgba(0, 0, 0, 0.08);
+    background-color: var(--atomic-docs-active-color, rgba(0, 0, 0, 0.08));
     font-weight: 500;
   }
 }

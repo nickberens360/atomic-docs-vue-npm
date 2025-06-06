@@ -188,16 +188,17 @@ onUnmounted(() => {
 
 .docs-menu-content {
   position: fixed;
-  z-index: 1000;
-  background-color: white;
-  border-radius: 4px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+  z-index: var(--atomic-docs-z-index-modal, 1000);
+  background-color: var(--atomic-docs-surface-color, white);
+  border-radius: var(--atomic-docs-border-radius-sm, 4px);
+  box-shadow: var(--atomic-docs-shadow-md, 0 5px 15px rgba(0, 0, 0, 0.15));
   min-width: 200px;
   max-width: 80vw;
   max-height: 80vh;
   overflow-y: auto;
   transform-origin: top left;
   animation: menu-open 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--atomic-docs-text-primary, rgba(0, 0, 0, 0.87));
 }
 
 @keyframes menu-open {
@@ -209,11 +210,5 @@ onUnmounted(() => {
     opacity: 1;
     transform: scale(1);
   }
-}
-
-// Dark theme support
-.docs-app-theme--dark .docs-menu-content {
-  background-color: #1e1e1e;
-  color: white;
 }
 </style>

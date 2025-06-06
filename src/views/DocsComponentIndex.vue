@@ -165,15 +165,20 @@ function handleNavClick(arg: ComponentItem): void {
 }
 </script>
 <style>
-body {
+body:has(.atomic-docs) {
   display: unset !important;
-  background: white;
+  background: var(--atomic-docs-background-color, white);
 }
-#app {
+body:has(.atomic-docs) #app {
   display: none !important;
 }
 </style>
 <style scoped lang="scss">
+.atomic-docs {
+  background-color: var(--atomic-docs-background-color, white);
+  border-radius: var(--atomic-docs-border-radius-sm, 4px);
+  padding: var(--atomic-docs-spacing-md, 16px);
+}
 @keyframes bounce-right {
   0% {
     transform: translateX(0);
@@ -206,4 +211,5 @@ body {
   margin-top: var(--atomic-docs-spacing-md, 16px);
   margin-bottom: var(--atomic-docs-spacing-md, 16px);
 }
+
 </style>

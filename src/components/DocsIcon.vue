@@ -27,7 +27,7 @@ defineEmits(['click']);
 // Function to map Material Design Icons to Unicode/emoji equivalents
 function getIconContent(iconName?: string): string {
   if (!iconName) return '';
-  
+
   // Map of common MDI icons to Unicode/emoji equivalents
   const iconMap: Record<string, string> = {
     'mdi-close': '✕',
@@ -55,7 +55,7 @@ function getIconContent(iconName?: string): string {
     'mdi-moon-waning-crescent': '🌙',
     'mdi-white-balance-sunny': '☀️'
   };
-  
+
   return iconMap[iconName] || iconName;
 }
 </script>
@@ -65,48 +65,49 @@ function getIconContent(iconName?: string): string {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: var(--atomic-docs-font-size-lg, 24px);
   width: 1em;
   height: 1em;
   vertical-align: middle;
   user-select: none;
-  
+  color: var(--atomic-docs-text-primary, rgba(0, 0, 0, 0.87));
+
   // Size variants
   &--size-18 {
-    font-size: 18px;
+    font-size: var(--atomic-docs-font-size-md, 18px);
   }
-  
+
   &--size-small {
-    font-size: 16px;
+    font-size: var(--atomic-docs-font-size-sm, 16px);
   }
-  
+
   &--size-large {
-    font-size: 36px;
+    font-size: var(--atomic-docs-font-size-xl, 36px);
   }
-  
+
   &--size-x-large {
     font-size: 48px;
   }
-  
+
   // Color variants
   &--color-primary {
-    color: #1976d2;
+    color: var(--atomic-docs-primary-color, #1976d2);
   }
-  
+
   &--color-error {
-    color: #ff5252;
+    color: var(--atomic-docs-error-color, #ff5252);
   }
-  
+
   &--color-success {
-    color: #4caf50;
+    color: var(--atomic-docs-success-color, #4caf50);
   }
-  
+
   &--color-warning {
-    color: #fb8c00;
+    color: var(--atomic-docs-warning-color, #fb8c00);
   }
-  
+
   &--color-info {
-    color: #2196f3;
+    color: var(--atomic-docs-info-color, #2196f3);
   }
 }
 </style>

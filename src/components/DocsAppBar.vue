@@ -156,13 +156,12 @@ onUnmounted(() => {
   top: 0;
   left: 0;
   right: 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--atomic-docs-shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.1));
   display: flex;
   align-items: center;
   height: 64px;
   width: 100%;
-  background-color: var(--docs-background-color, #f5f5f5);
-  box-shadow: none;
+  background-color: var(--atomic-docs-background-color, #f5f5f5);
   padding: 0 16px;
   z-index: 100;
 }
@@ -185,10 +184,10 @@ onUnmounted(() => {
   cursor: pointer;
   padding: 8px;
   margin-right: 8px;
-  border-radius: 4px;
+  border-radius: var(--atomic-docs-border-radius-sm, 4px);
 
   &:hover {
-    background-color: rgba(0, 0, 0, 0.04);
+    background-color: var(--atomic-docs-hover-color, rgba(0, 0, 0, 0.04));
   }
 }
 
@@ -199,6 +198,7 @@ onUnmounted(() => {
 .docs-title-text {
   font-size: 20px;
   font-weight: 500;
+  color: var(--atomic-docs-text-primary, rgba(0, 0, 0, 0.87));
 }
 
 .docs-app-bar-actions {
@@ -213,9 +213,9 @@ onUnmounted(() => {
 
 .docs-text-field {
   width: 300px;
-  background-color: white;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: var(--atomic-docs-surface-color, white);
+  border-radius: var(--atomic-docs-border-radius-sm, 4px);
+  box-shadow: var(--atomic-docs-shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .docs-input-wrapper {
@@ -226,7 +226,7 @@ onUnmounted(() => {
 
 .docs-prepend-icon, .docs-append-icon {
   font-size: 18px;
-  color: rgba(0, 0, 0, 0.54);
+  color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.54));
 }
 
 .docs-append-icon {
@@ -239,6 +239,8 @@ onUnmounted(() => {
   outline: none;
   padding: 0 8px;
   font-size: 14px;
+  color: var(--atomic-docs-text-primary, rgba(0, 0, 0, 0.87));
+  background-color: transparent;
 }
 
 .docs-menu-container {
@@ -250,9 +252,9 @@ onUnmounted(() => {
   top: 100%;
   left: 0;
   width: 300px;
-  background-color: white;
-  border-radius: 4px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: var(--atomic-docs-surface-color, white);
+  border-radius: var(--atomic-docs-border-radius-sm, 4px);
+  box-shadow: var(--atomic-docs-shadow-md, 0 4px 8px rgba(0, 0, 0, 0.1));
   z-index: 100;
   margin-top: 4px;
 }
@@ -289,7 +291,7 @@ onUnmounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ccc;
+  background-color: var(--atomic-docs-text-secondary, #ccc);
   transition: .4s;
   border-radius: 20px;
 }
@@ -301,13 +303,13 @@ onUnmounted(() => {
   width: 16px;
   left: 2px;
   bottom: 2px;
-  background-color: white;
+  background-color: var(--atomic-docs-surface-color, white);
   transition: .4s;
   border-radius: 50%;
 }
 
 input:checked + .docs-slider {
-  background-color: #2196F3;
+  background-color: var(--atomic-docs-primary-color, #2196F3);
 }
 
 input:checked + .docs-slider:before {
