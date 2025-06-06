@@ -11,7 +11,9 @@
         </p>
       </slot>
     </div>
-    <slot name="default" />
+    <DocsComponentIsolation>
+      <slot name="default" />
+    </DocsComponentIsolation>
 
     <div class="docs-tabs-example">
       <DocsTabs :tabs="tabsExample">
@@ -176,6 +178,7 @@ import {
 import DocsDataTable from './DocsDataTable.vue';
 import DocsTabs from './DocsTabs.vue';
 import DocsSourceCode from './DocsSourceCode.vue';
+import DocsComponentIsolation from './DocsComponentIsolation.vue';
 import { ComponentDocPlugin } from '../types';
 
 // Inject the plugin
