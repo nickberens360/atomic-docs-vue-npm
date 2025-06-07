@@ -1,4 +1,8 @@
+// src/types.ts
+
+// Add this import at the top of the file
 import type { RouterHistory } from 'vue-router';
+import type { Plugin } from 'vue';
 
 export interface ComponentItem {
   type: 'component';
@@ -47,6 +51,7 @@ export interface ComponentDocOptions {
   }>;
   componentFont?: string;
   history?: RouterHistory;
+  plugins?: Plugin[]; // <-- MODIFIED: Changed from 'vuetify' to a generic 'plugins' array
 }
 
 // Plugin interface
@@ -56,6 +61,6 @@ export interface ComponentDocPlugin {
   exampleModules: Record<string, () => Promise<any>>;
   componentsDirName: string;
   examplesDirName: string;
-  rawComponentSourceModules?: Record<string, () => Promise<string>>; // New property
+  rawComponentSourceModules?: Record<string, () => Promise<string>>;
   options?: ComponentDocOptions;
 }
