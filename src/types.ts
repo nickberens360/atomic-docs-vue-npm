@@ -1,4 +1,5 @@
-// Navigation item interfaces
+import type { RouterHistory } from 'vue-router';
+
 export interface ComponentItem {
   type: 'component';
   label: string;
@@ -35,16 +36,17 @@ export type NavItem = ComponentNavItem | DirectoryNavItem;
 // Configuration options interface
 export interface ComponentDocOptions {
   enableDocs?: boolean;
-  componentModules: Record<string, () => Promise<any>>; // Now required
-  exampleModules: Record<string, () => Promise<any>>; // Now required
-  componentsDirName: string; // Now required
+  componentModules: Record<string, () => Promise<any>>;
+  exampleModules: Record<string, () => Promise<any>>;
+  componentsDirName: string;
   examplesDirName: string;
-  rawComponentSourceModules?: Record<string, () => Promise<string>>; // New option for raw source
+  rawComponentSourceModules?: Record<string, () => Promise<string>>;
   colors?: Array<{
     name: string;
     color: string;
   }>;
-  componentFont?: string; // Option for configuring the font in documented components
+  componentFont?: string;
+  history?: RouterHistory;
 }
 
 // Plugin interface

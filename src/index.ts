@@ -1,10 +1,9 @@
 import { App, Plugin, Component, createApp } from 'vue';
-import { createRouter, createWebHistory } from 'vue-router';
 import ExampleComponent from './components/DocsExampleComponent.vue';
 import DocsComponentIndex from './views/DocsComponentIndex.vue';
 import { ComponentDocPlugin, ComponentDocOptions } from './types';
 import routesConfig from './routes'; // Import routes with a clear name
-// Import base styles
+import { createRouter, createWebHistory } from 'vue-router';
 import './styles';
 
 /**
@@ -89,7 +88,7 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
 
       // Create a separate router for the docs app
       const docsRouter = createRouter({
-        history: createWebHistory(),
+        history: options.history || createWebHistory(), // Use the history from options
         routes: routesConfig
       });
 
