@@ -1,97 +1,99 @@
 <template>
   <Teleport to="body">
-    <div
-      v-if="isDocsEnabled"
-      class="atomic-docs"
-      :class="themeClass"
-    >
-      <DocsAppBar
-        :is-dark="isDark" 
-        @toggle-theme="toggleTheme"
-        @toggle-drawer="toggleDrawer"
-      />
-      <DocsAppNavigationDrawer 
-        :is-rail-open="isRailOpen"
-        :is-nav-drawer-open="isNavDrawerOpen"
-      />
-      <DocsMain>
-        <DocsContainer fluid>
-          <DocsRow
-            class="h-100"
-            :justify="isComponentDocsRoute ? 'center' : 'end'"
-          >
-            <DocsCol
-              cols="12"
-              md="5"
-              sm="6"
-              class="px-6"
+    <div>
+      <div
+        v-if="isDocsEnabled"
+        class="atomic-docs"
+        :class="themeClass"
+      >
+        <DocsAppBar
+          :is-dark="isDark"
+          @toggle-theme="toggleTheme"
+          @toggle-drawer="toggleDrawer"
+        />
+        <DocsAppNavigationDrawer
+          :is-rail-open="isRailOpen"
+          :is-nav-drawer-open="isNavDrawerOpen"
+        />
+        <DocsMain>
+          <DocsContainer fluid>
+            <DocsRow
+              class="h-100"
+              :justify="isComponentDocsRoute ? 'center' : 'end'"
             >
-              <div>
-                <div v-if="isComponentDocsRoute">
-                  <p
-                    class="docs-header-text"
-                    style="line-height: .80; letter-spacing: -4px;"
-                  >
-                    <span style="font-size: 10vw;">Atomic</span>
-                    <span
-                      class="docs-title-block"
-                      style="font-size: 17vw; letter-spacing: -9px;"
-                    >Docs</span>
-                  </p>
-                  <div
-                    style="height: 4px;"
-                    class="docs-divider"
-                  />
-                </div>
-                <DocsTextField
-                  v-if="isComponentDocsRoute"
-                  v-model="filterText"
-                  name="filter-list"
-                  placeholder="Search Components"
-                  variant="solo"
-                  prepend-inner-icon="mdi-magnify"
-                  hide-details
-                  autocomplete="one-time-code"
-                >
-                  <template #append-inner>
-                    <DocsIcon
-                      v-if="filterText"
-                      icon="mdi-close"
-                      size="18"
-                      @click="filterText = ''"
+              <DocsCol
+                cols="12"
+                md="5"
+                sm="6"
+                class="px-6"
+              >
+                <div>
+                  <div v-if="isComponentDocsRoute">
+                    <p
+                      class="docs-header-text"
+                      style="line-height: .80; letter-spacing: -4px;"
+                    >
+                      <span style="font-size: 10vw;">Atomic</span>
+                      <span
+                        class="docs-title-block"
+                        style="font-size: 17vw; letter-spacing: -9px;"
+                      >Docs</span>
+                    </p>
+                    <div
+                      style="height: 4px;"
+                      class="docs-divider"
                     />
-                  </template>
-                </DocsTextField>
-                <DocsMenu
-                  :model-value="isComponentDocsRoute"
-                  activator="parent"
-                  :open-on-hover="true"
-                  :open-on-focus="true"
-                >
-                  <DocsComponentNavigation
-                    :filter-text="filterText"
-                    :on-nav-click="handleNavClick"
-                  />
-                </DocsMenu>
-              </div>
-            </DocsCol>
-            <DocsCol cols="12">
-              <div class="content">
-                <Suspense>
-                  <RouterView :key="route.path" />
-                  <template #fallback>
-                    Loading...
-                  </template>
-                </Suspense>
-              </div>
-            </DocsCol>
-          </DocsRow>
-        </DocsContainer>
-      </DocsMain>
+                  </div>
+                  <DocsTextField
+                    v-if="isComponentDocsRoute"
+                    v-model="filterText"
+                    name="filter-list"
+                    placeholder="Search Components"
+                    variant="solo"
+                    prepend-inner-icon="mdi-magnify"
+                    hide-details
+                    autocomplete="one-time-code"
+                  >
+                    <template #append-inner>
+                      <DocsIcon
+                        v-if="filterText"
+                        icon="mdi-close"
+                        size="18"
+                        @click="filterText = ''"
+                      />
+                    </template>
+                  </DocsTextField>
+                  <DocsMenu
+                    :model-value="isComponentDocsRoute"
+                    activator="parent"
+                    :open-on-hover="true"
+                    :open-on-focus="true"
+                  >
+                    <DocsComponentNavigation
+                      :filter-text="filterText"
+                      :on-nav-click="handleNavClick"
+                    />
+                  </DocsMenu>
+                </div>
+              </DocsCol>
+              <DocsCol cols="12">
+                <div class="content">
+                  <Suspense>
+                    <RouterView :key="route.path" />
+                    <template #fallback>
+                      Loading...
+                    </template>
+                  </Suspense>
+                </div>
+              </DocsCol>
+            </DocsRow>
+          </DocsContainer>
+        </DocsMain>
+      </div>
+      <template v-else>
+        <h2>Component documentation is not enabled.</h2>
+      </template>
     </div>
-    <template v-else>
-      <h2>Component documentation is not enabled.</h2>
-    </template>
   </Teleport>
 </template>
 
