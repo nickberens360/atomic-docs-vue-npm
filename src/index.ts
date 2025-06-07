@@ -1,4 +1,5 @@
-import { App, Plugin, Component } from 'vue';
+import { App, Plugin, Component, createApp } from 'vue';
+import { createRouter, createWebHistory } from 'vue-router';
 import ExampleComponent from './components/DocsExampleComponent.vue';
 import DocsComponentIndex from './views/DocsComponentIndex.vue';
 import { ComponentDocPlugin, ComponentDocOptions } from './types';
@@ -26,6 +27,14 @@ export function convertPathToExampleName(path: string): string {
   } catch {
     return 'ExampleComponent';
   }
+}
+
+// Create a separate mount point for the docs app
+function createDocsAppMountPoint(): HTMLElement {
+  const mountPoint = document.createElement('div');
+  mountPoint.id = 'atomic-docs-app';
+  document.body.appendChild(mountPoint);
+  return mountPoint;
 }
 
 const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
@@ -72,9 +81,52 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
         options
       };
 
-      app.provide('componentDocPlugin', plugin);
-      app.component('ExampleComponentUsage', ExampleComponent as Component)
-        .component('DocsComponentIndex', DocsComponentIndex as Component);
+      // Register components in the main app for potential reuse
+      app.component('ExampleComponentUsage', ExampleComponent as Component);
+
+      // Create a separate Vue app for documentation
+      const docsApp = createApp(DocsComponentIndex);
+
+      // Create a separate router for the docs app
+      const docsRouter = createRouter({
+        history: createWebHistory(),
+        routes: routesConfig
+      });
+
+      // Provide the plugin to the docs app
+      docsApp.provide('componentDocPlugin', plugin);
+      docsApp.use(docsRouter);
+      docsApp.component('ExampleComponentUsage', ExampleComponent as Component);
+
+      // Mount the docs app to a separate DOM element
+      const mountPoint = createDocsAppMountPoint();
+      docsApp.mount(mountPoint);
+
+      // Add a method to toggle docs visibility
+      const toggleDocs = (show: boolean) => {
+        const docsElement = document.getElementById('atomic-docs-app');
+        if (docsElement) {
+          docsElement.style.display = show ? 'block' : 'none';
+        }
+      };
+
+      // Listen for route changes in the main app
+      app.config.globalProperties.$router.beforeEach((to, from, next) => {
+        // Check if the route is a component docs route
+        const isDocsRoute = to.path.startsWith('/component-docs');
+        toggleDocs(isDocsRoute);
+
+        // If it's a docs route, navigate in the docs router too
+        if (isDocsRoute) {
+          docsRouter.push(to.fullPath);
+        }
+
+        next();
+      });
+
+      // Initially hide the docs app
+      toggleDocs(false);
+
       console.log('Component documentation plugin installed successfully.');
 
     } catch (error) {

@@ -1,100 +1,98 @@
 <template>
-  <Teleport to="body">
-    <div>
-      <div
-        v-if="isDocsEnabled"
-        class="atomic-docs"
-        :class="themeClass"
-      >
-        <DocsAppBar
-          :is-dark="isDark"
-          @toggle-theme="toggleTheme"
-          @toggle-drawer="toggleDrawer"
-        />
-        <DocsAppNavigationDrawer
-          :is-rail-open="isRailOpen"
-          :is-nav-drawer-open="isNavDrawerOpen"
-        />
-        <DocsMain>
-          <DocsContainer fluid>
-            <DocsRow
-              class="h-100"
-              :justify="isComponentDocsRoute ? 'center' : 'end'"
+  <div>
+    <div
+      v-if="isDocsEnabled"
+      class="atomic-docs"
+      :class="themeClass"
+    >
+      <DocsAppBar
+        :is-dark="isDark"
+        @toggle-theme="toggleTheme"
+        @toggle-drawer="toggleDrawer"
+      />
+      <DocsAppNavigationDrawer
+        :is-rail-open="isRailOpen"
+        :is-nav-drawer-open="isNavDrawerOpen"
+      />
+      <DocsMain>
+        <DocsContainer fluid>
+          <DocsRow
+            class="h-100"
+            :justify="isComponentDocsRoute ? 'center' : 'end'"
+          >
+            <DocsCol
+              cols="12"
+              md="5"
+              sm="6"
+              class="px-6"
             >
-              <DocsCol
-                cols="12"
-                md="5"
-                sm="6"
-                class="px-6"
-              >
-                <div>
-                  <div v-if="isComponentDocsRoute">
-                    <p
-                      class="docs-header-text"
-                      style="line-height: .80; letter-spacing: -4px;"
-                    >
-                      <span style="font-size: 10vw;">Atomic</span>
-                      <span
-                        class="docs-title-block"
-                        style="font-size: 17vw; letter-spacing: -9px;"
-                      >Docs</span>
-                    </p>
-                    <div
-                      style="height: 4px;"
-                      class="docs-divider"
-                    />
-                  </div>
-                  <DocsTextField
-                    v-if="isComponentDocsRoute"
-                    v-model="filterText"
-                    name="filter-list"
-                    placeholder="Search Components"
-                    variant="solo"
-                    prepend-inner-icon="mdi-magnify"
-                    hide-details
-                    autocomplete="one-time-code"
+              <div>
+                <div v-if="isComponentDocsRoute">
+                  <p
+                    class="docs-header-text"
+                    style="line-height: .80; letter-spacing: -4px;"
                   >
-                    <template #append-inner>
-                      <DocsIcon
-                        v-if="filterText"
-                        icon="mdi-close"
-                        size="18"
-                        @click="filterText = ''"
-                      />
-                    </template>
-                  </DocsTextField>
-                  <DocsMenu
-                    :model-value="isComponentDocsRoute"
-                    activator="parent"
-                    :open-on-hover="true"
-                    :open-on-focus="true"
-                  >
-                    <DocsComponentNavigation
-                      :filter-text="filterText"
-                      :on-nav-click="handleNavClick"
+                    <span style="font-size: 10vw;">Atomic</span>
+                    <span
+                      class="docs-title-block"
+                      style="font-size: 17vw; letter-spacing: -9px;"
+                    >Docs</span>
+                  </p>
+                  <div
+                    style="height: 4px;"
+                    class="docs-divider"
+                  />
+                </div>
+                <DocsTextField
+                  v-if="isComponentDocsRoute"
+                  v-model="filterText"
+                  name="filter-list"
+                  placeholder="Search Components"
+                  variant="solo"
+                  prepend-inner-icon="mdi-magnify"
+                  hide-details
+                  autocomplete="one-time-code"
+                >
+                  <template #append-inner>
+                    <DocsIcon
+                      v-if="filterText"
+                      icon="mdi-close"
+                      size="18"
+                      @click="filterText = ''"
                     />
-                  </DocsMenu>
-                </div>
-              </DocsCol>
-              <DocsCol cols="12">
-                <div class="content">
-                  <Suspense>
-                    <RouterView :key="route.path" />
-                    <template #fallback>
-                      Loading...
-                    </template>
-                  </Suspense>
-                </div>
-              </DocsCol>
-            </DocsRow>
-          </DocsContainer>
-        </DocsMain>
-      </div>
-      <template v-else>
-        <h2>Component documentation is not enabled.</h2>
-      </template>
+                  </template>
+                </DocsTextField>
+                <DocsMenu
+                  :model-value="isComponentDocsRoute"
+                  activator="parent"
+                  :open-on-hover="true"
+                  :open-on-focus="true"
+                >
+                  <DocsComponentNavigation
+                    :filter-text="filterText"
+                    :on-nav-click="handleNavClick"
+                  />
+                </DocsMenu>
+              </div>
+            </DocsCol>
+            <DocsCol cols="12">
+              <div class="content">
+                <Suspense>
+                  <RouterView :key="route.path" />
+                  <template #fallback>
+                    Loading...
+                  </template>
+                </Suspense>
+              </div>
+            </DocsCol>
+          </DocsRow>
+        </DocsContainer>
+      </DocsMain>
     </div>
-  </Teleport>
+    <div v-else>
+      <h2>Component documentation is not enabled.</h2>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -166,20 +164,33 @@ function handleNavClick(arg: ComponentItem): void {
   });
 }
 </script>
-<style>
-body:has(.atomic-docs) {
-  display: unset !important;
-  background: var(--atomic-docs-background-color, white);
+<style lang="scss">
+/* Global styles for the docs app */
+html, body {
+  display: unset;
+  margin: 0;
+  padding: 0;
+  height: 100%;
 }
-body:has(.atomic-docs) #app {
-  display: none !important;
+
+#atomic-docs-app {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  background-color: var(--atomic-docs-background-color, white);
 }
 </style>
+
 <style scoped lang="scss">
 .atomic-docs {
   background-color: var(--atomic-docs-background-color, white);
   border-radius: var(--atomic-docs-border-radius-sm, 4px);
   padding: var(--atomic-docs-spacing-md, 16px);
+  height: 100vh;
+  overflow: auto;
 }
 @keyframes bounce-right {
   0% {
