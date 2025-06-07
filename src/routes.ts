@@ -10,7 +10,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/component-docs',
     name: 'componentDocs',
-    component: () => import('./views/DocsComponentIndex.vue'),
+    component: () => import('./views/DocsHomeView.vue'),
     children: [
       {
         path: ':componentName',
