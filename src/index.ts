@@ -45,7 +45,6 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
       const componentsDirName = options?.componentsDirName;
       const exampleModules = options?.exampleModules;
       const examplesDirName = options?.examplesDirName;
-      const rawComponentSourceModules = options?.rawComponentSourceModules;
       const plugins = options?.plugins;
       const enableDocs = options?.enableDocs ?? (process.env.NODE_ENV === 'development');
 
@@ -65,7 +64,6 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
         componentsDirName,
         examplesDirName,
         exampleModules,
-        rawComponentSourceModules,
         options
       };
 

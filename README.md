@@ -34,7 +34,8 @@ app.use(componentDocsPlugin, {
   componentsDirName: 'components',
   exampleModules: import.meta.glob('./examples/**/*.vue'),
   examplesDirName: 'examples',
-  rawComponentSourceModules: import.meta.glob('./components/**/*.vue', { as: 'raw' }),
+  // Note: Source code is now fetched on-demand directly from the Vite dev server
+  // for better HMR support, so rawComponentSourceModules is no longer needed
   colors: [
     { name: 'Primary', color: '#1976d2' },
     { name: 'Secondary', color: '#424242' },

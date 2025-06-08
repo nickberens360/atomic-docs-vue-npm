@@ -44,7 +44,6 @@ export interface ComponentDocOptions {
   exampleModules: Record<string, () => Promise<any>>;
   componentsDirName: string;
   examplesDirName: string;
-  rawComponentSourceModules?: Record<string, () => Promise<string>>;
   colors?: Array<{
     name: string;
     color: string;
@@ -61,6 +60,5 @@ export interface ComponentDocPlugin {
   exampleModules: Record<string, () => Promise<any>>;
   componentsDirName: string;
   examplesDirName: string;
-  rawComponentSourceModules?: Record<string, () => Promise<string>>;
   options?: ComponentDocOptions;
 }

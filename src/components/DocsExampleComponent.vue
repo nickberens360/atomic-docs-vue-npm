@@ -162,7 +162,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref, onMounted } from 'vue';
+import { computed, inject, ref, onMounted, watch } from 'vue';
 import {
   generatePropsItems,
   getPropsHeaders,
@@ -227,49 +227,65 @@ const tabsExample = [
 ];
 
 
-// Load and process the raw component source and component module
-onMounted(async () => {
-  console.log('props.relativePath', props.relativePath);
-  if (props.relativePath && componentDocPlugin) {
-    // Load raw component source for code display
-    if (componentDocPlugin.rawComponentSourceModules) {
-      // Find the matching raw source module
-      const rawSourcePath = Object.keys(componentDocPlugin.rawComponentSourceModules)
-        .find(path => path.includes(props.relativePath));
-
-      if (rawSourcePath) {
-        try {
-          const rawSource = await componentDocPlugin.rawComponentSourceModules[rawSourcePath]();
-
-          // Use the imported extractor functions directly
-          templateSource.value = extractTemplateContent(rawSource);
-          scriptSource.value = extractScriptContent(rawSource);
-          styleSource.value = extractStyleContent(rawSource);
-
-          // Generate compiled code
-          compiledSource.value = generateCompiledCode(rawSource);
-        } catch (error) {
-          console.error('Failed to load raw component source:', error);
-        }
-      }
+// Function to fetch source code directly from the server
+async function fetchSourceCode(path: string) {
+  try {
+    // Fetch the file directly from the Vite dev server
+    const response = await fetch(`/@fs/${path}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch source code: ${response.statusText}`);
     }
 
-    // Load component module for documentation generation
-    if (componentDocPlugin.componentModules) {
-      const componentPath = Object.keys(componentDocPlugin.componentModules)
-        .find(path => path.includes(props.relativePath));
+    const rawSource = await response.text();
+    console.log('Raw Source:', rawSource);
 
-      if (componentPath) {
-        try {
-          const componentModule = await componentDocPlugin.componentModules[componentPath]();
-          loadedComponent.value = componentModule.default; // Assuming the component is the default export
-        } catch (error) {
-          console.error('Failed to load component module:', error);
-        }
+    // Extract content from the raw source
+    templateSource.value = extractTemplateContent(rawSource);
+    scriptSource.value = extractScriptContent(rawSource);
+    styleSource.value = extractStyleContent(rawSource);
+    compiledSource.value = generateCompiledCode(rawSource);
+  } catch (error) {
+    console.error('Failed to fetch source code:', error);
+  }
+}
+
+// Function to find the full path of the component
+function findComponentPath() {
+  if (!props.relativePath || !componentDocPlugin?.componentModules) return null;
+
+  return Object.keys(componentDocPlugin.componentModules)
+    .find(path => path.includes(props.relativePath));
+}
+
+// Load and process the component module
+onMounted(async () => {
+  if (props.relativePath && componentDocPlugin) {
+    const componentPath = findComponentPath();
+
+    if (componentPath) {
+      try {
+        // Load the component module
+        const componentModule = await componentDocPlugin.componentModules[componentPath]();
+        loadedComponent.value = componentModule.default;
+
+        // Fetch the source code
+        await fetchSourceCode(componentPath);
+      } catch (error) {
+        console.error('Failed to load component:', error);
       }
     }
   }
 });
+
+// Watch for changes in the loaded component (which will update via HMR)
+// This will trigger a re-fetch of the source code when the component changes
+watch(loadedComponent, async () => {
+  const componentPath = findComponentPath();
+  if (componentPath) {
+    console.log('Watch Component Path:', componentPath);
+    await fetchSourceCode(componentPath);
+  }
+}, { deep: true });
 
 // Computed properties
 const computedPropItems = computed(() => {
