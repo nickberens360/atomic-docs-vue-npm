@@ -188,6 +188,34 @@ const scriptSource = ref<string | null>(null);
 const styleSource = ref<string | null>(null);
 const compiledSource = ref<string | null>(null);
 
+// Define props directly without TypeScript
+const props = defineProps({
+  component: {
+    type: Object,
+    default: undefined
+  },
+  description: {
+    type: String,
+    default: ''
+  },
+  eventItems: {
+    type: Array,
+    default: () => []
+  },
+  slotItems: {
+    type: Array,
+    default: () => []
+  },
+  propItems: {
+    type: Array,
+    default: () => []
+  },
+  relativePath: {
+    type: String,
+    default: ''
+  }
+});
+
 // Example data for DocsTabs
 const tabsExample = [
   { title: '📚API' },
@@ -220,34 +248,6 @@ onMounted(async () => {
         console.error('Failed to load raw component source:', error);
       }
     }
-  }
-});
-
-// Define props directly without TypeScript
-const props = defineProps({
-  component: {
-    type: Object,
-    default: undefined
-  },
-  description: {
-    type: String,
-    default: ''
-  },
-  eventItems: {
-    type: Array,
-    default: () => []
-  },
-  slotItems: {
-    type: Array,
-    default: () => []
-  },
-  propItems: {
-    type: Array,
-    default: () => []
-  },
-  relativePath: {
-    type: String,
-    default: ''
   }
 });
 
