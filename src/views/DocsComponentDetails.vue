@@ -14,7 +14,10 @@
       </span>
     </div>
     <Suspense>
-      <Component :is="currentComponent" :relativePath="props.relativePath" />
+      <Component 
+        :is="currentComponent"
+        :relative-path="props.relativePath"
+      />
 
       <template #fallback>
         Loading...
@@ -72,17 +75,6 @@ const currentComponent = computed<ComponentType>(() => {
 </script>
 
 <style lang="scss" scoped>
-::deep(.example-component code) {
-  background-color: var(--atomic-docs-surface-color, #e3e3e3);
-  color: var(--atomic-docs-error-color, red);
-  font-size: 0.8em;
-  padding: var(--atomic-docs-spacing-xs, 2px);
-  border-radius: var(--atomic-docs-border-radius-sm, 1px);
-}
-::deep(.example-component mark) {
-  background-color: transparent;
-  color: var(--atomic-docs-text-secondary, #9E9E9E);
-}
 
 .docs-chip {
   display: inline-flex;
@@ -103,6 +95,7 @@ const currentComponent = computed<ComponentType>(() => {
 }
 
 .component-title {
+  margin-bottom: 0;
   margin-right: var(--atomic-docs-spacing-sm, 8px);
 }
 </style>

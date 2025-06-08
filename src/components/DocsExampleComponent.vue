@@ -187,6 +187,7 @@ const templateSource = ref<string | null>(null);
 const scriptSource = ref<string | null>(null);
 const styleSource = ref<string | null>(null);
 const compiledSource = ref<string | null>(null);
+const loadedComponent = ref<any>(null); // New ref to store the loaded component
 
 // Define props directly without TypeScript
 const props = defineProps({
@@ -226,26 +227,45 @@ const tabsExample = [
 ];
 
 
-// Load and process the raw component source
+// Load and process the raw component source and component module
 onMounted(async () => {
-  if (props.relativePath && componentDocPlugin?.rawComponentSourceModules) {
-    // Find the matching raw source module
-    const rawSourcePath = Object.keys(componentDocPlugin.rawComponentSourceModules)
-      .find(path => path.includes(props.relativePath));
+  console.log('props.relativePath', props.relativePath);
+  if (props.relativePath && componentDocPlugin) {
+    // Load raw component source for code display
+    if (componentDocPlugin.rawComponentSourceModules) {
+      // Find the matching raw source module
+      const rawSourcePath = Object.keys(componentDocPlugin.rawComponentSourceModules)
+        .find(path => path.includes(props.relativePath));
 
-    if (rawSourcePath) {
-      try {
-        const rawSource = await componentDocPlugin.rawComponentSourceModules[rawSourcePath]();
+      if (rawSourcePath) {
+        try {
+          const rawSource = await componentDocPlugin.rawComponentSourceModules[rawSourcePath]();
 
-        // Use the imported extractor functions directly
-        templateSource.value = extractTemplateContent(rawSource);
-        scriptSource.value = extractScriptContent(rawSource);
-        styleSource.value = extractStyleContent(rawSource);
+          // Use the imported extractor functions directly
+          templateSource.value = extractTemplateContent(rawSource);
+          scriptSource.value = extractScriptContent(rawSource);
+          styleSource.value = extractStyleContent(rawSource);
 
-        // Generate compiled code
-        compiledSource.value = generateCompiledCode(rawSource);
-      } catch (error) {
-        console.error('Failed to load raw component source:', error);
+          // Generate compiled code
+          compiledSource.value = generateCompiledCode(rawSource);
+        } catch (error) {
+          console.error('Failed to load raw component source:', error);
+        }
+      }
+    }
+
+    // Load component module for documentation generation
+    if (componentDocPlugin.componentModules) {
+      const componentPath = Object.keys(componentDocPlugin.componentModules)
+        .find(path => path.includes(props.relativePath));
+
+      if (componentPath) {
+        try {
+          const componentModule = await componentDocPlugin.componentModules[componentPath]();
+          loadedComponent.value = componentModule.default; // Assuming the component is the default export
+        } catch (error) {
+          console.error('Failed to load component module:', error);
+        }
       }
     }
   }
@@ -260,6 +280,10 @@ const computedPropItems = computed(() => {
   // Otherwise, generate the props from the component if it's provided
   if (props.component) {
     return generatePropsItems(props.component);
+  }
+  // If neither propItems nor component is provided, use the loaded component
+  if (loadedComponent.value) {
+    return generatePropsItems(loadedComponent.value);
   }
   return [];
 });
