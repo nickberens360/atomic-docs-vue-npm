@@ -162,6 +162,10 @@
 </template>
 
 <script setup lang="ts">
+console.log('DocsExampleComponent process.env.NODE_ENV:', process.env.NODE_ENV);
+console.log('DocsExampleComponent import.meta.env.MODE:', import.meta.env.MODE); // Vite's preferred way
+console.log('DocsExampleComponent import.meta.env.DEV:', import.meta.env.DEV); // boolean
+
 import { computed, inject, ref, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
 import {
