@@ -10,21 +10,8 @@ export const extractTemplateContent = (source: string): string | null => {
   // First try standard SFC format
   const templateMatch = source.match(/<template[^>]*>([\s\S]*?)<\/template>/);
   if (templateMatch) {
-    // Process the template to handle escape sequences
-    try {
-      // If the template contains escape sequences like \n, process them
-      if (templateMatch[0].includes('\\n') || templateMatch[0].includes('\\\"')) {
-        // Use JSON.parse to properly handle escape sequences
-        // Wrap in quotes and escape any existing quotes to make it valid JSON
-        const jsonString = `"${templateMatch[0].replace(/"/g, '\\"')}"`;
-        const processed = JSON.parse(jsonString);
-        return processed;
-      }
-      return templateMatch[0];
-    } catch (error) {
-      console.error('Error processing template:', error);
-      return templateMatch[0]; // Return original if processing fails
-    }
+    // Simply return the matched content without trying to process it with JSON.parse
+    return templateMatch[0];
   }
 
   // For Vite-transformed code, look for the render function
@@ -48,21 +35,8 @@ export const extractScriptContent = (source: string): string | null => {
   // First try standard SFC format
   const scriptMatch = source.match(/<script[^>]*>([\s\S]*?)<\/script>/);
   if (scriptMatch) {
-    // Process the script to handle escape sequences
-    try {
-      // If the script contains escape sequences like \n, process them
-      if (scriptMatch[0].includes('\\n') || scriptMatch[0].includes('\\\"')) {
-        // Use JSON.parse to properly handle escape sequences
-        // Wrap in quotes and escape any existing quotes to make it valid JSON
-        const jsonString = `"${scriptMatch[0].replace(/"/g, '\\"')}"`;
-        const processed = JSON.parse(jsonString);
-        return processed;
-      }
-      return scriptMatch[0];
-    } catch (error) {
-      console.error('Error processing script:', error);
-      return scriptMatch[0]; // Return original if processing fails
-    }
+    // Simply return the matched content without trying to process it with JSON.parse
+    return scriptMatch[0];
   }
 
   // For Vite-transformed code, extract the component definition
@@ -83,21 +57,8 @@ export const extractStyleContent = (source: string): string | null => {
   // First try standard SFC format
   const styleMatch = source.match(/<style[^>]*>([\s\S]*?)<\/style>/);
   if (styleMatch) {
-    // Process the style to handle escape sequences
-    try {
-      // If the style contains escape sequences like \n, process them
-      if (styleMatch[0].includes('\\n') || styleMatch[0].includes('\\\"')) {
-        // Use JSON.parse to properly handle escape sequences
-        // Wrap in quotes and escape any existing quotes to make it valid JSON
-        const jsonString = `"${styleMatch[0].replace(/"/g, '\\"')}"`;
-        const processed = JSON.parse(jsonString);
-        return processed;
-      }
-      return styleMatch[0];
-    } catch (error) {
-      console.error('Error processing style:', error);
-      return styleMatch[0]; // Return original if processing fails
-    }
+    // Simply return the matched content without trying to process it with JSON.parse
+    return styleMatch[0];
   }
 
   // For Vite-transformed code, look for style imports
@@ -119,17 +80,7 @@ export const generateCompiledCode = (source: string): string | null => {
     // For Vite-transformed code, the render function is already available
     const renderFunctionMatch = source.match(/function _sfc_render\([^)]*\)[^{]*{[\s\S]*?}/);
     if (renderFunctionMatch) {
-      // Process the render function to handle escape sequences
-      if (renderFunctionMatch[0].includes('\\n') || renderFunctionMatch[0].includes('\\\"')) {
-        try {
-          const jsonString = `"${renderFunctionMatch[0].replace(/"/g, '\\"')}"`;
-          const processed = JSON.parse(jsonString);
-          return `// Compiled Template Render Function\n${processed}`;
-        } catch (parseError) {
-          console.error('Error processing render function:', parseError);
-          return `// Compiled Template Render Function\n${renderFunctionMatch[0]}`;
-        }
-      }
+      // Simply return the matched content without trying to process it with JSON.parse
       return `// Compiled Template Render Function\n${renderFunctionMatch[0]}`;
     }
 
@@ -137,22 +88,24 @@ export const generateCompiledCode = (source: string): string | null => {
     const templateMatch = source.match(/<template[^>]*>([\s\S]*?)<\/template>/);
     if (!templateMatch || !templateMatch[1]) return null;
 
-    // Process the template to handle escape sequences
+    // Use the template content directly without JSON parsing
     let template = templateMatch[1];
-    if (template.includes('\\n') || template.includes('\\\"')) {
-      try {
-        const jsonString = `"${template.replace(/"/g, '\\"')}"`;
-        template = JSON.parse(jsonString);
-      } catch (parseError) {
-        console.error('Error processing template for compilation:', parseError);
-        // Continue with the original template
-      }
+
+    try {
+      // Sanitize the template content to handle special characters
+      // Replace all unquoted attribute values with quoted values
+      // Exclude Vue directives and bindings (starting with :, v-, or @)
+      template = template.replace(/(\s+(?!:|v-|@)[a-zA-Z0-9_-]+)=([^"'][^>\s]*)/g, '$1="$2"');
+
+      const ast = parse(template);
+      const { code } = compile(ast);
+
+      return `// Compiled Template Render Function\n${code}`;
+    } catch (parseError) {
+      console.error('Error parsing template:', parseError);
+      // Return a more informative error message
+      return `// Error compiling component: ${parseError}\n// Template content might contain special characters that need to be properly quoted in attribute values.`;
     }
-
-    const ast = parse(template);
-    const { code } = compile(ast);
-
-    return `// Compiled Template Render Function\n${code}`;
   } catch (error) {
     console.error('Failed to compile component:', error);
     return `// Error compiling component: ${error}`;
