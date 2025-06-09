@@ -14,11 +14,10 @@
       </span>
     </div>
     <Suspense>
-      <Component 
+      <Component
         :is="currentComponent"
-        :relative-path="props.relativePath"
       />
-
+      <!--        :relative-path="props.relativePath"-->
       <template #fallback>
         Loading...
       </template>

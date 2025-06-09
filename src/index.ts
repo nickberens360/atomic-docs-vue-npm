@@ -50,10 +50,8 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
       const enableDocs = options?.enableDocs ?? (process.env.NODE_ENV === 'development');
 
       if (!enableDocs) {
-        console.log('Component documentation plugin is disabled.');
         return;
       }
-      console.log('Component documentation plugin initializing...');
       if (!componentModules) throw new Error('componentModules is required');
       if (!exampleModules) throw new Error('exampleModules is required');
       if (!componentsDirName) throw new Error('componentsDirName is required');
@@ -108,7 +106,6 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
 
       toggleDocs(false);
 
-      console.log('Component documentation plugin installed successfully.');
 
     } catch (error) {
       console.error('Component docs plugin failed to initialize:', error);
