@@ -17,7 +17,7 @@
 
     <div class="docs-tabs-example">
       <DocsTabs :tabs="tabsExample">
-        <template #tab-0>
+        <template #[`tab-0`]>
           <div class="tab-content">
             <h2 class="example-component__heading">
               Props
@@ -93,22 +93,22 @@
           </div>
         </template>
 
-        <template #tab-1>
+        <template #[`tab-1`]>
           <div class="tab-content">
-            <DocsSourceCode 
-              v-if="templateSource" 
-              :source="templateSource" 
-              language="markup" 
+            <DocsSourceCode
+              v-if="templateSource"
+              :source="templateSource"
+              language="markup"
             />
           </div>
         </template>
 
-        <template #tab-2>
+        <template #[`tab-2`]>
           <div class="tab-content">
-            <DocsSourceCode 
-              v-if="scriptSource" 
-              :source="scriptSource" 
-              language="javascript" 
+            <DocsSourceCode
+              v-if="scriptSource"
+              :source="scriptSource"
+              language="javascript"
             />
             <div
               v-else
@@ -119,12 +119,12 @@
           </div>
         </template>
 
-        <template #tab-3>
+        <template #[`tab-3`]>
           <div class="tab-content">
-            <DocsSourceCode 
-              v-if="styleSource" 
-              :source="styleSource" 
-              language="css" 
+            <DocsSourceCode
+              v-if="styleSource"
+              :source="styleSource"
+              language="css"
             />
             <div
               v-else
@@ -135,12 +135,12 @@
           </div>
         </template>
 
-        <template #tab-4>
+        <template #[`tab-4`]>
           <div class="tab-content">
-            <DocsSourceCode 
-              v-if="compiledSource" 
-              :source="compiledSource" 
-              language="javascript" 
+            <DocsSourceCode
+              v-if="compiledSource"
+              :source="compiledSource"
+              language="javascript"
             />
             <div
               v-else
@@ -162,11 +162,7 @@
 </template>
 
 <script setup lang="ts">
-console.log('DocsExampleComponent process.env.NODE_ENV:', process.env.NODE_ENV);
-console.log('DocsExampleComponent import.meta.env.MODE:', import.meta.env.MODE); // Vite's preferred way
-console.log('DocsExampleComponent import.meta.env.DEV:', import.meta.env.DEV); // boolean
-
-import { computed, inject, ref, watchEffect } from 'vue';
+import { computed, inject, ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import {
   generatePropsItems,
@@ -187,14 +183,15 @@ import DocsComponentIsolation from './DocsComponentIsolation.vue';
 import { ComponentDocPlugin } from '../types';
 
 const route = useRoute();
+// Inject the plugin
 const componentDocPlugin = inject('componentDocPlugin') as ComponentDocPlugin;
-
 const templateSource = ref<string | null>(null);
 const scriptSource = ref<string | null>(null);
 const styleSource = ref<string | null>(null);
 const compiledSource = ref<string | null>(null);
-const loadedComponent = ref<any>(null);
+const loadedComponent = ref<any>(null); // New ref to store the loaded component
 
+// Define props directly without TypeScript
 const props = defineProps({
   component: {
     type: Object,
@@ -220,6 +217,7 @@ const props = defineProps({
 
 const relativePath = computed(() => route.query.relativePath as string);
 
+// Example data for DocsTabs
 const tabsExample = [
   { title: '📚API' },
   { title: '🖼️Template' },
@@ -228,157 +226,78 @@ const tabsExample = [
   { title: '📦Compiled' },
 ];
 
-const hmrTrigger = ref(0);
-let currentRawSourcePathKey: string | undefined = undefined;
-let currentComponentPathKey: string | undefined = undefined;
 
-if (import.meta.hot) {
-  console.log('DocsExampleComponent: Attaching HMR listener.');
-
-  import.meta.hot.on('vite:afterUpdate', (payload) => {
-    console.log('DocsExampleComponent HMR: vite:afterUpdate event received. Payload:', JSON.stringify(payload));
-
-    let needsReload = false;
-    if (componentDocPlugin) {
-      for (const update of payload.updates) {
-        console.log(`DocsExampleComponent HMR: Processing update - Path: "${update.path}", Type: "${update.type}"`);
-        console.log(`DocsExampleComponent HMR: Current relativePath.value: "${relativePath.value}"`);
-        console.log(`DocsExampleComponent HMR: Current currentRawSourcePathKey: "${currentRawSourcePathKey}"`);
-        // console.log(`DocsExampleComponent HMR: Current currentComponentPathKey: "${currentComponentPathKey}"`); // Optional: if component module also needs checking
-
-        if (update.type === 'js-update' || update.type === 'vue-reload') {
-          let isMatch = false;
-
-          // Strategy 1: Check if Vite's updated path includes/ends with relativePath.value
-          // This assumes relativePath.value is like "MyComponent.vue" or "feature/MyComponent.vue"
-          // And update.path from Vite is like "/src/components/feature/MyComponent.vue"
-          if (relativePath.value && update.path.endsWith(relativePath.value)) {
-            isMatch = true;
-            console.log(`DocsExampleComponent HMR: Matched because update.path ("${update.path}") ends with relativePath.value ("${relativePath.value}").`);
-          } else if (relativePath.value && update.path.includes(relativePath.value)) {
-             isMatch = true;
-             console.log(`DocsExampleComponent HMR: Matched because update.path ("${update.path}") includes relativePath.value ("${relativePath.value}").`);
-          }
-
-          // Strategy 2: Check against currentRawSourcePathKey (if strategy 1 failed)
-          // This is more complex due to how module keys might be formed (e.g., relative paths, Vite suffixes like ?raw)
-          if (!isMatch && currentRawSourcePathKey) {
-            // Normalize currentRawSourcePathKey: remove query strings (like ?raw), get the base path
-            const normalizedKey = currentRawSourcePathKey.split('?')[0];
-            // Check if Vite's update.path ends with this normalized key
-            // This is useful if currentRawSourcePathKey is like '../components/MyComponent.vue' and update.path is '/src/components/MyComponent.vue'
-            if (update.path.endsWith(normalizedKey)) {
-                isMatch = true;
-                console.log(`DocsExampleComponent HMR: Matched because update.path ("${update.path}") ends with normalized currentRawSourcePathKey ("${normalizedKey}").`);
-            } else {
-                 // Fallback: try to get just the filename from the key
-                 const keyFilename = normalizedKey.substring(normalizedKey.lastIndexOf('/') + 1);
-                 if (update.path.endsWith(keyFilename)) {
-                    isMatch = true;
-                    console.log(`DocsExampleComponent HMR: Matched because update.path ("${update.path}") ends with filename from currentRawSourcePathKey ("${keyFilename}").`);
-                 }
-            }
-          }
-
-          if (isMatch) {
-            needsReload = true;
-            console.log(`DocsExampleComponent HMR: Setting needsReload = true for path: ${update.path}`);
-            break; 
-          }
-        }
-      }
-    } else {
-      console.warn('DocsExampleComponent HMR: componentDocPlugin not available at time of HMR event.');
-    }
-
-    if (needsReload) {
-      console.log(`DocsExampleComponent HMR: Triggering UI refresh for component related to: "${relativePath.value || 'unknown'}" due to update in "${payload.updates.find(u => u.type === 'js-update' || u.type === 'vue-reload')?.path}"`);
-      hmrTrigger.value++;
-    } else {
-      console.log(`DocsExampleComponent HMR: No relevant HMR update found to trigger UI refresh for "${relativePath.value || 'unknown'}".`);
-    }
-  });
-} else {
-  console.log('DocsExampleComponent: HMR (import.meta.hot) not available.');
-}
-
-watchEffect(async () => {
-  // User's log, plus hmrTrigger value and current relativePath for context
-  console.log(`DocsExampleComponent: watchEffect triggered. HMR Trigger: ${hmrTrigger.value}, Path: "${relativePath.value}"`);
-
-  // Make hmrTrigger a dependency of this effect by reading it
-  const triggerValue = hmrTrigger.value; 
-
+// Load and process the raw component source and component module
+onMounted(async () => {
   if (relativePath.value && componentDocPlugin) {
-    currentRawSourcePathKey = undefined; // Reset before finding
-    currentComponentPathKey = undefined; // Reset before finding
-
-    console.log(`DocsExampleComponent watchEffect: Loading data for relativePath: "${relativePath.value}", Trigger: ${triggerValue}`);
-
+    // Load raw component source for code display
     if (componentDocPlugin.rawComponentSourceModules) {
-      currentRawSourcePathKey = Object.keys(componentDocPlugin.rawComponentSourceModules)
-        .find(pathKey => pathKey.includes(relativePath.value)); // This find logic might also need adjustment
+      // Find the matching raw source module
+      const rawSourcePath = Object.keys(componentDocPlugin.rawComponentSourceModules)
+        .find(path => path.includes(relativePath.value));
 
-      if (currentRawSourcePathKey) {
-        console.log(`DocsExampleComponent watchEffect: Found raw source key: "${currentRawSourcePathKey}"`);
+      if (rawSourcePath) {
         try {
-          const rawSourceModuleLoader = componentDocPlugin.rawComponentSourceModules[currentRawSourcePathKey];
-          const rawSource = await rawSourceModuleLoader();
+          const rawSource = await componentDocPlugin.rawComponentSourceModules[rawSourcePath]();
+
+          // Use the imported extractor functions directly
           templateSource.value = extractTemplateContent(rawSource);
           scriptSource.value = extractScriptContent(rawSource);
           styleSource.value = extractStyleContent(rawSource);
+
+          // Generate compiled code
           compiledSource.value = generateCompiledCode(rawSource);
         } catch (error) {
-          console.error(`DocsExampleComponent watchEffect: Failed to load raw component source for "${currentRawSourcePathKey}":`, error);
-          // Set to error messages or null
+          console.error('Failed to load raw component source:', error);
         }
-      } else {
-        console.warn(`DocsExampleComponent watchEffect: No raw source module found for relativePath: "${relativePath.value}"`);
-        templateSource.value = scriptSource.value = styleSource.value = compiledSource.value = null;
       }
     }
 
+    // Load component module for documentation generation
     if (componentDocPlugin.componentModules) {
-      currentComponentPathKey = Object.keys(componentDocPlugin.componentModules)
-        .find(pathKey => pathKey.includes(relativePath.value)); // Similar find logic
+      const componentPath = Object.keys(componentDocPlugin.componentModules)
+        .find(path => path.includes(relativePath.value));
 
-      if (currentComponentPathKey) {
-        console.log(`DocsExampleComponent watchEffect: Found component module key: "${currentComponentPathKey}"`);
+      if (componentPath) {
         try {
-          const componentModuleLoader = componentDocPlugin.componentModules[currentComponentPathKey];
-          const componentModule = await componentModuleLoader();
-          loadedComponent.value = componentModule.default;
+          const componentModule = await componentDocPlugin.componentModules[componentPath]();
+          loadedComponent.value = componentModule.default; // Assuming the component is the default export
         } catch (error) {
-          console.error(`DocsExampleComponent watchEffect: Failed to load component module for "${currentComponentPathKey}":`, error);
-          loadedComponent.value = null;
+          console.error('Failed to load component module:', error);
         }
-      } else {
-        console.warn(`DocsExampleComponent watchEffect: No component module found for relativePath: "${relativePath.value}"`);
-        loadedComponent.value = null;
       }
     }
-  } else {
-    console.log(`DocsExampleComponent watchEffect: Clearing sources because relativePath ("${relativePath.value}") or componentDocPlugin is not set. Trigger: ${triggerValue}`);
-    templateSource.value = null;
-    scriptSource.value = null;
-    styleSource.value = null;
-    compiledSource.value = null;
-    loadedComponent.value = null;
-    currentRawSourcePathKey = undefined;
-    currentComponentPathKey = undefined;
   }
 });
 
+// Computed properties
 const computedPropItems = computed(() => {
-  if (props.propItems && props.propItems.length > 0) return props.propItems;
-  if (props.component) return generatePropsItems(props.component);
-  if (loadedComponent.value) return generatePropsItems(loadedComponent.value);
+  // Use the propItems prop if it's provided and not empty
+  if (props.propItems && props.propItems.length > 0) {
+    return props.propItems;
+  }
+  // Otherwise, generate the props from the component if it's provided
+  if (props.component) {
+    return generatePropsItems(props.component);
+  }
+  // If neither propItems nor component is provided, use the loaded component
+  if (loadedComponent.value) {
+    return generatePropsItems(loadedComponent.value);
+  }
   return [];
 });
 
-const propHeaders = computed(getPropsHeaders);
-const eventHeaders = computed(getEventHeaders);
-const slotHeaders = computed(getSlotHeaders);
+const propHeaders = computed(() => {
+  return getPropsHeaders();
+});
+
+const eventHeaders = computed(() => {
+  return getEventHeaders();
+});
+
+const slotHeaders = computed(() => {
+  return getSlotHeaders();
+});
 </script>
 
 <style scoped lang="scss">
