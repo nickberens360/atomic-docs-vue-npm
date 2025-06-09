@@ -35,7 +35,24 @@ const props = defineProps({
 // Computed property for highlighted source
 const highlightedSource = computed(() => {
   if (!props.source) return '';
-  return Prism.highlight(props.source, Prism.languages[props.language], props.language);
+
+  // Process the source to ensure escape sequences are properly handled
+  let processedSource = props.source;
+
+  // If the source is a string with escape sequences, process it
+  if (typeof processedSource === 'string' && 
+      (processedSource.includes('\\n') || processedSource.includes('\\"'))) {
+    try {
+      // Replace newlines with actual newlines for better display
+      processedSource = processedSource.replace(/\\n/g, '\n');
+      // Replace escaped quotes with actual quotes
+      processedSource = processedSource.replace(/\\"/g, '"');
+    } catch (error) {
+      console.error('Error processing source for highlighting:', error);
+    }
+  }
+
+  return Prism.highlight(processedSource, Prism.languages[props.language], props.language);
 });
 </script>
 

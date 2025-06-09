@@ -1,20 +1,51 @@
 <template>
-  <div class="component-isolation-wrapper">
+  <div
+    ref="wrapperRef"
+    class="component-isolation-wrapper"
+  >
     <slot />
   </div>
 </template>
 
 <script setup lang="ts">
-import { inject, computed } from 'vue';
+import { inject, computed, ref, onMounted, onUnmounted, nextTick } from 'vue';
 import { ComponentDocPlugin } from '../types';
 
-// Inject the plugin to access the configuration
 const componentDocPlugin = inject<ComponentDocPlugin>('componentDocPlugin');
+const wrapperRef = ref<HTMLElement>();
+let observer: MutationObserver | null = null;
 
-// Get the configured font or use a default system font stack if not provided
+const emit = defineEmits<{
+  domChanged: []
+}>();
+
 const componentFont = computed(() => {
-  return componentDocPlugin?.options?.componentFont || 
+  return componentDocPlugin?.options?.componentFont ||
     '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"';
+});
+
+const handleDomChange = () => {
+  emit('domChanged');
+};
+
+onMounted(async () => {
+  await nextTick(); // Wait for slot content to render
+  handleDomChange();
+  if (wrapperRef.value) {
+    observer = new MutationObserver(() => {
+      handleDomChange();
+    });
+    observer.observe(wrapperRef.value, {
+      childList: true,    // Watch for added/removed children
+      subtree: true,      // Watch all descendants
+      attributes: true,   // Watch attribute changes (optional)
+      characterData: true // Watch text content changes (optional)
+    });
+  }
+});
+
+onUnmounted(() => {
+  observer?.disconnect();
 });
 </script>
 

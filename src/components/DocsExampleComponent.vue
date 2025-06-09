@@ -11,7 +11,7 @@
         </p>
       </slot>
     </div>
-    <DocsComponentIsolation>
+    <DocsComponentIsolation @dom-changed="onDomChanged">
       <slot name="default" />
     </DocsComponentIsolation>
 
@@ -230,27 +230,29 @@ const tabsExample = [
 // Load and process the raw component source and component module
 onMounted(async () => {
   if (relativePath.value && componentDocPlugin) {
-    // Load raw component source for code display
-    if (componentDocPlugin.rawComponentSourceModules) {
-      // Find the matching raw source module
-      const rawSourcePath = Object.keys(componentDocPlugin.rawComponentSourceModules)
-        .find(path => path.includes(relativePath.value));
+    // Load raw component source for code display using fetch
+    try {
+      // Construct the path to the raw component file
+      const rawSourcePath = `/src/components/${relativePath.value}?raw`;
 
-      if (rawSourcePath) {
-        try {
-          const rawSource = await componentDocPlugin.rawComponentSourceModules[rawSourcePath]();
-
-          // Use the imported extractor functions directly
-          templateSource.value = extractTemplateContent(rawSource);
-          scriptSource.value = extractScriptContent(rawSource);
-          styleSource.value = extractStyleContent(rawSource);
-
-          // Generate compiled code
-          compiledSource.value = generateCompiledCode(rawSource);
-        } catch (error) {
-          console.error('Failed to load raw component source:', error);
-        }
+      // Use the browser fetch API to get the raw source code
+      const response = await fetch(rawSourcePath);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch component source: ${response.statusText}`);
       }
+
+      const rawSource = await response.text();
+      console.log('rawSource:', rawSource);
+
+      // Use the imported extractor functions directly
+      templateSource.value = extractTemplateContent(rawSource);
+      scriptSource.value = extractScriptContent(rawSource);
+      styleSource.value = extractStyleContent(rawSource);
+
+      // Generate compiled code
+      compiledSource.value = generateCompiledCode(rawSource);
+    } catch (error) {
+      console.error('Failed to load raw component source:', error);
     }
 
     // Load component module for documentation generation
@@ -269,6 +271,35 @@ onMounted(async () => {
     }
   }
 });
+
+const onDomChanged = async () => {
+  console.log('onDomChanged called!');
+  if (relativePath.value && componentDocPlugin) {
+    try {
+      // Construct the path to the raw component file
+      const rawSourcePath = `/src/components/${relativePath.value}?raw`;
+
+      // Use the browser fetch API to get the raw source code
+      const response = await fetch(rawSourcePath);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch component source: ${response.statusText}`);
+      }
+
+      const rawSource = await response.text();
+      console.log('rawSource:', rawSource);
+
+      // Use the imported extractor functions directly
+      templateSource.value = extractTemplateContent(rawSource);
+      scriptSource.value = extractScriptContent(rawSource);
+      styleSource.value = extractStyleContent(rawSource);
+
+      // Generate compiled code
+      compiledSource.value = generateCompiledCode(rawSource);
+    } catch (error) {
+      console.error('Failed to load raw component source:', error);
+    }
+  }
+};
 
 // Computed properties
 const computedPropItems = computed(() => {
