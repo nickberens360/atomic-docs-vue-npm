@@ -227,10 +227,9 @@ const tabsExample = [
 ];
 
 
-// Load and process the raw component source and component module
-onMounted(async () => {
+// Extract the common code into a reusable function
+const fetchAndProcessSourceCode = async () => {
   if (relativePath.value && componentDocPlugin) {
-    // Load raw component source for code display using fetch
     try {
       // Construct the path to the raw component file
       const rawSourcePath = `/src/components/${relativePath.value}?raw`;
@@ -242,7 +241,6 @@ onMounted(async () => {
       }
 
       const rawSource = await response.text();
-      console.log('rawSource:', rawSource);
 
       // Use the imported extractor functions directly
       templateSource.value = extractTemplateContent(rawSource);
@@ -254,19 +252,25 @@ onMounted(async () => {
     } catch (error) {
       console.error('Failed to load raw component source:', error);
     }
+  }
+};
 
-    // Load component module for documentation generation
-    if (componentDocPlugin.componentModules) {
-      const componentPath = Object.keys(componentDocPlugin.componentModules)
-        .find(path => path.includes(relativePath.value));
+// Load and process the raw component source and component module
+onMounted(async () => {
+  // Fetch and process source code
+  await fetchAndProcessSourceCode();
 
-      if (componentPath) {
-        try {
-          const componentModule = await componentDocPlugin.componentModules[componentPath]();
-          loadedComponent.value = componentModule.default; // Assuming the component is the default export
-        } catch (error) {
-          console.error('Failed to load component module:', error);
-        }
+  // Load component module for documentation generation
+  if (relativePath.value && componentDocPlugin && componentDocPlugin.componentModules) {
+    const componentPath = Object.keys(componentDocPlugin.componentModules)
+      .find(path => path.includes(relativePath.value));
+
+    if (componentPath) {
+      try {
+        const componentModule = await componentDocPlugin.componentModules[componentPath]();
+        loadedComponent.value = componentModule.default; // Assuming the component is the default export
+      } catch (error) {
+        console.error('Failed to load component module:', error);
       }
     }
   }
@@ -274,31 +278,8 @@ onMounted(async () => {
 
 const onDomChanged = async () => {
   console.log('onDomChanged called!');
-  if (relativePath.value && componentDocPlugin) {
-    try {
-      // Construct the path to the raw component file
-      const rawSourcePath = `/src/components/${relativePath.value}?raw`;
-
-      // Use the browser fetch API to get the raw source code
-      const response = await fetch(rawSourcePath);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch component source: ${response.statusText}`);
-      }
-
-      const rawSource = await response.text();
-      console.log('rawSource:', rawSource);
-
-      // Use the imported extractor functions directly
-      templateSource.value = extractTemplateContent(rawSource);
-      scriptSource.value = extractScriptContent(rawSource);
-      styleSource.value = extractStyleContent(rawSource);
-
-      // Generate compiled code
-      compiledSource.value = generateCompiledCode(rawSource);
-    } catch (error) {
-      console.error('Failed to load raw component source:', error);
-    }
-  }
+  // Reuse the same function to fetch and process source code
+  await fetchAndProcessSourceCode();
 };
 
 // Computed properties
