@@ -8,7 +8,7 @@ import { parse, compile } from '@vue/compiler-dom';
  */
 export const extractTemplateContent = (source: string): string | null => {
   const templateMatch = source.match(/<template[^>]*>([\s\S]*?)<\/template>/);
-  return templateMatch ? templateMatch[0] : null;
+  return templateMatch ? templateMatch[1] : null;
 };
 
 /**
@@ -18,7 +18,7 @@ export const extractTemplateContent = (source: string): string | null => {
  */
 export const extractScriptContent = (source: string): string | null => {
   const scriptMatch = source.match(/<script[^>]*>([\s\S]*?)<\/script>/);
-  return scriptMatch ? scriptMatch[0] : null;
+  return scriptMatch ? scriptMatch[1] : null;
 };
 
 /**
@@ -28,7 +28,7 @@ export const extractScriptContent = (source: string): string | null => {
  */
 export const extractStyleContent = (source: string): string | null => {
   const styleMatch = source.match(/<style[^>]*>([\s\S]*?)<\/style>/);
-  return styleMatch ? styleMatch[0] : null;
+  return styleMatch ? styleMatch[1] : null;
 };
 
 /**

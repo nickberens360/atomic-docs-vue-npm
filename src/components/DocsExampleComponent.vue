@@ -197,6 +197,8 @@ import DocsTabs from './DocsTabs.vue';
 import DocsSourceCode from './DocsSourceCode.vue';
 import DocsComponentIsolation from './DocsComponentIsolation.vue';
 import { ComponentDocPlugin } from '../types';
+// Import indent.js for proper HTML indentation
+import { indent } from 'indent.js';
 
 const route = useRoute();
 // Inject the plugin
@@ -246,30 +248,38 @@ const tabsExample = [
 ];
 
 
-// Helper function to format HTML with indentation
+// Helper function to format HTML with indentation using indent.js
 const formatHtml = (html: string): string => {
-  let formatted = '';
-  let indent = 0;
+  try {
+    // Use indent.js to format the HTML with proper indentation
+    return indent.html(html, { tabString: '  ' });
+  } catch (error) {
+    console.error('Error formatting HTML with indent.js:', error);
 
-  // Split the HTML string into an array of tags and text
-  const arr = html.replace(/>\s*</g, '>\n<').split('\n');
+    // Fallback to basic formatting if indent.js fails
+    let formatted = '';
+    let indentLevel = 0;
 
-  arr.forEach(line => {
-    // Check if this line is a closing tag
-    if (line.match(/<\//)) {
-      indent--;
-    }
+    // Split the HTML string into an array of tags and text
+    const arr = html.replace(/>\s*</g, '>\n<').split('\n');
 
-    // Add the line with proper indentation
-    formatted += '  '.repeat(indent > 0 ? indent : 0) + line + '\n';
+    arr.forEach(line => {
+      // Check if this line is a closing tag
+      if (line.match(/<\//)) {
+        indentLevel--;
+      }
 
-    // Check if this line is an opening tag and not a self-closing tag
-    if (line.match(/<[^/]/) && !line.match(/\/>/)) {
-      indent++;
-    }
-  });
+      // Add the line with proper indentation
+      formatted += '  '.repeat(indentLevel > 0 ? indentLevel : 0) + line + '\n';
 
-  return formatted;
+      // Check if this line is an opening tag and not a self-closing tag
+      if (line.match(/<[^/]/) && !line.match(/\/>/)) {
+        indentLevel++;
+      }
+    });
+
+    return formatted;
+  }
 };
 
 // Function to update the rendered DOM
