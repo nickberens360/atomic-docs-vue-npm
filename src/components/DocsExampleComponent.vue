@@ -150,6 +150,22 @@
             </div>
           </div>
         </template>
+
+        <template #[`tab-5`]>
+          <div class="tab-content">
+            <DocsSourceCode
+              v-if="renderedDomSource"
+              :source="renderedDomSource"
+              language="markup"
+            />
+            <div
+              v-else
+              class="rendered-dom-section"
+            >
+              <p>No rendered DOM available for this component.</p>
+            </div>
+          </div>
+        </template>
       </DocsTabs>
     </div>
     <div
@@ -162,7 +178,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref, onMounted } from 'vue';
+import { computed, inject, ref, onMounted, watch, nextTick, onBeforeUnmount } from 'vue';
 import { useRoute } from 'vue-router';
 import {
   generatePropsItems,
@@ -189,7 +205,9 @@ const templateSource = ref<string | null>(null);
 const scriptSource = ref<string | null>(null);
 const styleSource = ref<string | null>(null);
 const compiledSource = ref<string | null>(null);
+const renderedDomSource = ref<string | null>(null);
 const loadedComponent = ref<any>(null); // New ref to store the loaded component
+const observer = ref<MutationObserver | null>(null); // Ref for the MutationObserver
 
 // Define props directly without TypeScript
 const props = defineProps({
@@ -224,8 +242,55 @@ const tabsExample = [
   { title: '🚀Script' },
   { title: '🎨Styles' },
   { title: '📦Compiled' },
+  { title: '🔍Rendered DOM' },
 ];
 
+
+// Helper function to format HTML with indentation
+const formatHtml = (html: string): string => {
+  let formatted = '';
+  let indent = 0;
+
+  // Split the HTML string into an array of tags and text
+  const arr = html.replace(/>\s*</g, '>\n<').split('\n');
+
+  arr.forEach(line => {
+    // Check if this line is a closing tag
+    if (line.match(/<\//)) {
+      indent--;
+    }
+
+    // Add the line with proper indentation
+    formatted += '  '.repeat(indent > 0 ? indent : 0) + line + '\n';
+
+    // Check if this line is an opening tag and not a self-closing tag
+    if (line.match(/<[^/]/) && !line.match(/\/>/)) {
+      indent++;
+    }
+  });
+
+  return formatted;
+};
+
+// Function to update the rendered DOM
+const updateRenderedDom = async () => {
+  await nextTick();
+  // Get the component container element
+  const componentContainer = document.querySelector('.component-isolation-wrapper');
+  if (componentContainer) {
+    // Clone the DOM to avoid modifying the actual component
+    const clonedDom = componentContainer.cloneNode(true) as HTMLElement;
+
+    // Clean up the DOM by removing any script tags or other unwanted elements
+    const scripts = clonedDom.querySelectorAll('script');
+    scripts.forEach(script => script.remove());
+
+    // Get the HTML as a string, with proper indentation
+    renderedDomSource.value = formatHtml(clonedDom.innerHTML);
+  } else {
+    renderedDomSource.value = null;
+  }
+};
 
 // Load and process the raw component source and component module
 onMounted(async () => {
@@ -267,6 +332,37 @@ onMounted(async () => {
         }
       }
     }
+  }
+
+  // Add a small delay to ensure the component is fully rendered
+  setTimeout(updateRenderedDom, 100);
+
+  // Set up a MutationObserver to watch for DOM changes
+  const componentContainer = document.querySelector('.component-isolation-wrapper');
+  if (componentContainer) {
+    observer.value = new MutationObserver(() => {
+      // When DOM changes are detected, update the rendered DOM
+      updateRenderedDom();
+    });
+
+    // Start observing the component container for all changes
+    observer.value.observe(componentContainer, {
+      attributes: true,
+      childList: true,
+      subtree: true,
+      characterData: true
+    });
+  }
+});
+
+// Update the rendered DOM whenever the component changes
+watch(() => props.component, updateRenderedDom, { deep: true });
+
+// Clean up the MutationObserver when the component is unmounted
+onBeforeUnmount(() => {
+  if (observer.value) {
+    observer.value.disconnect();
+    observer.value = null;
   }
 });
 
