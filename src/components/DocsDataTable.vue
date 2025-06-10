@@ -87,6 +87,10 @@ const props = withDefaults(defineProps<Props>(), {
     border-bottom: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.12));
   }
 
+  td{
+    font-size: var(--atomic-docs-font-size-sm, 14px) !important;
+  }
+
   th {
     font-weight: 500;
     color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));

@@ -192,7 +192,7 @@ onUnmounted(() => {
 }
 
 .docs-nav-icon {
-  font-size: 24px;
+  font-size: var(--atomic-docs-font-size-md, 18px);
   color: var(--atomic-docs-text-primary, rgba(0, 0, 0, 0.87));
 }
 
@@ -226,7 +226,7 @@ onUnmounted(() => {
 }
 
 .docs-prepend-icon, .docs-append-icon {
-  font-size: 18px;
+  font-size: var(--atomic-docs-font-size-md, 18px);
   color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.54));
 }
 
@@ -270,7 +270,7 @@ onUnmounted(() => {
 
 .docs-theme-icon {
   margin-right: 8px;
-  font-size: 20px;
+  font-size: var(--atomic-docs-font-size-lg, 20px);
 }
 
 /* Custom switch styling */

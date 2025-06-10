@@ -7,7 +7,7 @@
       class="docs-recursive-list-header" 
       @click="toggleExpanded($event)"
     >
-      <span class="docs-icon docs-folder-icon">📁</span>
+      <span class="docs-icon docs-folder-icon">🗂️</span>
       <span class="docs-title">{{ navItems.label }}</span>
       <span class="docs-expand-icon">{{ expanded ? '▲' : '▼' }}</span>
     </div>
@@ -106,6 +106,7 @@ const sortedChildren = computed<NavItem[]>(() => {
   border-radius: var(--atomic-docs-border-radius-sm, 4px);
   transition: background-color 0.2s;
   color: var(--atomic-docs-text-primary, rgba(0, 0, 0, 0.87));
+  font-size: var(--atomic-docs-font-size-sm, 14px);
 
   &:hover {
     background-color: var(--atomic-docs-hover-color, rgba(0, 0, 0, 0.04));
@@ -117,7 +118,7 @@ const sortedChildren = computed<NavItem[]>(() => {
 }
 
 .docs-icon {
-  font-size: var(--atomic-docs-font-size-sm, 16px);
+  font-size: var(--atomic-docs-font-size-md, 16px);
   margin-right: var(--atomic-docs-spacing-sm, 8px);
   color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
 }
@@ -127,7 +128,7 @@ const sortedChildren = computed<NavItem[]>(() => {
 }
 
 .docs-expand-icon {
-  font-size: var(--atomic-docs-font-size-xs, 12px);
+  font-size: var(--atomic-docs-font-size-md, 16px);
   color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
 }
 </style>

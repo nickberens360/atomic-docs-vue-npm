@@ -46,7 +46,7 @@
               class="docs-nav-link"
               active-class="docs-nav-link--active"
             >
-              <span class="docs-icon docs-file-icon">📄</span>
+              <span class="docs-icon docs-file-icon">🎨</span>
               <span class="docs-title">Color System</span>
             </router-link>
           </div>
@@ -196,7 +196,7 @@ watch(() => props.isRailOpen, (newValue) => {
 }
 
 .docs-prepend-icon, .docs-append-icon {
-  font-size: 18px;
+  font-size: var(--atomic-docs-font-size-md, 18px);
   color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.54));
 }
 

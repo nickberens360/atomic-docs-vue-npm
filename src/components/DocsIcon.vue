@@ -65,7 +65,7 @@ function getIconContent(iconName?: string): string {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--atomic-docs-font-size-lg, 24px);
+  font-size: var(--atomic-docs-font-size-md, 18px);
   width: 1em;
   height: 1em;
   vertical-align: middle;
