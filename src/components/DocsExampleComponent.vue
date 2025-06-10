@@ -197,9 +197,6 @@ import DocsTabs from './DocsTabs.vue';
 import DocsSourceCode from './DocsSourceCode.vue';
 import DocsComponentIsolation from './DocsComponentIsolation.vue';
 import { ComponentDocPlugin } from '../types';
-// Import indent.js for proper HTML indentation
-import { indent } from 'indent.js';
-
 const route = useRoute();
 // Inject the plugin
 const componentDocPlugin = inject('componentDocPlugin') as ComponentDocPlugin;
@@ -248,39 +245,6 @@ const tabsExample = [
 ];
 
 
-// Helper function to format HTML with indentation using indent.js
-const formatHtml = (html: string): string => {
-  try {
-    // Use indent.js to format the HTML with proper indentation
-    return indent.html(html, { tabString: '  ' });
-  } catch (error) {
-    console.error('Error formatting HTML with indent.js:', error);
-
-    // Fallback to basic formatting if indent.js fails
-    let formatted = '';
-    let indentLevel = 0;
-
-    // Split the HTML string into an array of tags and text
-    const arr = html.replace(/>\s*</g, '>\n<').split('\n');
-
-    arr.forEach(line => {
-      // Check if this line is a closing tag
-      if (line.match(/<\//)) {
-        indentLevel--;
-      }
-
-      // Add the line with proper indentation
-      formatted += '  '.repeat(indentLevel > 0 ? indentLevel : 0) + line + '\n';
-
-      // Check if this line is an opening tag and not a self-closing tag
-      if (line.match(/<[^/]/) && !line.match(/\/>/)) {
-        indentLevel++;
-      }
-    });
-
-    return formatted;
-  }
-};
 
 // Function to update the rendered DOM
 const updateRenderedDom = async () => {
@@ -295,8 +259,8 @@ const updateRenderedDom = async () => {
     const scripts = clonedDom.querySelectorAll('script');
     scripts.forEach(script => script.remove());
 
-    // Get the HTML as a string, with proper indentation
-    renderedDomSource.value = formatHtml(clonedDom.innerHTML);
+    // Get the raw HTML as a string without formatting
+    renderedDomSource.value = clonedDom.innerHTML;
   } else {
     renderedDomSource.value = null;
   }

@@ -17,16 +17,19 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-// Import Prism.js
 import Prism from 'prismjs';
-// Import Prism.js CSS theme
+
+// 1. Import Prettier and its parsers/plugins
+import prettier from 'prettier/standalone';
+import * as parserHtml from 'prettier/parser-html';
+import * as parserTypeScript from 'prettier/parser-typescript';
+import * as parserPostcss from 'prettier/parser-postcss';
+
+// (Prism CSS and language imports would remain here)
 import 'prismjs/themes/prism.css';
-// Import language support
 import 'prismjs/components/prism-markup';
 import 'prismjs/components/prism-javascript';
 import 'prismjs/components/prism-css';
-// Import indent.js for proper code indentation
-import { indent } from 'indent.js';
 
 const props = defineProps({
   source: {
@@ -40,35 +43,67 @@ const props = defineProps({
   }
 });
 
-// Computed property for highlighted source
+// A map to select the correct Prettier parser and plugin
+const prettierOptionsMap = {
+  markup: { parser: 'html', plugins: [parserHtml] },
+  javascript: {
+    parser: 'typescript',
+    plugins: [parserTypeScript],
+  },
+  css: { parser: 'css', plugins: [parserPostcss] },
+};
+
 const highlightedSource = computed(() => {
-  if (!props.source) return '';
+  if (!props.source || typeof props.source !== 'string') return '';
 
   try {
-    // Format the source code with proper indentation using indent.js
-    let formattedSource = props.source;
+    // First, try to highlight the source directly without Prettier formatting
+    // This ensures we at least get syntax highlighting even if formatting fails
+    const highlightedOriginal = Prism.highlight(
+      props.source,
+      Prism.languages[props.language] || {},
+      props.language
+    );
 
-    // Apply different formatting based on language
-    if (props.language === 'markup') {
-      formattedSource = indent.html(props.source, { tabString: '  ' });
-    } else if (props.language === 'javascript') {
-      formattedSource = indent.js(props.source, { tabString: '  ' });
-    } else if (props.language === 'css') {
-      formattedSource = indent.css(props.source, { tabString: '  ' });
-    }
-
-    // Highlight the formatted source with Prism.js
-    return Prism.highlight(formattedSource, Prism.languages[props.language], props.language);
-  } catch (error) {
-    console.error('Error formatting or highlighting source code:', error);
-
-    // Fall back to highlighting the original source without formatting
+    // Then try to format with Prettier in a separate try block
     try {
-      return Prism.highlight(props.source, Prism.languages[props.language], props.language);
-    } catch (fallbackError) {
-      console.error('Error highlighting original source code:', fallbackError);
-      return props.source; // Return the original source as a last resort
+      // Only attempt Prettier formatting for HTML and CSS
+      // Skip JavaScript/TypeScript to avoid the estree plugin error
+      if (props.language === 'markup' || props.language === 'css') {
+        const options = prettierOptionsMap[props.language];
+        if (options) {
+          const formattedSource = prettier.format(props.source, {
+            ...options,
+            semi: false,
+            singleQuote: true,
+          });
+
+          // If formatting succeeded, highlight the formatted source
+          if (typeof formattedSource === 'string') {
+            return Prism.highlight(
+              formattedSource,
+              Prism.languages[props.language] || {},
+              props.language
+            );
+          }
+        }
+      }
+
+      // If we got here, either:
+      // 1. It's JavaScript code (which we're skipping Prettier for)
+      // 2. Formatting failed but didn't throw an error
+      // 3. The formatted result wasn't a string
+      // In all cases, return the already highlighted original source
+      return highlightedOriginal;
+    } catch (prettierError) {
+      console.error('Error formatting with Prettier:', prettierError);
+      // Return the already highlighted original source
+      return highlightedOriginal;
     }
+  } catch (error) {
+    console.error('Error highlighting source code:', error);
+    // Last resort fallback - return the original source unformatted and unhighlighted
+    return props.source;
   }
 });
 </script>

@@ -39,7 +39,8 @@
     }
   },
   "dependencies": {
-    "prismjs": "^1.30.0"
+    "prismjs": "^1.30.0",
+    "prettier": "^3.2.5"
   },
   "devDependencies": {
     "@testing-library/vue": "^8.1.0",
