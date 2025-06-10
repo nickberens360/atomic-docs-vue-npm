@@ -253,6 +253,8 @@ onUnmounted(() => {
   top: 100%;
   left: 0;
   width: 300px;
+  max-height: 80vh; /* Limit height to 80% of viewport height */
+  overflow-y: auto; /* Enable vertical scrolling */
   background-color: var(--atomic-docs-surface-color, white);
   border-radius: var(--atomic-docs-border-radius-sm, 4px);
   box-shadow: var(--atomic-docs-shadow-md, 0 4px 8px rgba(0, 0, 0, 0.1));

@@ -117,6 +117,7 @@ watch(() => props.isRailOpen, (newValue) => {
 .docs-navigation-content {
   transition: opacity 0.2s ease, visibility 0.2s ease;
   padding: 4px;
+  height: 100%;
 }
 
 .docs-navigation-card {
