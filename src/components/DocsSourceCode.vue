@@ -1,9 +1,15 @@
 <template>
   <div class="docs-source-code">
-    <div v-if="source" class="source-section">
+    <div
+      v-if="source"
+      class="source-section"
+    >
       <pre><code v-html="highlightedSource" /></pre>
     </div>
-    <div v-else class="source-section">
+    <div
+      v-else
+      class="source-section"
+    >
       <p>No source code available.</p>
     </div>
   </div>

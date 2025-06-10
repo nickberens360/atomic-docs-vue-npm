@@ -1,20 +1,64 @@
 <template>
-  <div class="component-isolation-wrapper">
+  <div
+    ref="componentDom"
+    class="component-isolation-wrapper"
+  >
     <slot />
   </div>
 </template>
 
 <script setup lang="ts">
-import { inject, computed } from 'vue';
-import { ComponentDocPlugin } from '../types';
+import { computed, defineEmits, inject, onMounted, onUnmounted, ref } from 'vue';
+import type { ComponentDocPlugin } from '../types';
+
+const emit = defineEmits(['dom-ready']);
 
 // Inject the plugin to access the configuration
 const componentDocPlugin = inject<ComponentDocPlugin>('componentDocPlugin');
 
 // Get the configured font or use a default system font stack if not provided
 const componentFont = computed(() => {
-  return componentDocPlugin?.options?.componentFont || 
+  return componentDocPlugin?.options?.componentFont ||
     '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"';
+});
+
+const componentDom = ref<HTMLElement | null>(null);
+let observer: MutationObserver | null = null;
+
+// Function to emit the current DOM
+const emitCurrentDom = () => {
+  if (componentDom.value) {
+    emit('dom-ready', componentDom.value.innerHTML);
+  }
+};
+
+onMounted(() => {
+  if (componentDom.value) {
+    // Initial emission of the DOM
+    emitCurrentDom();
+
+    // Set up MutationObserver to watch for DOM changes
+    observer = new MutationObserver((mutations) => {
+      // When DOM changes are detected, emit the updated DOM
+      emitCurrentDom();
+    });
+
+    // Configure the observer to watch for changes to the DOM structure and attributes
+    observer.observe(componentDom.value, {
+      childList: true,      // Watch for changes to the direct children
+      subtree: true,        // Watch for changes to all descendants
+      attributes: true,     // Watch for changes to attributes
+      characterData: true   // Watch for changes to text content
+    });
+  }
+});
+
+onUnmounted(() => {
+  // Clean up the observer when the component is unmounted
+  if (observer) {
+    observer.disconnect();
+    observer = null;
+  }
 });
 </script>
 

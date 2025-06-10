@@ -11,7 +11,7 @@
         </p>
       </slot>
     </div>
-    <DocsComponentIsolation>
+    <DocsComponentIsolation @dom-ready="onDomReady">
       <slot name="default" />
     </DocsComponentIsolation>
 
@@ -150,6 +150,22 @@
             </div>
           </div>
         </template>
+
+        <template #[`tab-5`]>
+          <div class="tab-content">
+            <DocsSourceCode
+              v-if="domStringFromChild"
+              :source="formattedDomString"
+              language="markup"
+            />
+            <div
+              v-else
+              class="rendered-dom-section"
+            >
+              <p>No rendered DOM available for this component.</p>
+            </div>
+          </div>
+        </template>
       </DocsTabs>
     </div>
     <div
@@ -190,6 +206,8 @@ const scriptSource = ref<string | null>(null);
 const styleSource = ref<string | null>(null);
 const compiledSource = ref<string | null>(null);
 const loadedComponent = ref<any>(null); // New ref to store the loaded component
+const domStringFromChild = ref('');
+
 
 // Define props directly without TypeScript
 const props = defineProps({
@@ -215,6 +233,10 @@ const props = defineProps({
   },
 });
 
+function onDomReady(domString: string) {
+  domStringFromChild.value = domString;
+}
+
 const relativePath = computed(() => route.query.relativePath as string);
 
 // Example data for DocsTabs
@@ -224,6 +246,7 @@ const tabsExample = [
   { title: '🚀Script' },
   { title: '🎨Styles' },
   { title: '📦Compiled' },
+  { title: '🔍Rendered DOM' },
 ];
 
 
@@ -297,6 +320,45 @@ const eventHeaders = computed(() => {
 
 const slotHeaders = computed(() => {
   return getSlotHeaders();
+});
+
+// Format the DOM string for better readability
+const formattedDomString = computed(() => {
+  if (!domStringFromChild.value) return '';
+
+  // Basic formatting to improve readability
+  // Replace closing tags with newline + closing tag
+  let formatted = domStringFromChild.value
+    .replace(/></g, '>\n<')
+    .replace(/\/>/g, '/>\n');
+
+  const lines = formatted.split('\n');
+
+  // First pass: Calculate the indent level for each line
+  const indentLevels = [];
+  let currentIndent = 0;
+
+  lines.forEach(line => {
+    // For closing tags, decrease indent before this line
+    if (line.match(/<\/[^>]+>/)) {
+      if (currentIndent > 0) currentIndent--;
+    }
+
+    // Store the current indent level for this line
+    indentLevels.push(currentIndent);
+
+    // For opening tags (not self-closing), increase indent after this line
+    if (line.match(/<[^/][^>]*>/) && !line.match(/\/>/)) {
+      currentIndent++;
+    }
+  });
+
+  // Second pass: Apply the calculated indent levels
+  formatted = lines.map((line, index) => {
+    return '  '.repeat(indentLevels[index]) + line;
+  }).join('\n');
+
+  return formatted;
 });
 </script>
 
