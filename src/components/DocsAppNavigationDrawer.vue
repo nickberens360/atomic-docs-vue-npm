@@ -17,7 +17,26 @@
         ]"
       >
         <template #section-0>
-          <DocsComponentNavigation />
+          <div class="docs-text-field">
+            <div class="docs-input-wrapper">
+              <span class="docs-prepend-icon">🔍</span>
+              <input
+                v-model="filterText"
+                name="filter-components"
+                placeholder="Search Components"
+                class="docs-input"
+                autocomplete="one-time-code"
+              >
+              <span 
+                v-if="filterText" 
+                class="docs-append-icon" 
+                @click="filterText = ''"
+              >
+                ✕
+              </span>
+            </div>
+          </div>
+          <DocsComponentNavigation :filter-text="filterText" />
         </template>
 
         <template #section-1>
@@ -41,6 +60,9 @@
 import { ref, watch } from 'vue';
 import DocsComponentNavigation from "./DocsComponentNavigation.vue";
 import DocsAccordion from "./DocsAccordion.vue";
+
+// Define refs
+const filterText = ref('');
 
 // Define props
 const props = defineProps<{
@@ -157,5 +179,38 @@ watch(() => props.isRailOpen, (newValue) => {
 
 .docs-title {
   flex: 1;
+}
+
+.docs-text-field {
+  width: 100%;
+  background-color: var(--atomic-docs-background-color, white);
+  border-radius: var(--atomic-docs-border-radius-sm, 4px);
+  margin: 8px 0;
+  border: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.23));
+}
+
+.docs-input-wrapper {
+  display: flex;
+  align-items: center;
+  padding: 4px 12px;
+}
+
+.docs-prepend-icon, .docs-append-icon {
+  font-size: 18px;
+  color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.54));
+}
+
+.docs-append-icon {
+  cursor: pointer;
+}
+
+.docs-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 0 8px;
+  font-size: 14px;
+  color: var(--atomic-docs-text-primary, rgba(0, 0, 0, 0.87));
+  background-color: transparent;
 }
 </style>
