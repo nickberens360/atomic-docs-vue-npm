@@ -4,6 +4,10 @@
       v-for="(section, index) in sections"
       :key="index"
       class="docs-accordion__section"
+      :class="{
+        'docs-accordion__section--below-active': isSectionBelowActive(index),
+        'docs-accordion__section--active': activeSection === index
+      }"
     >
       <button
         class="docs-accordion__header"
@@ -19,12 +23,11 @@
         class="docs-accordion__content"
         :class="{ 'docs-accordion__content--active': activeSection === index }"
       >
-        <slot :name="`section-${index}`"></slot>
+        <slot :name="`section-${index}`" />
       </div>
     </div>
   </div>
 </template>
-
 <script setup lang="ts">
 import { ref, onMounted, useSlots, computed } from 'vue';
 
@@ -58,6 +61,11 @@ const hasSlotContent = computed(() => {
   return props.sections.map((_, index) => !!slots[`section-${index}`]);
 });
 
+// Check if a section is below the active section
+const isSectionBelowActive = (index: number) => {
+  return activeSection.value !== null && index > activeSection.value;
+};
+
 // Set the first section with content as active if no default is provided
 onMounted(() => {
   if (activeSection.value === null) {
@@ -68,14 +76,37 @@ onMounted(() => {
   }
 });
 </script>
-
 <style scoped lang="scss">
 .docs-accordion {
   margin: var(--atomic-docs-spacing-md, 16px) 0;
+  position: absolute;
+  height: 100%;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
 
   &__section {
     margin-bottom: var(--atomic-docs-spacing-xs, 4px);
     overflow: hidden;
+
+    // Active section should be able to grow
+    &--active {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0; // Important for Firefox
+    }
+
+    // Sections below active will be sticky to the bottom
+    &--below-active {
+      position: sticky;
+      bottom: 0;
+      z-index: 5; // Lower than the active header z-index
+      margin-top: auto; // Push to the bottom when there's space
+    }
   }
 
   &__header {
@@ -100,6 +131,9 @@ onMounted(() => {
     &--active {
       color: var(--atomic-docs-primary-color, #1976d2);
       background-color: var(--atomic-docs-active-color, rgba(0, 0, 0, 0.08));
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
   }
 
@@ -118,10 +152,13 @@ onMounted(() => {
   &__content {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.2s ease;
+    transition: max-height 0.2s ease, flex 0.2s ease;
 
     &--active {
-      max-height: 1000px; // Arbitrary large value
+      flex: 1;
+      overflow-y: auto; // Make content scrollable
+      max-height: none; // Remove the hardcoded height
+      height: 100%; // Fill the available space
       padding: var(--atomic-docs-spacing-xs, 4px) var(--atomic-docs-spacing-sm, 12px) var(--atomic-docs-spacing-sm, 8px);
     }
   }
