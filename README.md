@@ -55,9 +55,9 @@ app.use(componentDocsPlugin, {
   // The directory name for your components
   componentsDirName: 'components',
   // Vite glob import for your component example files
-  exampleModules: import.meta.glob('./examples/**/*.vue'),
+  exampleModules: import.meta.glob('./component-examples/**/*.vue'),
   // The directory name for your examples
-  examplesDirName: 'examples',
+  examplesDirName: 'component-examples',
 
   // --- Optional Options ---
   // Vite glob import to get raw source code for the code viewer
