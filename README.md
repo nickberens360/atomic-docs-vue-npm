@@ -1,116 +1,197 @@
-# Atomic Docs Plugin
+# Atomic Docs Vue Plugin
 
-A Vue 3 plugin for documenting and showcasing your component library.
+A Vue 3 plugin for automatically generating a live, interactive documentation site for your component library.
 
 ## Features
 
-- 📚 Component API documentation
-- 🎨 Color system visualization
-- 🧩 Interactive component examples
-- 🔍 Component search and filtering
-- 📱 Responsive layout
+- **Automatic Prop-Type Documentation**: Generates a props table for your components automatically.
+- **Interactive Component Playground**: Provides an isolated area to render and interact with your components.
+- **Source Code Viewer**: Includes tabs to view the `<template>`, `<script>`, and `<style>` blocks of your components.
+- **Live Color Palette**: Displays a grid of your design system's colors.
+- **Component Search**: Quickly filter and find components.
+- **Light & Dark Mode**: Switch between themes on the fly.
+- **Style Isolation**: Renders your components in a wrapper to prevent style conflicts with the documentation UI itself.
+- **Vite Build-Optimization Plugin**: An optional helper plugin to prevent common Vite build issues.
+- **Zero-Config Routing**: Automatically handles all documentation routes without needing changes to your app's router.
 
 ## Installation
 
 ```bash
-npm install atomic-docs
+npm install vue-component-docs-plugin
 ```
 
 ## Usage
 
-```javascript
-// main.ts
+### 1. Configure the Plugin
+
+In your application's entry file (e.g., `main.ts`), import and use the plugin. It's crucial to `app.use(router)` **before** you use the documentation plugin.
+
+```typescript
+// src/main.ts
 import { createApp } from 'vue';
+import { createRouter, createWebHistory } from 'vue-router';
 import App from './App.vue';
-import { createRouter } from 'vue-router';
-import componentDocsPlugin from 'atomic-docs';
+import yourAppRoutes from './router'; // Your app's routes
+
+import componentDocsPlugin from 'vue-component-docs-plugin';
 
 const app = createApp(App);
-const router = createRouter(/* your router options */);
 
-// Configure the plugin
+// 1. Create and use your application's router first
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes: yourAppRoutes,
+});
+app.use(router);
+
+// 2. Configure and use the documentation plugin
 app.use(componentDocsPlugin, {
+  // Recommended: only enable docs in development
+  enableDocs: import.meta.env.DEV,
+
+  // --- Required Options ---
+  // Vite glob import for your source components
   componentModules: import.meta.glob('./components/**/*.vue'),
+  // The directory name for your components
   componentsDirName: 'components',
+  // Vite glob import for your component example files
   exampleModules: import.meta.glob('./examples/**/*.vue'),
+  // The directory name for your examples
   examplesDirName: 'examples',
+
+  // --- Optional Options ---
+  // Vite glob import to get raw source code for the code viewer
   rawComponentSourceModules: import.meta.glob('./components/**/*.vue', { as: 'raw' }),
+  // Provide your design system colors for the color palette viewer
   colors: [
     { name: 'Primary', color: '#1976d2' },
     { name: 'Secondary', color: '#424242' },
-    // Add your color system here
   ],
-  enableDocs: true // Set to false in production if needed
+  // Automatically register all of your app's global components in the docs
+  autoRegisterComponents: true,
+  // See all options in the table below
 });
 
-app.use(router);
 app.mount('#app');
 ```
 
+### 2. (Optional) Add the Vite Plugin
+
+To prevent issues where Vue can be bundled twice, it's recommended to add our helper plugin to your Vite configuration.
+
+```typescript
+// vite.config.ts
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import { atomicDocsVitePlugin } from 'vue-component-docs-plugin';
+
+export default defineConfig({
+  plugins: [
+    vue(),
+    atomicDocsVitePlugin(), // Add the plugin here
+  ],
+});
+```
+
+#### A Note on Imports in vite.config.ts
+
+Your `vite.config.ts` file is run by Node.js. Depending on your project's module type, you might encounter an error with the direct named import shown above. If you do, use the following syntax for better compatibility:
+
+```typescript
+// vite.config.ts
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+// Use default import and destructure from the resulting object
+import pkg from 'vue-component-docs-plugin';
+const { atomicDocsVitePlugin } = pkg;
+
+export default defineConfig({
+  plugins: [
+    vue(),
+    atomicDocsVitePlugin(),
+  ],
+});
+```
+
+This method works reliably with both CommonJS and ESM module formats.
+
+### 3. Create Component Examples
+
+For each component you want to document, create a corresponding `.vue` file in your examples directory.
+
+For a component at `src/components/MyButton.vue`, create its example at `src/examples/MyButton.vue`.
+
+Inside the example file, use the globally available `<ExampleComponentUsage>` component to display your component and its documentation.
+
+```vue
+<!-- src/examples/MyButton.vue -->
+<template>
+  <ExampleComponentUsage
+    :component="MyButton"
+    description="This is a standard button used for primary actions."
+  >
+    <!-- The default slot is the interactive playground -->
+    <template #default>
+      <MyButton @click="onClick">Click Me!</MyButton>
+    </template>
+
+    <!-- You can optionally override the generated docs tables -->
+    <template #props>
+      <p>This will replace the props table.</p>
+    </template>
+  </ExampleComponentUsage>
+</template>
+
+<script setup lang="ts">
+// Import the component you are documenting
+import MyButton from '../components/MyButton.vue';
+
+function onClick() {
+  alert('Button clicked!');
+}
+</script>
+```
+
+## Configuration Options
+
+| Option | Type | Required | Default | Description |
+|--------|------|----------|---------|-------------|
+| `enableDocs` | `boolean` | No | `process.env.NODE_ENV === 'development'` | Toggles the entire plugin on or off. |
+| `componentModules` | `Record<string, () => Promise<any>>` | Yes | `undefined` | A Vite glob import of your source components. |
+| `componentsDirName` | `string` | Yes | `''` | The name of your components directory (e.g., 'components'). |
+| `exampleModules` | `Record<string, () => Promise<any>>` | Yes | `undefined` | A Vite glob import of your documentation example files. |
+| `examplesDirName` | `string` | Yes | `''` | The name of your examples directory (e.g., 'examples'). |
+| `rawComponentSourceModules` | `Record<string, () => Promise<string>>` | No | `undefined` | A Vite glob import for raw source code ({ as: 'raw' }). Required for the source code viewer. |
+| `colors` | `Array<{ name: string, color: string }>` | No | `[]` | An array of color objects for the color palette. |
+| `history` | `RouterHistory` | No | `createWebHistory()` | An optional vue-router history instance if you need to share history state. |
+| `plugins` | `Plugin[]` | No | `[]` | An array of other Vue plugins (like Vuetify, Pinia) to install into the documentation app instance. |
+| `globalComponents` | `Record<string, Component>` | No | `{}` | A map of components to register globally within the documentation app. |
+| `autoRegisterComponents` | `boolean` | No | `false` | If true, the plugin will attempt to register all of your main app's global components automatically. |
+| `componentFont` | `string` | No | `system-ui` | A CSS font-family string to apply to the component isolation wrapper. |
+
+## Routing
+
+The plugin handles its own routing automatically. When you navigate to `/component-docs`, the plugin will show its UI and hide your main app's content to prevent overlap. When you navigate away, your app will reappear. You do not need to add any routes to your main application's router.
+
 ## CSS Styling and Customization
 
-The Atomic Docs plugin now uses a robust CSS isolation approach to prevent style conflicts with your application. All styles are contained within the `.atomic-docs` namespace and use CSS custom properties (variables) for theming.
+The plugin uses a robust CSS isolation approach to prevent style conflicts. All documentation styles are contained within the `.atomic-docs` namespace and use CSS custom properties (variables) for theming.
 
-### Customizing Styles
-
-You can customize the appearance of the Atomic Docs plugin by overriding the CSS variables in your application's CSS:
+You can easily customize the appearance by overriding these variables in your own CSS.
 
 ```css
-/* In your application's CSS */
+/* In your application's main CSS file */
 .atomic-docs {
   /* Override color variables */
   --atomic-docs-primary-color: #ff5722;
   --atomic-docs-background-color: #f8f8f8;
-  --atomic-docs-text-primary: #333333;
-
-  /* Override spacing variables */
-  --atomic-docs-spacing-md: 20px;
 
   /* Override font variables */
-  --atomic-docs-font-family: 'Your Font', sans-serif;
-  --atomic-docs-font-size-md: 18px;
+  --atomic-docs-font-family: 'Your Custom Font', sans-serif;
 }
 ```
 
-### Theme Support
-
-The plugin supports both light and dark themes:
-
-- Light theme is the default
-- Dark theme can be toggled using the theme switch in the app bar
-- Both themes use the same CSS variables with different values
-
-You can customize each theme separately:
-
-```css
-/* Customize the light theme */
-.atomic-docs.docs-app-theme--light {
-  --atomic-docs-primary-color: #ff5722;
-  --atomic-docs-background-color: #f8f8f8;
-}
-
-/* Customize the dark theme */
-.atomic-docs.docs-app-theme--dark {
-  --atomic-docs-primary-color: #ff9800;
-  --atomic-docs-background-color: #1a1a1a;
-}
-```
-
-### Available CSS Variables
-
-The plugin provides a comprehensive set of CSS variables for customization, including:
-
-- Colors (primary, secondary, background, etc.)
-- Spacing (xs, sm, md, lg, xl)
-- Typography (font families, sizes)
-- Borders and shadows
-- Z-index values
-
-For a complete list of available CSS variables and detailed documentation on the CSS isolation approach, see the [CSS Styling Guide](./src/styles/README.md).
-
-## Troubleshooting Style Conflicts
-
-If you're experiencing style conflicts between your application and the Atomic Docs plugin, check out the troubleshooting section in the [CSS Styling Guide](./src/styles/README.md#troubleshooting-style-conflicts).
+For a complete list of variables and a more detailed guide, see the [CSS Styling Guide](http://docs.google.com/src/styles/README.md).
 
 ## License
 

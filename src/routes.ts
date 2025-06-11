@@ -8,6 +8,13 @@ interface ComponentDocRouteParams {
 
 const routes: RouteRecordRaw[] = [
   {
+    // This new route handles the root path '/' to prevent initialization warnings.
+    // It renders nothing and has no effect on your application.
+    path: '/',
+    name: 'docsRoot',
+    component: { render: () => null },
+  },
+  {
     path: '/component-docs',
     name: 'componentDocs',
     component: () => import('./views/DocsHomeView.vue'),

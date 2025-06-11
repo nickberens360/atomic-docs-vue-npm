@@ -79,22 +79,18 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
         });
       }
 
-      // Register global components if provided
       if (options.globalComponents) {
         Object.entries(options.globalComponents).forEach(([name, component]) => {
           docsApp.component(name, component);
         });
       }
 
-      // Auto-register all components from the main app if enabled
       if (options.autoRegisterComponents) {
-        // Get all globally registered components from the main app
         const mainAppComponents = app._context.components;
         if (mainAppComponents) {
           Object.entries(mainAppComponents).forEach(([name, component]) => {
-            // Skip router components and components already registered in the docs app
             if (
-              !['RouterLink', 'RouterView', 'ExampleComponentUsage'].includes(name) && 
+              !['RouterLink', 'RouterView', 'ExampleComponentUsage'].includes(name) &&
               (!docsApp._context.components || !docsApp._context.components[name])
             ) {
               docsApp.component(name, component);
@@ -110,17 +106,40 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
       const mountPoint = createDocsAppMountPoint();
       docsApp.mount(mountPoint);
 
+      // --- Start of Changes ---
+
+      let mainAppContainer: HTMLElement | null = null;
+      let originalDisplay = ''; // Variable to store the original display style
+
       const toggleDocs = (show: boolean) => {
         const docsElement = document.getElementById('atomic-docs-app');
+
+        if (!mainAppContainer) {
+          mainAppContainer = app._container as HTMLElement;
+        }
+
         if (docsElement) {
           docsElement.style.display = show ? 'block' : 'none';
         }
+
+        if (mainAppContainer) {
+          if (show) {
+            // When showing docs, save the original display style and then hide the main app
+            originalDisplay = mainAppContainer.style.display;
+            mainAppContainer.style.display = 'none';
+          } else {
+            // When hiding docs, restore the original display style
+            mainAppContainer.style.display = originalDisplay;
+          }
+        }
       };
+
+      // --- End of Changes ---
 
       app.config.globalProperties.$router.beforeEach((to, from, next) => {
         const isDocsRoute = to.path.startsWith('/component-docs');
         toggleDocs(isDocsRoute);
-        if (isDocsRoute) {
+        if (isDocsRoute && docsRouter.currentRoute.value.fullPath !== to.fullPath) {
           docsRouter.push(to.fullPath);
         }
         next();
@@ -131,7 +150,6 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
 
     } catch (error) {
       console.error('Component docs plugin failed to initialize:', error);
-      // Don't throw - allow app to continue
     }
   }
 };
