@@ -111,6 +111,14 @@
 
         <template #[`tab-1`]>
           <div class="tab-content">
+            <button
+              v-if="templateSource"
+              class="copy-button"
+              :title="copyStatus === 'template' ? 'Copied!' : 'Copy code'"
+              @click="copyToClipboard(templateSource, 'template')"
+            >
+              <DocsIcon :icon="copyStatus === 'template' ? 'mdi-check' : 'mdi-content-copy'" />
+            </button>
             <DocsSourceCode
               v-if="templateSource"
               :source="templateSource"
@@ -121,6 +129,14 @@
 
         <template #[`tab-2`]>
           <div class="tab-content">
+            <button
+              v-if="scriptSource"
+              class="copy-button"
+              :title="copyStatus === 'script' ? 'Copied!' : 'Copy code'"
+              @click="copyToClipboard(scriptSource, 'script')"
+            >
+              <DocsIcon :icon="copyStatus === 'script' ? 'mdi-check' : 'mdi-content-copy'" />
+            </button>
             <DocsSourceCode
               v-if="scriptSource"
               :source="scriptSource"
@@ -183,6 +199,7 @@ import DocsTabs from './DocsTabs.vue';
 import DocsSourceCode from './DocsSourceCode.vue';
 import DocsComponentIsolation from './DocsComponentIsolation.vue';
 import {ComponentDocPlugin} from '../types';
+import DocsIcon from "./DocsIcon.vue";
 
 const route = useRoute();
 // Inject the plugin
@@ -222,11 +239,30 @@ const relativePath = computed(() => route.query.relativePath as string);
 
 // Example data for DocsTabs
 const tabsExample = [
-  {title: '📚API'},
-  {title: '🖼️Template'},
-  {title: '🚀Script'},
-  {title: '🎨Styles'},
+  { title: 'API' },
+  { title: 'Template' },
+  { title: 'Script' },
+  { title: 'Styles' },
 ];
+
+// --- START: Added for copy functionality ---
+const copyStatus = ref('');
+const copyToClipboard = async (source: string | null, type: string) => {
+  if (!source) {
+    console.error('No source to copy.');
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(source);
+    copyStatus.value = type;
+    setTimeout(() => {
+      copyStatus.value = '';
+    }, 2000); // Reset after 2 seconds
+  } catch (err) {
+    console.error('Failed to copy text: ', err);
+  }
+};
+// --- END: Added for copy functionality ---
 
 
 // Load and process the raw component source and component module
@@ -327,6 +363,7 @@ const slotHeaders = computed(() => {
   }
 
   .tab-content {
+    position: relative; // Needed for positioning the copy button
     padding: var(--atomic-docs-spacing-md, 16px);
     background-color: var(--atomic-docs-surface-color, #f9f9f9);
     border-radius: var(--atomic-docs-border-radius-sm, 4px);
@@ -371,6 +408,30 @@ const slotHeaders = computed(() => {
     &:hover {
       background-color: #1565c0;
     }
+  }
+}
+
+.copy-button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background-color: var(--atomic-docs-background-color, white);
+  border: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.12));
+  border-radius: var(--atomic-docs-border-radius-sm, 4px);
+  padding: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: var(--atomic-docs-surface-color, #f5f5f5);
+  }
+
+  .docs-icon {
+    font-size: 18px;
   }
 }
 </style>

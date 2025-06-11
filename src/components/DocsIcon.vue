@@ -1,6 +1,6 @@
 <template>
-  <span 
-    class="docs-icon" 
+  <span
+    class="docs-icon"
     :class="[
       size && `docs-icon--size-${size}`,
       color && `docs-icon--color-${color}`
@@ -30,6 +30,7 @@ function getIconContent(iconName?: string): string {
 
   // Map of common MDI icons to Unicode/emoji equivalents
   const iconMap: Record<string, string> = {
+    'mdi-content-copy': '📑', // Use '📋', '⎘', or your preferred emoji here
     'mdi-close': '✕',
     'mdi-magnify': '🔍',
     'mdi-check': '✓',
