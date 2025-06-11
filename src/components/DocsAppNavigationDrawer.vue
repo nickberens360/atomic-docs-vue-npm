@@ -16,7 +16,7 @@
           { title: 'Colors' }
         ]"
       >
-        <template #section-0>
+        <template [`#section-0`]>
           <div class="docs-text-field">
             <div class="docs-input-wrapper">
               <span class="docs-prepend-icon">🔍</span>
@@ -39,7 +39,7 @@
           <DocsComponentNavigation :filter-text="filterText" />
         </template>
 
-        <template #section-1>
+        <template #[`section-1`]>
           <div class="docs-nav-item">
             <router-link
               to="/component-docs/colors"
