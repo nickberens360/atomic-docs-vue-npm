@@ -58,7 +58,11 @@ const directoryStructure = computed<Record<string, NavigationItem>>(() => {
     }
 
     // --- START: CORRECTED Logic ---
-    const isDocumented = Object.keys(componentDocPlugin.exampleModules).some(key => key.endsWith(relativePath));
+    const examplesDirName = componentDocPlugin.examplesDirName;
+    const isDocumented = Object.keys(componentDocPlugin.exampleModules).some(examplePath => {
+      const exampleRelativePath = examplePath.split(`${examplesDirName}/`)[1] || '';
+      return exampleRelativePath === relativePath;
+    });
     // --- END: CORRECTED Logic ---
 
     const exampleComponent = componentDocPlugin.convertPathToExampleName(relativePath);

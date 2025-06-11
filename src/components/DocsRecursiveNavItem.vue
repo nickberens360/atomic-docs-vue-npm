@@ -31,7 +31,18 @@
           :class="{ 'not-documented': child.isDocumented === false }"
           @click="emit('nav-click', child)"
         >
-          <span class="docs-icon docs-file-icon">📄</span>
+          <span
+            v-if="child.isDocumented"
+            class="docs-icon docs-file-icon"
+          >
+            📄
+          </span>
+          <span
+            v-else
+            class="docs-icon docs-file-icon"
+          >
+            ❌
+          </span>
           <span class="docs-title">{{ child.label }}</span>
         </div>
       </template>

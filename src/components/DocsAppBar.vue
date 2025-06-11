@@ -8,7 +8,7 @@
         >
           <span class="docs-nav-icon">☰</span>
         </button>
-        <span class="docs-title-text">Welcome</span>
+        <span class="docs-title-text">🚀 Atomic Docs</span>
       </div>
 
       <div class="docs-app-bar-actions">
