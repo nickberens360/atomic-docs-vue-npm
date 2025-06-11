@@ -9,6 +9,7 @@ export interface ComponentItem {
   label: string;
   relativePath: string;
   exampleComponent: string;
+  isDocumented?: boolean; // <-- ADDED
 }
 
 export interface DirectoryItem {
@@ -26,6 +27,7 @@ export interface ComponentNavItem {
   label: string;
   relativePath?: string;
   exampleComponent?: string;
+  isDocumented?: boolean; // <-- ADDED
 }
 
 export interface DirectoryNavItem {

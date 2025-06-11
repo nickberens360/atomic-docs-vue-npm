@@ -3,8 +3,8 @@
     v-if="navItems.type === 'directory'"
     class="docs-recursive-list-group"
   >
-    <div 
-      class="docs-recursive-list-header" 
+    <div
+      class="docs-recursive-list-header"
       @click="toggleExpanded($event)"
     >
       <span class="docs-icon docs-folder-icon">🗂️</span>
@@ -28,6 +28,7 @@
         <div
           v-else
           class="docs-recursive-list-item"
+          :class="{ 'not-documented': child.isDocumented === false }"
           @click="emit('nav-click', child)"
         >
           <span class="docs-icon docs-file-icon">📄</span>
@@ -39,9 +40,21 @@
   <div
     v-else
     class="docs-recursive-list-item"
+    :class="{ 'not-documented': navItems.isDocumented === false }"
     @click="emit('nav-click', navItems)"
   >
-    <span class="docs-icon docs-file-icon">📄</span>
+    <span
+      v-if="navItems.isDocumented"
+      class="docs-icon docs-file-icon"
+    >
+      📄
+    </span>
+    <span
+      v-else
+      class="docs-icon docs-file-icon"
+    >
+      ❌
+    </span>
     <span class="docs-title">{{ navItems.label }}</span>
   </div>
 </template>
@@ -49,7 +62,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 // import DocsRecursiveNavItem from './DocsRecursiveNavItem.vue';
-import { ComponentNavItem, DirectoryNavItem, NavItem } from '../types';
+import { NavItem } from '../types';
 
 // Define props
 interface Props {
@@ -130,5 +143,15 @@ const sortedChildren = computed<NavItem[]>(() => {
 .docs-expand-icon {
   font-size: var(--atomic-docs-font-size-md, 16px);
   color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
+}
+
+.docs-recursive-list-item.not-documented {
+  font-style: italic;
+  opacity: 0.5;
+  color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
+
+  .docs-icon {
+    color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
+  }
 }
 </style>

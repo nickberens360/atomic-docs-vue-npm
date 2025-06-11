@@ -57,12 +57,17 @@ const directoryStructure = computed<Record<string, NavigationItem>>(() => {
       return accumulator;
     }
 
+    // --- START: CORRECTED Logic ---
+    const isDocumented = Object.keys(componentDocPlugin.exampleModules).some(key => key.endsWith(relativePath));
+    // --- END: CORRECTED Logic ---
+
     const exampleComponent = componentDocPlugin.convertPathToExampleName(relativePath);
     const pathSegments = relativePath.split('/');
     let lastRef = accumulator;
     pathSegments.forEach((pathSegment) => {
       if (pathSegment.endsWith('.vue')) {
-        lastRef[pathSegment] = { type: 'component', label: pathSegment, relativePath, exampleComponent };
+        // --- MODIFIED: Add isDocumented flag ---
+        lastRef[pathSegment] = { type: 'component', label: pathSegment, relativePath, exampleComponent, isDocumented };
       } else if (!lastRef[pathSegment]) {
         lastRef[pathSegment] = { type: 'directory', label: pathSegment, relativePath, children: {} };
         lastRef = (lastRef[pathSegment] as DirectoryItem).children;
@@ -109,7 +114,8 @@ function handleNavClick(arg: NavItem): void {
         type: 'component',
         label: arg.label,
         relativePath: arg.relativePath,
-        exampleComponent: arg.exampleComponent
+        exampleComponent: arg.exampleComponent,
+        isDocumented: arg.isDocumented
       });
     }
     return;
