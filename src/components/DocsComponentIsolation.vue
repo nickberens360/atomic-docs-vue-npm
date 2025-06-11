@@ -27,7 +27,7 @@ const componentDom = ref<HTMLElement | null>(null);
 .component-isolation-wrapper {
   /* Create a new stacking context */
   position: relative;
-  z-index: 0;
+  //z-index: 0;
 
   /* Remove the atomic-docs class influence */
   color: initial;

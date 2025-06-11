@@ -2,7 +2,7 @@
 
 // Add this import at the top of the file
 import type { RouterHistory } from 'vue-router';
-import type { Plugin } from 'vue';
+import type { Plugin, Component } from 'vue';
 
 export interface ComponentItem {
   type: 'component';
@@ -52,6 +52,8 @@ export interface ComponentDocOptions {
   componentFont?: string;
   history?: RouterHistory;
   plugins?: Plugin[]; // <-- MODIFIED: Changed from 'vuetify' to a generic 'plugins' array
+  globalComponents?: Record<string, Component>; // Components to register globally in the docs app
+  autoRegisterComponents?: boolean; // Auto-register all components from the main app
 }
 
 // Plugin interface

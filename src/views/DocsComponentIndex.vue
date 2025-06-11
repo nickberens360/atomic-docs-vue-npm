@@ -164,28 +164,36 @@ function handleNavClick(arg: ComponentItem): void {
   });
 }
 </script>
-<style lang="scss">
-/* Global styles for the docs app */
+<style>
 html, body {
   display: unset;
   margin: 0;
   padding: 0;
   height: 100%;
 }
+</style>
 
-#atomic-docs-app {
+
+
+<!--<style lang="scss" scoped>-->
+<!--#atomic-docs-app {-->
+<!--  position: fixed;-->
+<!--  top: 0;-->
+<!--  left: 0;-->
+<!--  width: 100%;-->
+<!--  height: 100%;-->
+<!--  //z-index: 2000;-->
+<!--  background-color: var(&#45;&#45;atomic-docs-background-color, white);-->
+<!--}-->
+<!--</style>-->
+
+<style scoped lang="scss">
+.atomic-docs {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 9999;
-  background-color: var(--atomic-docs-background-color, white);
-}
-</style>
-
-<style scoped lang="scss">
-.atomic-docs {
   background-color: var(--atomic-docs-background-color, white);
   border-radius: var(--atomic-docs-border-radius-sm, 4px);
   padding: var(--atomic-docs-spacing-md, 16px);

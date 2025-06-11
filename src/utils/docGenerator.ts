@@ -37,72 +37,137 @@ export interface Header {
 }
 
 export function getPropType(prop: Prop): string {
-  if (Array.isArray(prop.type)) {
-    return prop.type.map(t => t.name).join(' | ');
+  try {
+    if (Array.isArray(prop.type)) {
+      return prop.type.map(t => t.name).join(' | ');
+    }
+    return prop.type ? prop.type.name : 'Type Undefined';
+  } catch (error) {
+    console.warn(`Could not determine prop type: ${error.message}`);
+    return 'Unknown';
   }
-  return prop.type ? prop.type.name : 'Type Undefined';
 }
 
 export function getPropDefault(prop: Prop): string {
-  if (prop.default === undefined) {
+  try {
+    if (prop.default === undefined) {
+      return 'undefined';
+    }
+    if (typeof prop.default === 'function') {
+      const defaultValue = prop.default();
+      return JSON.stringify(defaultValue);
+    }
+    return JSON.stringify(prop.default);
+  } catch (error) {
+    console.warn(`Could not determine prop default value: ${error.message}`);
     return 'undefined';
   }
-  if (typeof prop.default === 'function') {
-    const defaultValue = prop.default();
-    return JSON.stringify(defaultValue);
-  }
-  return JSON.stringify(prop.default);
 }
 
 export function generatePropsItems(component: Component): PropItem[] {
-  if (!component) return [];
+  try {
+    if (!component) return [];
 
-  // Try to extract props from various possible locations in the component object
-  let extractedProps: PropItem[] = [];
+    // Try to extract props from various possible locations in the component object
+    let extractedProps: PropItem[] = [];
 
-  // For Vue 3 components, try to access the component's __vccOpts which might contain props
-  if (component.__vccOpts && component.__vccOpts.props) {
-    const props = component.__vccOpts.props;
-    extractedProps = Object.keys(props).map(propName => {
-      const prop = props[propName];
-      return {
-        name: propName,
-        type: getPropType(prop),
-        required: prop.required ? 'true' : 'false',
-        default: getPropDefault(prop),
-      };
-    });
-  }
-  // Check if component has a setup function (Vue 3 Composition API)
-  else if (typeof component.setup === 'function') {
-    // Try to extract props from component.props (might be available in some cases)
-    if (component.props) {
-      console.log('Component has props property:', component.props);
-      extractedProps = Object.entries(component.props).map(([propName, prop]: [string, any]) => {
-        return {
-          name: propName,
-          type: typeof prop.type === 'function' ? prop.type.name : 'Unknown',
-          required: prop.required ? 'true' : 'false',
-          default: prop.default !== undefined ? JSON.stringify(prop.default) : 'undefined',
-        };
-      });
+    try {
+      // For Vue 3 components, try to access the component's __vccOpts which might contain props
+      if (component.__vccOpts && component.__vccOpts.props) {
+        const props = component.__vccOpts.props;
+        extractedProps = Object.keys(props).map(propName => {
+          try {
+            const prop = props[propName];
+            return {
+              name: propName,
+              type: getPropType(prop),
+              required: prop.required ? 'true' : 'false',
+              default: getPropDefault(prop),
+            };
+          } catch (error) {
+            console.warn(`Could not process prop ${propName}: ${error.message}`);
+            return {
+              name: propName,
+              type: 'Unknown',
+              required: 'false',
+              default: 'undefined',
+            };
+          }
+        });
+      }
+    } catch (error) {
+      console.warn(`Error accessing __vccOpts props: ${error.message}`);
     }
-  } 
-  // Check if component has props (Options API)
-  else if (component.props) {
-    const props = component.props;
-    extractedProps = Object.keys(props).map(propName => {
-      const prop = props[propName];
-      return {
-        name: propName,
-        type: getPropType(prop),
-        required: prop.required ? 'true' : 'false',
-        default: getPropDefault(prop),
-      };
-    });
-  }
 
-  return extractedProps;
+    // If no props extracted yet, try other methods
+    if (extractedProps.length === 0) {
+      try {
+        // Check if component has a setup function (Vue 3 Composition API)
+        if (typeof component.setup === 'function') {
+          // Try to extract props from component.props (might be available in some cases)
+          if (component.props) {
+            console.log('Component has props property:', component.props);
+            extractedProps = Object.entries(component.props).map(([propName, prop]: [string, any]) => {
+              try {
+                return {
+                  name: propName,
+                  type: typeof prop.type === 'function' ? prop.type.name : 'Unknown',
+                  required: prop.required ? 'true' : 'false',
+                  default: prop.default !== undefined ? JSON.stringify(prop.default) : 'undefined',
+                };
+              } catch (error) {
+                console.warn(`Could not process prop ${propName} from setup component: ${error.message}`);
+                return {
+                  name: propName,
+                  type: 'Unknown',
+                  required: 'false',
+                  default: 'undefined',
+                };
+              }
+            });
+          }
+        }
+      } catch (error) {
+        console.warn(`Error processing component with setup function: ${error.message}`);
+      }
+    }
+
+    // If still no props extracted, try Options API approach
+    if (extractedProps.length === 0) {
+      try {
+        // Check if component has props (Options API)
+        if (component.props) {
+          const props = component.props;
+          extractedProps = Object.keys(props).map(propName => {
+            try {
+              const prop = props[propName];
+              return {
+                name: propName,
+                type: getPropType(prop),
+                required: prop.required ? 'true' : 'false',
+                default: getPropDefault(prop),
+              };
+            } catch (error) {
+              console.warn(`Could not process prop ${propName} from options API: ${error.message}`);
+              return {
+                name: propName,
+                type: 'Unknown',
+                required: 'false',
+                default: 'undefined',
+              };
+            }
+          });
+        }
+      } catch (error) {
+        console.warn(`Error processing component with options API props: ${error.message}`);
+      }
+    }
+
+    return extractedProps;
+  } catch (error) {
+    console.warn(`Could not analyze component props: ${error.message}`);
+    return [];
+  }
 }
 
 export function getPropsHeaders(additionalHeaders: Header[] = []): Header[] {

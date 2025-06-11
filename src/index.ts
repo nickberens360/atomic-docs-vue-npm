@@ -67,8 +67,6 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
         options
       };
 
-      app.component('ExampleComponentUsage', ExampleComponent as Component);
-
       const docsApp = createApp(DocsComponentIndex);
       const docsRouter = createRouter({
         history: options.history || createWebHistory(),
@@ -79,6 +77,30 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
         plugins.forEach(plugin => {
           docsApp.use(plugin);
         });
+      }
+
+      // Register global components if provided
+      if (options.globalComponents) {
+        Object.entries(options.globalComponents).forEach(([name, component]) => {
+          docsApp.component(name, component);
+        });
+      }
+
+      // Auto-register all components from the main app if enabled
+      if (options.autoRegisterComponents) {
+        // Get all globally registered components from the main app
+        const mainAppComponents = app._context.components;
+        if (mainAppComponents) {
+          Object.entries(mainAppComponents).forEach(([name, component]) => {
+            // Skip router components and components already registered in the docs app
+            if (
+              !['RouterLink', 'RouterView', 'ExampleComponentUsage'].includes(name) && 
+              (!docsApp._context.components || !docsApp._context.components[name])
+            ) {
+              docsApp.component(name, component);
+            }
+          });
+        }
       }
 
       docsApp.provide('componentDocPlugin', plugin);
