@@ -43,53 +43,69 @@
               </DocsDataTable>
             </slot>
 
-            <h2 class="example-component__heading">
-              Events
-            </h2>
-            <slot name="events">
-              <DocsDataTable
-                :headers="eventHeaders"
-                :items="eventItems"
-                hide-default-footer
+            <div class="example-component__events">
+              <h2 class="example-component__heading">
+                Events
+              </h2>
+              <slot
+                v-if="eventItems.length > 0"
+                name="events"
               >
-                <template
-                  v-for="header in eventHeaders"
-                  :key="header.key"
-                  #[`item.${header.key}`]="slotProps"
+                <DocsDataTable
+                  :headers="eventHeaders"
+                  :items="eventItems"
+                  hide-default-footer
                 >
-                  <slot
-                    :name="`item.${header.key}`"
-                    v-bind="slotProps"
+                  <template
+                    v-for="header in eventHeaders"
+                    :key="header.key"
+                    #[`item.${header.key}`]="slotProps"
                   >
-                    {{ slotProps.value }}
-                  </slot>
-                </template>
-              </DocsDataTable>
-            </slot>
+                    <slot
+                      :name="`item.${header.key}`"
+                      v-bind="slotProps"
+                    >
+                      {{ slotProps.value }}
+                    </slot>
+                  </template>
+                </DocsDataTable>
+              </slot>
+              <p v-else>
+                No events documented.
+              </p>
+            </div>
 
-            <h2 class="example-component__heading">
-              Slots
-            </h2>
-            <slot name="slots">
-              <DocsDataTable
-                :headers="slotHeaders"
-                :items="slotItems"
-                hide-default-footer
+            <div class="example-component__slots">
+              <h2 class="example-component__heading">
+                Slots
+              </h2>
+              <slot
+                v-if="slotItems.length > 0"
+                name="slots"
               >
-                <template
-                  v-for="header in slotHeaders"
-                  :key="header.key"
-                  #[`item.${header.key}`]="slotProps"
+                <DocsDataTable
+                  :headers="slotHeaders"
+                  :items="slotItems"
+                  hide-default-footer
                 >
-                  <slot
-                    :name="`item.${header.key}`"
-                    v-bind="slotProps"
+                  <template
+                    v-for="header in slotHeaders"
+                    :key="header.key"
+                    #[`item.${header.key}`]="slotProps"
                   >
-                    {{ slotProps.value }}
-                  </slot>
-                </template>
-              </DocsDataTable>
-            </slot>
+                    <slot
+                      :name="`item.${header.key}`"
+                      v-bind="slotProps"
+                    >
+                      {{ slotProps.value }}
+                    </slot>
+                  </template>
+                </DocsDataTable>
+              </slot>
+              <p v-else>
+                No slots documented.
+              </p>
+            </div>
           </div>
         </template>
 
@@ -134,7 +150,6 @@
             </div>
           </div>
         </template>
-
       </DocsTabs>
     </div>
     <div
@@ -146,9 +161,12 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { computed, inject, ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+<script
+  setup
+  lang="ts"
+>
+import {computed, inject, ref, onMounted} from 'vue';
+import {useRoute} from 'vue-router';
 import {
   generatePropsItems,
   getPropsHeaders,
@@ -164,7 +182,7 @@ import DocsDataTable from './DocsDataTable.vue';
 import DocsTabs from './DocsTabs.vue';
 import DocsSourceCode from './DocsSourceCode.vue';
 import DocsComponentIsolation from './DocsComponentIsolation.vue';
-import { ComponentDocPlugin } from '../types';
+import {ComponentDocPlugin} from '../types';
 
 const route = useRoute();
 // Inject the plugin
@@ -204,10 +222,10 @@ const relativePath = computed(() => route.query.relativePath as string);
 
 // Example data for DocsTabs
 const tabsExample = [
-  { title: '📚API' },
-  { title: '🖼️Template' },
-  { title: '🚀Script' },
-  { title: '🎨Styles' },
+  {title: '📚API'},
+  {title: '🖼️Template'},
+  {title: '🚀Script'},
+  {title: '🎨Styles'},
 ];
 
 
@@ -283,7 +301,10 @@ const slotHeaders = computed(() => {
 
 </script>
 
-<style scoped lang="scss">
+<style
+  scoped
+  lang="scss"
+>
 .example-component {
   &__heading {
     font-size: var(--atomic-docs-font-size-lg, 1.2em);
