@@ -19,7 +19,7 @@
 import { computed, inject } from 'vue';
 import { useRouter } from 'vue-router';
 import DocsRecursiveNavItem from './DocsRecursiveNavItem.vue';
-import { ComponentItem, DirectoryItem, NavigationItem, ComponentDocPlugin, ComponentNavItem, DirectoryNavItem, NavItem } from '../types';
+import { ComponentItem, DirectoryItem, NavigationItem, ComponentDocPlugin, NavItem } from '../types';
 
 interface Props {
   filterText?: string;
@@ -40,9 +40,23 @@ const componentsDirName = componentDocPlugin?.componentsDirName;
 
 
 const directoryStructure = computed<Record<string, NavigationItem>>(() => {
-  if (!componentModules) return {};
+  // Guard against undefined modules or directory names which can happen in production builds
+  if (!componentModules || !componentsDirName) {
+    return {};
+  }
+
   return Object.keys(componentModules).reduce<Record<string, NavigationItem>>((accumulator, filePath) => {
-    const relativePath = filePath.split(`${componentsDirName}/`).slice(1).join('');
+    // Add a guard to ensure filePath is a string and contains the directory name before splitting
+    if (typeof filePath !== 'string' || !filePath.includes(componentsDirName)) {
+      return accumulator;
+    }
+
+    // Safely split the path and default to an empty string if the result is unexpected
+    const relativePath = filePath.split(`${componentsDirName}/`)[1] || '';
+    if (!relativePath) {
+      return accumulator;
+    }
+
     const exampleComponent = componentDocPlugin.convertPathToExampleName(relativePath);
     const pathSegments = relativePath.split('/');
     let lastRef = accumulator;

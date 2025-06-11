@@ -46,23 +46,42 @@ interface Props {
 }
 const componentDocPlugin = inject('componentDocPlugin') as ComponentDocPlugin;
 const exampleComponents: Record<string, ExampleComponent> = {};
+
+// --- Start of Changes ---
+
 const examplesDirName = componentDocPlugin?.examplesDirName;
-const importComponentPromises = Object.entries(componentDocPlugin?.exampleModules || {})
-  .map(async ([path, moduleImport]) => {
-    const relativePath = path.split(`${examplesDirName}/`).slice(1).join('');
-    const componentName = componentDocPlugin.convertPathToExampleName(relativePath);
-    if (exampleComponents[componentName]) {
-      throw new Error(`Component already registered with name: ${componentName}`);
-    } else {
-      exampleComponents[componentName] = await moduleImport();
-    }
-    return exampleComponents[componentName];
-  });
-await Promise.all(importComponentPromises);
+const exampleModules = componentDocPlugin?.exampleModules;
+
+// Add guards to prevent crashes in production builds
+if (exampleModules && examplesDirName) {
+  const importComponentPromises = Object.entries(exampleModules)
+    .map(async ([path, moduleImport]) => {
+      // Ensure path is a string and contains the directory name before splitting
+      if (typeof path !== 'string' || !path.includes(examplesDirName)) {
+        return null;
+      }
+      console.log('path', path);
+      const relativePath = path.split(`${examplesDirName}/`).slice(1).join('');
+      const componentName = componentDocPlugin.convertPathToExampleName(relativePath);
+      if (exampleComponents[componentName]) {
+        console.warn(`Component example already loaded: ${componentName}`);
+      } else {
+        exampleComponents[componentName] = await moduleImport();
+      }
+      return exampleComponents[componentName];
+    });
+  await Promise.all(importComponentPromises);
+}
+
+// --- End of Changes ---
 
 const props = defineProps<Props>();
 
-const componentName = computed<string>(() => props.relativePath.split('/').pop()?.replace('.vue', '') || '');
+const componentName = computed<string>(() => {
+  // Add guard for relativePath
+  if (!props.relativePath || typeof props.relativePath !== 'string') return '';
+  return props.relativePath.split('/').pop()?.replace('.vue', '') || '';
+});
 
 const currentComponent = computed<ComponentType>(() => {
   if (exampleComponents[props.componentName]) {
