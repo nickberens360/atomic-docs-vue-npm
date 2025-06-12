@@ -16,7 +16,7 @@
           { title: 'Colors' }
         ]"
       >
-        <template [`#section-0`]>
+        <template #[`section-0`]>
           <div class="docs-text-field">
             <div class="docs-input-wrapper">
               <span class="docs-prepend-icon">🔍</span>

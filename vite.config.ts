@@ -16,7 +16,7 @@ export default defineConfig({
       entry: path.resolve(__dirname, 'src/index.ts'),
       name: 'VueComponentDocsPlugin', // Global variable name for UMD build
       // the proper extensions will be added
-      fileName: (format) => `vue-component-docs-plugin.${format}.js`,
+      fileName: (format) => `vue-atomic-docs.${format}.js`,
       formats: ['es', 'umd', 'cjs'] // Generate ESM, UMD, and CJS formats
     },
     rollupOptions: {
@@ -36,7 +36,7 @@ export default defineConfig({
         // but can still be used for other assets like images or fonts if any.
         assetFileNames: (assetInfo) => {
           // This condition for 'style.css' will no longer be met if CSS is inlined.
-          // if (assetInfo.name === 'style.css') return 'vue-component-docs-plugin.css';
+          // if (assetInfo.name === 'style.css') return 'vue-atomic-docs.css';
           return assetInfo.name ?? 'assets/[name]-[hash][extname]';
         },
       },

@@ -60,7 +60,6 @@ if (exampleModules && examplesDirName) {
       if (typeof path !== 'string' || !path.includes(examplesDirName)) {
         return null;
       }
-      console.log('path', path);
       const relativePath = path.split(`${examplesDirName}/`).slice(1).join('');
       const componentName = componentDocPlugin.convertPathToExampleName(relativePath);
       if (exampleComponents[componentName]) {

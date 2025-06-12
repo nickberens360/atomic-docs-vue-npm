@@ -17,7 +17,7 @@ A Vue 3 plugin for automatically generating a live, interactive documentation si
 ## Installation
 
 ```bash
-npm install vue-component-docs-plugin
+npm install vue-atomic-docs
 ```
 
 ## Usage
@@ -33,7 +33,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import App from './App.vue';
 import yourAppRoutes from './router'; // Your app's routes
 
-import componentDocsPlugin from 'vue-component-docs-plugin';
+import componentDocsPlugin from 'vue-atomic-docs';
 
 const app = createApp(App);
 
@@ -83,7 +83,7 @@ To prevent issues where Vue can be bundled twice, it's recommended to add our he
 // vite.config.ts
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
-import { atomicDocsVitePlugin } from 'vue-component-docs-plugin';
+import { atomicDocsVitePlugin } from 'vue-atomic-docs';
 
 export default defineConfig({
   plugins: [
@@ -102,7 +102,7 @@ Your `vite.config.ts` file is run by Node.js. Depending on your project's module
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 // Use default import and destructure from the resulting object
-import pkg from 'vue-component-docs-plugin';
+import pkg from 'vue-atomic-docs';
 const { atomicDocsVitePlugin } = pkg;
 
 export default defineConfig({

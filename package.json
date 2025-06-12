@@ -1,15 +1,15 @@
 {
-  "name": "vue-component-docs-plugin",
+  "name": "vue-atomic-docs",
   "version": "1.0.0",
   "description": "A Vue plugin to automatically generate documentation for your components.",
-  "author": "Your Name <your.email@example.com>",
+  "author": "Nick Berens nickberens360@gmail.com",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/nickberens360/atomic-docs-vue-npm.git"
   },
-  "main": "dist/vue-component-docs-plugin.umd.js",
-  "module": "dist/vue-component-docs-plugin.es.js",
+  "main": "dist/vue-atomic-docs.umd.js",
+  "module": "dist/vue-atomic-docs.es.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist",
