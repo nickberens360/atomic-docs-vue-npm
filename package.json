@@ -6,7 +6,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/nickberens360/atomic-docs-vue-npm.git"
+    "url": "git+https://github.com/nickberens360/atomic-docs-vue-npm.git"
   },
   "main": "dist/vue-atomic-docs.umd.js",
   "module": "dist/vue-atomic-docs.es.js",
