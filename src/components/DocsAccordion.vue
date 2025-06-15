@@ -78,7 +78,7 @@ onMounted(() => {
 </script>
 <style scoped lang="scss">
 .docs-accordion {
-  margin: var(--atomic-docs-spacing-md, 16px) 0;
+  //margin: var(--atomic-docs-spacing-md, 16px) 0;
   position: absolute;
   height: 100%;
   top: 0;
