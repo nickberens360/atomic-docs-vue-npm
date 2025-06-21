@@ -106,10 +106,8 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
       const mountPoint = createDocsAppMountPoint();
       docsApp.mount(mountPoint);
 
-      // --- Start of Changes ---
 
       let mainAppContainer: HTMLElement | null = null;
-      let originalDisplay = ''; // Variable to store the original display style
 
       const toggleDocs = (show: boolean) => {
         const docsElement = document.getElementById('atomic-docs-app');
@@ -124,17 +122,15 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
 
         if (mainAppContainer) {
           if (show) {
-            // When showing docs, save the original display style and then hide the main app
-            originalDisplay = mainAppContainer.style.display;
+            // When showing docs, hide the main app
             mainAppContainer.style.display = 'none';
           } else {
-            // When hiding docs, restore the original display style
-            mainAppContainer.style.display = originalDisplay;
+            // When hiding docs, always ensure the main app is visible
+            mainAppContainer.style.display = ''; // Use empty string to reset to default display value
           }
         }
       };
 
-      // --- End of Changes ---
 
       app.config.globalProperties.$router.beforeEach((to, from, next) => {
         const isDocsRoute = to.path.startsWith('/component-docs');
