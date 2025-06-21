@@ -48,7 +48,7 @@
                 Events
               </h2>
               <slot
-                v-if="eventItems.length > 0"
+                v-if="eventItems.length > 0 || $slots.events"
                 name="events"
               >
                 <DocsDataTable
@@ -80,7 +80,7 @@
                 Slots
               </h2>
               <slot
-                v-if="slotItems.length > 0"
+                v-if="slotItems.length > 0 || $slots.slots"
                 name="slots"
               >
                 <DocsDataTable
