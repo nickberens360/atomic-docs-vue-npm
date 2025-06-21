@@ -129,19 +129,6 @@ html, body {
 </style>
 
 
-
-<!--<style lang="scss" scoped>-->
-<!--#atomic-docs-app {-->
-<!--  position: fixed;-->
-<!--  top: 0;-->
-<!--  left: 0;-->
-<!--  width: 100%;-->
-<!--  height: 100%;-->
-<!--  //z-index: 2000;-->
-<!--  background-color: var(&#45;&#45;atomic-docs-background-color, white);-->
-<!--}-->
-<!--</style>-->
-
 <style scoped lang="scss">
 .atomic-docs {
   position: fixed;
@@ -190,7 +177,6 @@ html, body {
 
 .readme-content {
   max-width: 900px;
-  margin: 78px auto var(--atomic-docs-spacing-lg, 24px);
 }
 
 </style>
