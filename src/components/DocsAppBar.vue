@@ -2,7 +2,7 @@
   <header class="docs-app-bar">
     <div class="docs-app-bar-content">
       <div class="docs-app-bar-title">
-        <button 
+        <button
           class="docs-nav-icon-button"
           @click="toggleDrawer"
         >
@@ -13,7 +13,6 @@
 
       <div class="docs-app-bar-actions">
         <div
-          v-if="!isComponentDocsRoute"
           class="docs-search-container"
         >
           <div class="docs-text-field">
@@ -26,9 +25,9 @@
                 class="docs-input"
                 autocomplete="one-time-code"
               >
-              <span 
-                v-if="filterText" 
-                class="docs-append-icon" 
+              <span
+                v-if="filterText"
+                class="docs-append-icon"
                 @click="filterText = ''"
               >
                 ✕
@@ -37,7 +36,7 @@
           </div>
 
           <div class="docs-menu-container">
-            <div 
+            <div
               v-show="isMenuOpen"
               class="docs-menu"
               @mouseleave="isMenuOpen = false"
@@ -56,7 +55,7 @@
             {{ props.isDark ? '🌙' : '☀️' }}
           </span>
           <label class="docs-switch">
-            <input 
+            <input
               type="checkbox"
               :checked="props.isDark"
               @change="toggleTheme(($event.target as HTMLInputElement).checked)"
