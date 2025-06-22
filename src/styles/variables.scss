@@ -1,0 +1,75 @@
+/*
+ * Atomic Docs - CSS Variables
+ *
+ * This file contains CSS custom properties (variables) for the documentation plugin.
+ * These variables can be overridden by consumers to customize the appearance.
+ */
+
+:root {
+  /* Color variables */
+  --atomic-docs-primary-color: #1976d2;
+  --atomic-docs-secondary-color: #424242;
+  --atomic-docs-background-color: #ffffff;
+  --atomic-docs-surface-color: #f5f5f5;
+  --atomic-docs-surface-color-dark: #e0e0e0;
+  --atomic-docs-error-color: #d32f2f;
+  --atomic-docs-text-primary: rgba(0, 0, 0, 0.87);
+  --atomic-docs-text-secondary: rgba(0, 0, 0, 0.6);
+  --atomic-docs-text-color-secondary: #666;
+  --atomic-docs-border-color: rgba(0, 0, 0, 0.12);
+  --atomic-docs-primary-color-light: rgba(25, 118, 210, 0.1);
+
+  /* Spacing variables */
+  --atomic-docs-spacing-xs: 4px;
+  --atomic-docs-spacing-sm: 8px;
+  --atomic-docs-spacing-md: 16px;
+  --atomic-docs-spacing-lg: 24px;
+  --atomic-docs-spacing-xl: 32px;
+
+  /* Font variables */
+  --atomic-docs-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  --atomic-docs-font-family-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --atomic-docs-font-size-xs: 12px;
+  --atomic-docs-font-size-sm: 14px;
+  --atomic-docs-font-size-md: 16px;
+  --atomic-docs-font-size-lg: 20px;
+  --atomic-docs-font-size-xl: 24px;
+
+  /* Border radius */
+  --atomic-docs-border-radius-sm: 4px;
+  --atomic-docs-border-radius-md: 8px;
+  --atomic-docs-border-radius-lg: 16px;
+
+  /* Shadow */
+  --atomic-docs-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --atomic-docs-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+  --atomic-docs-shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.14);
+
+  /* Z-index */
+  --atomic-docs-z-index-drawer: 100;
+  --atomic-docs-z-index-appbar: 200;
+  --atomic-docs-z-index-modal: 300;
+}
+
+/* Theme classes */
+.atomic-docs.docs-app-theme--light {
+  /* Light theme variables */
+  --atomic-docs-primary-color: #1976d2;
+  --atomic-docs-secondary-color: #424242;
+  --atomic-docs-background-color: #ffffff;
+  --atomic-docs-surface-color: #f5f5f5;
+  --atomic-docs-text-primary: rgba(0, 0, 0, 0.87);
+  --atomic-docs-text-secondary: rgba(0, 0, 0, 0.6);
+  --atomic-docs-border-color: rgba(0, 0, 0, 0.12);
+}
+
+.atomic-docs.docs-app-theme--dark {
+  /* Dark theme variables */
+  --atomic-docs-primary-color: #90caf9;
+  --atomic-docs-secondary-color: #a0a0a0;
+  --atomic-docs-background-color: #121212;
+  --atomic-docs-surface-color: #1e1e1e;
+  --atomic-docs-text-primary: rgba(255, 255, 255, 0.87);
+  --atomic-docs-text-secondary: rgba(255, 255, 255, 0.6);
+  --atomic-docs-border-color: rgba(255, 255, 255, 0.12);
+}

@@ -1,8 +1,8 @@
 <template>
-  <div class="docs-source-code">
+  <div class="docs-source-code docs-markdown">
     <div
       v-if="source"
-      class="source-section"
+      class="source-section code-block-wrapper"
     >
       <pre><code v-html="highlightedSource" /></pre>
     </div>
@@ -46,19 +46,13 @@ const highlightedSource = computed(() => {
 </script>
 
 <style scoped lang="scss">
+/*
+ * Styles for code display are now consolidated in DocsMarkdown.vue
+ * This component uses those styles for consistency
+ */
 .docs-source-code {
-  .source-section pre {
-    background-color: var(--atomic-docs-surface-color, #f5f5f5);
-    padding: var(--atomic-docs-spacing-md, 16px);
-    border-radius: var(--atomic-docs-border-radius-sm, 4px);
-    overflow-x: auto;
-    margin: 0;
-  }
-
-  .source-section code {
-    font-family: var(--atomic-docs-font-family-mono, monospace);
-    white-space: pre-wrap;
-    word-break: break-all;
+  .source-section {
+    margin-bottom: var(--atomic-docs-spacing-md, 16px);
   }
 }
 </style>
