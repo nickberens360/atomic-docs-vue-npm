@@ -124,24 +124,47 @@ const isUsingExtractedColors = computed(() =>
 // Search functionality
 const searchTerm = ref('');
 
-// Fuzzy search function
+// Improved fuzzy search function
 const fuzzyMatch = (text: string, pattern: string): boolean => {
   if (!pattern) return true;
 
   const lowerText = text.toLowerCase();
   const lowerPattern = pattern.toLowerCase();
 
+  // For short search terms (1-2 chars), require consecutive matches
+  if (lowerPattern.length <= 2) {
+    return lowerText.includes(lowerPattern);
+  }
+
+  // For longer terms, prioritize word boundaries
+  const words = lowerText.split(/[-_\s]/);
+
+  // Check if pattern starts at the beginning of any word
+  for (const word of words) {
+    if (word.startsWith(lowerPattern)) {
+      return true;
+    }
+  }
+
+  // Fall back to standard fuzzy search with consecutive character bonus
   let patternIdx = 0;
   let textIdx = 0;
+  let consecutiveMatches = 0;
+  let maxConsecutive = 0;
 
   while (patternIdx < lowerPattern.length && textIdx < lowerText.length) {
     if (lowerPattern[patternIdx] === lowerText[textIdx]) {
       patternIdx++;
+      consecutiveMatches++;
+      maxConsecutive = Math.max(maxConsecutive, consecutiveMatches);
+    } else {
+      consecutiveMatches = 0;
     }
     textIdx++;
   }
 
-  return patternIdx === lowerPattern.length;
+  // Require at least 2 consecutive matches for longer patterns
+  return patternIdx === lowerPattern.length && maxConsecutive >= 2;
 };
 
 // Filter colors based on search term
