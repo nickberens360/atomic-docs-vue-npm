@@ -7,9 +7,15 @@ import { ref, onMounted } from 'vue';
 /**
  * Determines if a CSS value represents a color
  * @param value The CSS value to check
+ * @param element Optional element to use for resolving CSS variables
  * @returns Boolean indicating if the value is a color
  */
-function isColorValue(value: string): boolean {
+function isColorValue(value: string, element?: Element): boolean {
+  // If no value or empty string, it's not a color
+  if (!value || value.trim() === '') {
+    return false;
+  }
+
   // Named CSS colors
   const namedColors = [
     'aliceblue', 'antiquewhite', 'aqua', 'aquamarine', 'azure', 'beige', 'bisque', 'black',
@@ -45,9 +51,23 @@ function isColorValue(value: string): boolean {
     return true;
   }
 
-  // Improved CSS variable detection - matches var(--*) anywhere in the value
+  // CSS variable handling - resolve and check the actual value
   if (/var\(--[^)]+\)/.test(value)) {
-    return true;
+    // Extract the variable name
+    const varName = value.match(/var\(([^)]+)\)/)?.[1]?.trim();
+    if (varName && element) {
+      // Try to get the computed value of the variable
+      const computedStyles = window.getComputedStyle(element);
+      const resolvedValue = computedStyles.getPropertyValue(varName).trim();
+
+      // If we got a value, check if it's a color (recursive call without the element to avoid infinite loops)
+      if (resolvedValue && resolvedValue !== value) {
+        return isColorValue(resolvedValue);
+      }
+    }
+    // If we couldn't resolve the variable or don't have an element, we can't determine
+    // Default to false to avoid including non-color variables
+    return false;
   }
 
   // Enhanced Vuetify RGB detection - more flexible pattern
@@ -118,7 +138,7 @@ export function extractCssColorVariables() {
 
         processedVars.add(prop);
         const value = styles.getPropertyValue(prop).trim();
-        if (isColorValue(value)) {
+        if (isColorValue(value, element)) {
           colors.push({
             name: prop,
             color: formatColorValue(value)
@@ -154,7 +174,9 @@ export function extractCssColorVariables() {
 
                 processedVars.add(prop);
                 const value = rule.style.getPropertyValue(prop).trim();
-                if (isColorValue(value)) {
+                // For style rules, we don't have a specific element to resolve against
+                // We'll use document.documentElement as a fallback
+                if (isColorValue(value, document.documentElement)) {
                   colors.push({
                     name: prop,
                     color: formatColorValue(value)
