@@ -1,6 +1,5 @@
 <template>
   <DocsContainer class="colors-view">
-    <h1 class="colors-title">Colors</h1>
     <DocsColors />
   </DocsContainer>
 </template>

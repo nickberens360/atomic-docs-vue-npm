@@ -7,12 +7,22 @@
       These are the colors defined in your design system.
     </p>
 
+    <!-- Search input -->
+    <div class="docs-colors-search">
+      <input
+        type="text"
+        v-model="searchTerm"
+        placeholder="Search by variable name..."
+        class="docs-colors-search-input"
+      />
+    </div>
+
     <!-- User-defined colors section -->
-    <div v-if="configColors.length > 0" class="docs-colors-section">
+    <div v-if="filteredConfigColors.length > 0" class="docs-colors-section">
       <h3 class="docs-colors-section-title">User-Defined Colors</h3>
       <div class="docs-colors-grid">
         <div
-          v-for="(colorItem, index) in configColors"
+          v-for="(colorItem, index) in filteredConfigColors"
           :key="'config-' + index"
           class="docs-color-card"
         >
@@ -43,14 +53,14 @@
     </div>
 
     <!-- Automatically extracted colors section -->
-    <div v-if="isUsingExtractedColors" class="docs-colors-section">
+    <div v-if="isUsingExtractedColors && filteredExtractedColors.length > 0" class="docs-colors-section">
       <h3 class="docs-colors-section-title">Automatically Extracted Colors</h3>
       <p class="docs-colors-note">
         <em>Note: These colors are automatically extracted from CSS variables in your application.</em>
       </p>
       <div class="docs-colors-grid">
         <div
-          v-for="(colorItem, index) in extractedColors"
+          v-for="(colorItem, index) in filteredExtractedColors"
           :key="'extracted-' + index"
           class="docs-color-card"
         >
@@ -111,6 +121,40 @@ const isUsingExtractedColors = computed(() =>
   shouldExtractColors.value && extractedColors.value.length > 0
 );
 
+// Search functionality
+const searchTerm = ref('');
+
+// Fuzzy search function
+const fuzzyMatch = (text: string, pattern: string): boolean => {
+  if (!pattern) return true;
+
+  const lowerText = text.toLowerCase();
+  const lowerPattern = pattern.toLowerCase();
+
+  let patternIdx = 0;
+  let textIdx = 0;
+
+  while (patternIdx < lowerPattern.length && textIdx < lowerText.length) {
+    if (lowerPattern[patternIdx] === lowerText[textIdx]) {
+      patternIdx++;
+    }
+    textIdx++;
+  }
+
+  return patternIdx === lowerPattern.length;
+};
+
+// Filter colors based on search term
+const filteredConfigColors = computed(() => {
+  if (!searchTerm.value) return configColors.value;
+  return configColors.value.filter(color => fuzzyMatch(color.name, searchTerm.value));
+});
+
+const filteredExtractedColors = computed(() => {
+  if (!searchTerm.value) return extractedColors.value;
+  return extractedColors.value.filter(color => fuzzyMatch(color.name, searchTerm.value));
+});
+
 </script>
 
 <style scoped lang="scss">
@@ -127,6 +171,26 @@ const isUsingExtractedColors = computed(() =>
 .docs-colors-description {
   margin-bottom: var(--atomic-docs-spacing-lg, 24px);
   color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
+}
+
+.docs-colors-search {
+  margin-bottom: var(--atomic-docs-spacing-lg, 24px);
+}
+
+.docs-colors-search-input {
+  width: 100%;
+  padding: var(--atomic-docs-spacing-sm, 8px) var(--atomic-docs-spacing-md, 16px);
+  border: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.12));
+  border-radius: var(--atomic-docs-border-radius-sm, 4px);
+  font-size: var(--atomic-docs-font-size-md, 16px);
+  color: var(--atomic-docs-text-primary, rgba(0, 0, 0, 0.87));
+  background-color: var(--atomic-docs-background-color, white);
+  transition: border-color 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: var(--atomic-docs-primary-color, #1976d2);
+  }
 }
 
 .docs-colors-section {
