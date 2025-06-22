@@ -14,8 +14,8 @@ import {computed} from 'vue';
 import MarkdownIt from 'markdown-it';
 // Import Prism.js
 import Prism from 'prismjs';
-// Import Prism.js CSS theme
-import 'prismjs/themes/prism.css';
+// Import theme loader utility instead of static Prism theme
+import { initPrismTheme } from '../utils/themeLoader';
 // Import language support
 import 'prismjs/components/prism-markup';
 import 'prismjs/components/prism-javascript';
@@ -88,6 +88,10 @@ const props = defineProps({
     required: true
   }
 });
+
+// Initialize Prism theme with default light theme
+// The MutationObserver in initPrismTheme will handle theme changes
+initPrismTheme(false);
 
 const renderedContent = computed(() => {
   return md.render(props.content);

@@ -19,8 +19,8 @@
 import { computed } from 'vue';
 // Import Prism.js
 import Prism from 'prismjs';
-// Import Prism.js CSS theme
-import 'prismjs/themes/prism.css';
+// Import theme loader utility instead of static Prism theme
+import { initPrismTheme } from '../utils/themeLoader';
 // Import language support
 import 'prismjs/components/prism-markup';
 import 'prismjs/components/prism-javascript';
@@ -37,6 +37,10 @@ const props = defineProps({
     validator: (value) => ['markup', 'javascript', 'css'].includes(value)
   }
 });
+
+// Initialize Prism theme with default light theme
+// The MutationObserver in initPrismTheme will handle theme changes
+initPrismTheme(false);
 
 // Computed property for highlighted source
 const highlightedSource = computed(() => {
