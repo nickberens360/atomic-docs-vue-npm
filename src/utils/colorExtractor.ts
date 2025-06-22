@@ -67,6 +67,38 @@ function isColorValue(value: string): boolean {
 }
 
 /**
+ * Checks if a value is in comma-separated RGB/RGBA format (like "96,125,139" or "96,125,139,0.5")
+ * @param value The value to check
+ * @returns Boolean indicating if the value is in comma-separated RGB/RGBA format
+ */
+function isCommaSeparatedRgbFormat(value: string): boolean {
+  return /^\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}(\s*,\s*([01](\.\d+)?|\.\d+))?\s*$/.test(value);
+}
+
+/**
+ * Formats a color value to ensure it's a valid CSS color
+ * @param value The color value to format
+ * @returns A valid CSS color value
+ */
+function formatColorValue(value: string): string {
+  // If it's a comma-separated RGB/RGBA value, convert it to a valid CSS rgb()/rgba() format
+  if (isCommaSeparatedRgbFormat(value)) {
+    const parts = value.split(',').map(part => part.trim());
+
+    // Check if it has an alpha component (RGBA)
+    if (parts.length >= 4) {
+      return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${parts[3]})`;
+    }
+
+    // RGB format
+    return `rgb(${parts[0]}, ${parts[1]}, ${parts[2]})`;
+  }
+
+  // Return other color values as-is
+  return value;
+}
+
+/**
  * Extracts CSS variables that represent colors from the DOM
  * @returns Array of color objects with name and color properties
  */
@@ -89,7 +121,7 @@ export function extractCssColorVariables() {
         if (isColorValue(value)) {
           colors.push({
             name: prop,
-            color: value
+            color: formatColorValue(value)
           });
         }
       }
@@ -125,7 +157,7 @@ export function extractCssColorVariables() {
                 if (isColorValue(value)) {
                   colors.push({
                     name: prop,
-                    color: value
+                    color: formatColorValue(value)
                   });
                 }
               }
