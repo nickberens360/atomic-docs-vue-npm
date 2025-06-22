@@ -50,6 +50,19 @@ function isColorValue(value: string): boolean {
     return true;
   }
 
+  // Enhanced Vuetify RGB detection - more flexible pattern
+  // This checks for 2-3 comma-separated numbers that could be RGB or RGBA values
+  if (/^\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}(\s*,\s*([01](\.\d+)?|\.\d+))?\s*$/.test(value)) {
+    // Validate that the values are in the valid RGB range (0-255)
+    const parts = value.split(',').map(part => parseInt(part.trim(), 10));
+    if (parts.length >= 3 &&
+        parts[0] >= 0 && parts[0] <= 255 &&
+        parts[1] >= 0 && parts[1] <= 255 &&
+        parts[2] >= 0 && parts[2] <= 255) {
+      return true;
+    }
+  }
+
   return false;
 }
 
