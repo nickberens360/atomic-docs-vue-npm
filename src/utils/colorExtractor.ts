@@ -2,7 +2,7 @@
  * Utility for extracting CSS color variables from the DOM at runtime
  */
 
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 
 /**
  * Determines if a CSS value represents a color
@@ -75,7 +75,7 @@ export function extractCssColorVariables() {
         const value = styles.getPropertyValue(prop).trim();
         if (isColorValue(value)) {
           colors.push({
-            name: prop.replace('--', ''),
+            name: prop,
             color: value
           });
         }
@@ -99,7 +99,8 @@ export function extractCssColorVariables() {
       if (styleSheet) {
         for (let i = 0; i < styleSheet.cssRules.length; i++) {
           const rule = styleSheet.cssRules[i];
-          if (rule.style) {
+          // Check if the rule is a CSSStyleRule before accessing style
+          if (rule instanceof CSSStyleRule) {
             // Look for CSS variables in the style declaration
             for (let j = 0; j < rule.style.length; j++) {
               const prop = rule.style[j];
@@ -110,7 +111,7 @@ export function extractCssColorVariables() {
                 const value = rule.style.getPropertyValue(prop).trim();
                 if (isColorValue(value)) {
                   colors.push({
-                    name: prop.replace('--', ''),
+                    name: prop,
                     color: value
                   });
                 }
@@ -134,7 +135,6 @@ export function extractCssColorVariables() {
  */
 export function useExtractedColors() {
   const extractedColors = ref([]);
-  let observer = null;
 
   const updateColors = () => {
     extractedColors.value = extractCssColorVariables();
@@ -144,36 +144,21 @@ export function useExtractedColors() {
     updateColors();
 
     // Set up a MutationObserver to watch for style changes
-    observer = new MutationObserver(updateColors);
+    const observer = new MutationObserver(updateColors);
 
-    // Observe the document body for style changes, including added/removed style elements
-    observer.observe(document.body, {
+    // Observe the document for style changes
+    observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['style', 'class'],
-      childList: true, // Watch for added/removed nodes
-      subtree: true, // Watch all descendants
-      characterData: true // Watch for text changes in style elements
+      attributeFilter: ['style', 'class']
     });
 
-    // Also observe the document head for added/removed style elements
-    observer.observe(document.head, {
-      childList: true,
-      subtree: true,
-      characterData: true
-    });
+    // Clean up the observer when the component is unmounted
+    return () => {
+      observer.disconnect();
+    };
   });
 
-  // Clean up function that will be called when the component is unmounted
-  const cleanup = () => {
-    if (observer) {
-      observer.disconnect();
-      observer = null;
-    }
-  };
-
-  // Return both the extracted colors and the cleanup function
   return {
-    extractedColors,
-    cleanup
+    extractedColors
   };
 }

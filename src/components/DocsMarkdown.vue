@@ -2,7 +2,6 @@
   <div
     class="docs-markdown"
     v-html="renderedContent"
-    @click="handleCopyClick"
   />
 </template>
 
@@ -10,12 +9,13 @@
   setup
   lang="ts"
 >
-import {computed} from 'vue';
+import {computed, onMounted, createApp, h} from 'vue';
 import MarkdownIt from 'markdown-it';
 // Import Prism.js
 import Prism from 'prismjs';
 // Import theme loader utility instead of static Prism theme
 import { initPrismTheme } from '../utils/themeLoader';
+import DocsCopyToClipboard from './DocsCopyToClipboard.vue';
 // Import language support
 import 'prismjs/components/prism-markup';
 import 'prismjs/components/prism-javascript';
@@ -72,10 +72,7 @@ md.renderer.rules.fence = (tokens, idx, options, env, slf) => {
     <div class="code-block-wrapper">
       <div class="code-block-header">
         ${language ? `<span class="code-language">${language}</span>` : ''}
-        <button class="copy-button" data-code="${encodeURIComponent(code)}">
-          <span class="copy-icon">📋</span>
-          <span class="copy-text">Copy</span>
-        </button>
+        <div class="copy-button-wrapper" data-code="${encodeURIComponent(code)}"></div>
       </div>
       ${originalRendered}
     </div>
@@ -97,37 +94,37 @@ const renderedContent = computed(() => {
   return md.render(props.content);
 });
 
-// Handle copy button clicks
-const handleCopyClick = (event: MouseEvent) => {
-  const target = event.target as HTMLElement;
+// Mount DocsCopyToClipboard components after the content is rendered
+onMounted(() => {
+  // Wait for the next tick to ensure the content is rendered
+  setTimeout(() => {
+    // Find all copy button wrappers
+    const copyButtonWrappers = document.querySelectorAll('.copy-button-wrapper');
 
-  // Check if the click was on a copy button or its children
-  const copyButton = target.closest('.copy-button');
-  if (!copyButton) return;
+    // Mount a DocsCopyToClipboard component in each wrapper
+    copyButtonWrappers.forEach(wrapper => {
+      const code = decodeURIComponent(wrapper.getAttribute('data-code') || '');
+      if (!code) return;
 
-  // Get the code to copy
-  const code = decodeURIComponent(copyButton.getAttribute('data-code') || '');
-  if (!code) return;
+      // Create a new instance of DocsCopyToClipboard
+      const app = createApp({
+        render() {
+          return h(DocsCopyToClipboard, {
+            text: code,
+            title: 'Copy code',
+            showText: true,
+            buttonText: 'Copy',
+            class: 'copy-button'
+          });
+        }
+      });
 
-  // Copy to clipboard
-  navigator.clipboard.writeText(code)
-    .then(() => {
-      // Update button text temporarily
-      const copyText = copyButton.querySelector('.copy-text');
-      if (copyText) {
-        const originalText = copyText.textContent;
-        copyText.textContent = 'Copied!';
-
-        // Reset after 2 seconds
-        setTimeout(() => {
-          copyText.textContent = originalText;
-        }, 2000);
-      }
-    })
-    .catch(err => {
-      console.error('Failed to copy text: ', err);
+      // Mount the component
+      app.component('DocsCopyToClipboard', DocsCopyToClipboard);
+      app.mount(wrapper);
     });
-};
+  }, 0);
+});
 </script>
 
 <style lang="scss">
@@ -248,26 +245,12 @@ const handleCopyClick = (event: MouseEvent) => {
   }
 
   .copy-button {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    color: var(--atomic-docs-text-color-secondary);
-    font-size: 0.85rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: var(--atomic-docs-border-radius-sm);
-    transition: background-color 0.2s, color 0.2s;
-
-    &:hover {
-      background-color: var(--atomic-docs-primary-color-light);
-      color: var(--atomic-docs-primary-color);
-    }
+    /* Styles are now handled by the DocsCopyToClipboard component */
+    margin-left: auto;
   }
 
-  .copy-icon {
-    font-size: 1rem;
+  .copy-button-wrapper {
+    margin-left: auto;
   }
 
   pre {

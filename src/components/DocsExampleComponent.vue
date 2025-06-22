@@ -111,14 +111,12 @@
 
         <template #[`tab-1`]>
           <div class="tab-content">
-            <button
+            <DocsCopyToClipboard
               v-if="templateSource"
+              :text="templateSource"
+              title="Copy code"
               class="copy-button"
-              :title="copyStatus === 'template' ? 'Copied!' : 'Copy code'"
-              @click="copyToClipboard(templateSource, 'template')"
-            >
-              <DocsIcon :icon="copyStatus === 'template' ? 'mdi-check' : 'mdi-content-copy'" />
-            </button>
+            />
             <DocsSourceCode
               v-if="templateSource"
               :source="templateSource"
@@ -129,14 +127,12 @@
 
         <template #[`tab-2`]>
           <div class="tab-content">
-            <button
+            <DocsCopyToClipboard
               v-if="scriptSource"
+              :text="scriptSource"
+              title="Copy code"
               class="copy-button"
-              :title="copyStatus === 'script' ? 'Copied!' : 'Copy code'"
-              @click="copyToClipboard(scriptSource, 'script')"
-            >
-              <DocsIcon :icon="copyStatus === 'script' ? 'mdi-check' : 'mdi-content-copy'" />
-            </button>
+            />
             <DocsSourceCode
               v-if="scriptSource"
               :source="scriptSource"
@@ -153,6 +149,12 @@
 
         <template #[`tab-3`]>
           <div class="tab-content">
+            <DocsCopyToClipboard
+              v-if="styleSource"
+              :text="styleSource"
+              title="Copy code"
+              class="copy-button"
+            />
             <DocsSourceCode
               v-if="styleSource"
               :source="styleSource"
@@ -200,6 +202,7 @@ import DocsSourceCode from './DocsSourceCode.vue';
 import DocsComponentIsolation from './DocsComponentIsolation.vue';
 import {ComponentDocPlugin} from '../types';
 import DocsIcon from "./DocsIcon.vue";
+import DocsCopyToClipboard from './DocsCopyToClipboard.vue';
 
 const route = useRoute();
 // Inject the plugin
@@ -245,24 +248,6 @@ const tabsExample = [
   { title: 'Styles' },
 ];
 
-// --- START: Added for copy functionality ---
-const copyStatus = ref('');
-const copyToClipboard = async (source: string | null, type: string) => {
-  if (!source) {
-    console.error('No source to copy.');
-    return;
-  }
-  try {
-    await navigator.clipboard.writeText(source);
-    copyStatus.value = type;
-    setTimeout(() => {
-      copyStatus.value = '';
-    }, 2000); // Reset after 2 seconds
-  } catch (err) {
-    console.error('Failed to copy text: ', err);
-  }
-};
-// --- END: Added for copy functionality ---
 
 
 // Load and process the raw component source and component module
