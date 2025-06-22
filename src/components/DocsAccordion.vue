@@ -11,7 +11,6 @@
     >
       <button
         class="docs-accordion__header"
-        :class="{ 'docs-accordion__header--active': activeSection === index }"
         @click="toggleSection(index)"
       >
         <span class="docs-accordion__title">{{ section.title }}</span>
@@ -125,7 +124,6 @@ onMounted(() => {
 
     &:hover {
       color: var(--atomic-docs-primary-color, #1976d2);
-      background-color: var(--atomic-docs-hover-color, rgba(0, 0, 0, 0.04));
     }
 
     &--active {
@@ -160,6 +158,18 @@ onMounted(() => {
       max-height: none; // Remove the hardcoded height
       height: 100%; // Fill the available space
       padding: var(--atomic-docs-spacing-xs, 4px) var(--atomic-docs-spacing-sm, 12px) var(--atomic-docs-spacing-sm, 8px);
+    }
+  }
+}
+
+/* Dark mode specific styles */
+:global(.atomic-docs.docs-app-theme--dark) {
+  .docs-accordion {
+    &__header {
+      &--active {
+        /* Lighter background for better contrast in dark mode */
+        background-color: rgba(255, 255, 255, 0.15);
+      }
     }
   }
 }
