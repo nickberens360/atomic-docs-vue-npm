@@ -7,14 +7,18 @@
       These are the colors defined in your design system.
     </p>
 
+    <p v-if="isUsingExtractedColors" class="docs-colors-note">
+      <em>Note: Some colors are automatically extracted from CSS variables in your application.</em>
+    </p>
+
     <div class="docs-colors-grid">
-      <div 
-        v-for="(colorItem, index) in colors" 
+      <div
+        v-for="(colorItem, index) in colors"
         :key="index"
         class="docs-color-card"
       >
-        <div 
-          class="docs-color-preview" 
+        <div
+          class="docs-color-preview"
           :style="{ backgroundColor: colorItem.color }"
         />
         <div class="docs-color-info">
@@ -31,16 +35,43 @@
 </template>
 
 <script setup lang="ts">
-import { inject, computed } from 'vue';
+import { inject, computed, onUnmounted } from 'vue';
 import { ComponentDocPlugin } from '../types';
+import { useExtractedColors } from '../utils/colorExtractor';
 
 // Inject the component doc plugin
 const componentDocPlugin = inject<ComponentDocPlugin>('componentDocPlugin');
 
-// Get colors from plugin options
-const colors = computed(() => {
-  return componentDocPlugin?.options?.colors || [];
+// Get extracted colors from the DOM and the cleanup function
+const { extractedColors, cleanup } = useExtractedColors();
+
+// Call cleanup when component is unmounted
+onUnmounted(() => {
+  if (cleanup) {
+    cleanup();
+  }
 });
+
+// Get colors from plugin options or use extracted colors if none provided and autoExtractColors is enabled
+const configColors = computed(() => componentDocPlugin?.options?.colors || []);
+const shouldExtractColors = computed(() => componentDocPlugin?.options?.autoExtractColors !== false); // Default to true if not specified
+
+const colors = computed(() => {
+  // Start with manually configured colors
+  let result = [...configColors.value];
+
+  // Add extracted colors if auto-extraction is enabled
+  if (shouldExtractColors.value && extractedColors.value.length > 0) {
+    result = [...result, ...extractedColors.value];
+  }
+
+  return result;
+});
+
+// Determine if we're using extracted colors
+const isUsingExtractedColors = computed(() =>
+  shouldExtractColors.value && extractedColors.value.length > 0
+);
 </script>
 
 <style scoped lang="scss">
@@ -55,8 +86,18 @@ const colors = computed(() => {
 }
 
 .docs-colors-description {
+  margin-bottom: var(--atomic-docs-spacing-md, 16px);
+  color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
+}
+
+.docs-colors-note {
   margin-bottom: var(--atomic-docs-spacing-lg, 24px);
   color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
+  font-size: var(--atomic-docs-font-size-sm, 14px);
+  padding: var(--atomic-docs-spacing-sm, 8px) var(--atomic-docs-spacing-md, 16px);
+  background-color: var(--atomic-docs-surface-color, #f5f5f5);
+  border-radius: var(--atomic-docs-border-radius-sm, 4px);
+  border-left: 3px solid var(--atomic-docs-primary-color, #1976d2);
 }
 
 .docs-colors-grid {

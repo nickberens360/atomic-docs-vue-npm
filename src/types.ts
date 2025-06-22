@@ -51,6 +51,7 @@ export interface ComponentDocOptions {
     name: string;
     color: string;
   }>;
+  autoExtractColors?: boolean; // Whether to automatically extract colors from the DOM when no colors are provided
   componentFont?: string;
   history?: RouterHistory;
   plugins?: Plugin[]; // <-- MODIFIED: Changed from 'vuetify' to a generic 'plugins' array
