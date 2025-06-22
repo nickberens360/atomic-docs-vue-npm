@@ -131,9 +131,16 @@ const fuzzyMatch = (text: string, pattern: string): boolean => {
   const lowerText = text.toLowerCase();
   const lowerPattern = pattern.toLowerCase();
 
-  // For short search terms (1-2 chars), require consecutive matches
+  // For short search terms (1-2 chars), require word boundary matches
   if (lowerPattern.length <= 2) {
-    return lowerText.includes(lowerPattern);
+    // Check if pattern is at the start of the text
+    if (lowerText.startsWith(lowerPattern)) {
+      return true;
+    }
+
+    // Check if pattern appears after a delimiter
+    const delimiterPattern = new RegExp(`[-_\\s]${lowerPattern}`, 'i');
+    return delimiterPattern.test(lowerText);
   }
 
   // For longer terms, prioritize word boundaries
