@@ -174,15 +174,19 @@ const fuzzyMatch = (text: string, pattern: string): boolean => {
   return patternIdx === lowerPattern.length && maxConsecutive >= 2;
 };
 
-// Filter colors based on search term
+// Filter colors based on search term and sort alphabetically
 const filteredConfigColors = computed(() => {
-  if (!searchTerm.value) return configColors.value;
-  return configColors.value.filter(color => fuzzyMatch(color.name, searchTerm.value));
+  const filtered = !searchTerm.value
+    ? configColors.value
+    : configColors.value.filter(color => fuzzyMatch(color.name, searchTerm.value));
+  return filtered.sort((a, b) => a.name.localeCompare(b.name));
 });
 
 const filteredExtractedColors = computed(() => {
-  if (!searchTerm.value) return extractedColors.value;
-  return extractedColors.value.filter(color => fuzzyMatch(color.name, searchTerm.value));
+  const filtered = !searchTerm.value
+    ? extractedColors.value
+    : extractedColors.value.filter(color => fuzzyMatch(color.name, searchTerm.value));
+  return filtered.sort((a, b) => a.name.localeCompare(b.name));
 });
 
 </script>
