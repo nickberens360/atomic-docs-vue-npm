@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.app.json",
+  "compilerOptions": {
+    "module": "es2022",
+    "moduleResolution": "NodeNext",
+    "target": "es2020",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "types": ["vite/client"],
+    "skipLibCheck": true,
+    "isolatedModules": true
+  }
+}

@@ -21,7 +21,7 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "vite build && tsc --emitDeclarationOnly --declarationDir dist --project tsconfig.build.json",
+    "build": "vite build && tsc --emitDeclarationOnly --declarationDir dist --project tsconfig.build.json --rootDir .",
     "build:watch": "vite build --watch",
     "preview": "vite preview",
     "test": "vitest run",
