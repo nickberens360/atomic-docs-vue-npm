@@ -133,7 +133,7 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
 
 
       app.config.globalProperties.$router.beforeEach((to, from, next) => {
-        const isDocsRoute = to.path.startsWith('/component-docs');
+        const isDocsRoute = to.path.startsWith('/atomic-docs');
         toggleDocs(isDocsRoute);
         if (isDocsRoute && docsRouter.currentRoute.value.fullPath !== to.fullPath) {
           docsRouter.push(to.fullPath);

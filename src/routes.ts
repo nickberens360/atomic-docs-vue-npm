@@ -15,7 +15,7 @@ const routes: RouteRecordRaw[] = [
     component: { render: () => null },
   },
   {
-    path: '/component-docs',
+    path: '/atomic-docs',
     name: 'componentDocs',
     component: () => import('./views/DocsHomeView.vue'),
     children: [

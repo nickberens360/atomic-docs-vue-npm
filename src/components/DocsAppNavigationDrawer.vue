@@ -43,7 +43,7 @@
         <template #[`section-1`]>
           <div class="atomic-docs-nav-item">
             <router-link
-              to="/component-docs/colors"
+              to="/atomic-docs/colors"
               class="atomic-docs-nav-link"
               active-class="atomic-docs-nav-link--active"
             >
@@ -56,7 +56,7 @@
         <template #[`section-2`]>
           <div class="atomic-docs-nav-item">
             <router-link
-              to="/component-docs/typography"
+              to="/atomic-docs/typography"
               class="atomic-docs-nav-link"
               active-class="atomic-docs-nav-link--active"
             >
