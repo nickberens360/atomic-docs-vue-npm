@@ -1,19 +1,29 @@
 <template>
   <div class="typography-view">
-    <h2 class="typography-title">Typography System Test 2</h2>
+    <h2 class="typography-title">Typography System Test</h2>
     <p class="typography-description">
       The following styles are dynamically extracted by parsing your application's loaded stylesheets.
     </p>
+
+    <!-- Add search input -->
+    <div class="typography-search">
+      <input
+        type="text"
+        v-model="searchTerm"
+        placeholder="Search by class name..."
+        class="typography-search-input"
+      />
+    </div>
 
     <div v-if="isLoading" class="loading-message">
       <p>Analyzing stylesheets...</p>
     </div>
 
     <div v-else class="typography-sections">
-      <section v-if="typographyData.utilityClasses.length" class="typography-section">
+      <section v-if="filteredUtilityClasses.length" class="typography-section">
         <h3 class="section-title">Utility Classes</h3>
         <p class="section-subtitle">Classes that apply specific typography styles.</p>
-        <div v-for="rule in typographyData.utilityClasses" :key="rule.selector" class="typography-example">
+        <div v-for="rule in filteredUtilityClasses" :key="rule.selector" class="typography-example">
           <p :class="rule.selector.substring(1)" class="element-preview">{{ rule.selector }}</p>
           <div class="details-list">
             <div v-for="(value, key) in rule.styles" :key="key" class="detail-item">
@@ -24,10 +34,10 @@
         </div>
       </section>
 
-      <section v-if="Object.keys(typographyData.elementStyles).length" class="typography-section">
+      <section v-if="filteredElementTags.length" class="typography-section">
         <h3 class="section-title">Base Element Styles</h3>
         <p class="section-subtitle">Default styles applied to common HTML tags.</p>
-        <div v-for="tag in sortedElementTags" :key="tag" class="typography-example">
+        <div v-for="tag in filteredElementTags" :key="tag" class="typography-example">
           <component :is="tag" class="element-preview">{{ tag.charAt(0).toUpperCase() + tag.slice(1) }} Default Style</component>
           <div class="details-list">
             <div v-for="(value, key) in typographyData.elementStyles[tag]" :key="key" class="detail-item">
@@ -38,11 +48,11 @@
         </div>
       </section>
 
-      <section v-if="Object.keys(typographyData.variables).length" class="typography-section">
+      <section v-if="Object.keys(filteredVariables).length" class="typography-section">
         <h3 class="section-title">CSS Variables</h3>
         <p class="section-subtitle">Typography-related custom properties found in your stylesheets.</p>
         <div class="variables-table">
-          <div v-for="(value, name) in typographyData.variables" :key="name" class="variable-row">
+          <div v-for="(value, name) in filteredVariables" :key="name" class="variable-row">
             <code class="variable-name">{{ name }}</code>
             <code class="variable-value">{{ value }}</code>
           </div>
@@ -59,6 +69,70 @@ import { useExtractedTypography } from '../utils/typographyExtractor';
 const { extractedTypography: typographyData } = useExtractedTypography();
 const isLoading = ref(true);
 
+// Add search functionality
+const searchTerm = ref('');
+
+// Fuzzy search function (similar to DocsColors)
+const fuzzyMatch = (text: string, pattern: string): boolean => {
+  if (!pattern) return true;
+
+  const lowerText = text.toLowerCase();
+  const lowerPattern = pattern.toLowerCase();
+
+  // For short search terms (1-2 chars), require word boundary matches
+  if (lowerPattern.length <= 2) {
+    // Check if pattern is at the start of the text
+    if (lowerText.startsWith(lowerPattern)) {
+      return true;
+    }
+
+    // Check if pattern appears after a delimiter
+    const delimiterPattern = new RegExp(`[-_\\s]${lowerPattern}`, 'i');
+    return delimiterPattern.test(lowerText);
+  }
+
+  // For longer terms, prioritize word boundaries
+  const words = lowerText.split(/[-_\s]/);
+
+  // Check if pattern starts at the beginning of any word
+  for (const word of words) {
+    if (word.startsWith(lowerPattern)) {
+      return true;
+    }
+  }
+
+  // Fall back to standard fuzzy search with consecutive character bonus
+  let patternIdx = 0;
+  let textIdx = 0;
+  let consecutiveMatches = 0;
+  let maxConsecutive = 0;
+
+  while (patternIdx < lowerPattern.length && textIdx < lowerText.length) {
+    if (lowerPattern[patternIdx] === lowerText[textIdx]) {
+      patternIdx++;
+      consecutiveMatches++;
+      maxConsecutive = Math.max(maxConsecutive, consecutiveMatches);
+    } else {
+      consecutiveMatches = 0;
+    }
+    textIdx++;
+  }
+
+  // Require at least 2 consecutive matches for longer patterns
+  return patternIdx === lowerPattern.length && maxConsecutive >= 2;
+};
+
+// Filter utility classes based on search term
+const filteredUtilityClasses = computed(() => {
+  if (!searchTerm.value) {
+    return typographyData.value.utilityClasses;
+  }
+  return typographyData.value.utilityClasses.filter(rule =>
+    fuzzyMatch(rule.selector, searchTerm.value)
+  );
+});
+
+// Sort and filter element tags
 const sortedElementTags = computed(() => {
   // Sort h1-h6 tags numerically, then others alphabetically
   return Object.keys(typographyData.value.elementStyles || {}).sort((a, b) => {
@@ -67,6 +141,30 @@ const sortedElementTags = computed(() => {
     if (b === 'body') return 1;
     return a.localeCompare(b);
   });
+});
+
+const filteredElementTags = computed(() => {
+  if (!searchTerm.value) {
+    return sortedElementTags.value;
+  }
+  return sortedElementTags.value.filter(tag =>
+    fuzzyMatch(tag, searchTerm.value)
+  );
+});
+
+// Filter variables based on search term
+const filteredVariables = computed(() => {
+  if (!searchTerm.value) {
+    return typographyData.value.variables;
+  }
+
+  const result: Record<string, string> = {};
+  Object.entries(typographyData.value.variables).forEach(([key, value]) => {
+    if (fuzzyMatch(key, searchTerm.value)) {
+      result[key] = value;
+    }
+  });
+  return result;
 });
 
 watch(typographyData, (newData) => {
@@ -92,6 +190,23 @@ watch(typographyData, (newData) => {
 .typography-description, .section-subtitle {
   margin-bottom: var(--atomic-docs-spacing-lg, 24px);
   color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
+}
+
+.typography-search {
+  margin-bottom: var(--atomic-docs-spacing-lg, 24px);
+}
+
+.typography-search-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.12));
+  border-radius: 4px;
+  font-size: 14px;
+
+  &:focus {
+    outline: none;
+    border-color: var(--atomic-docs-primary-color, #1976d2);
+  }
 }
 
 .section-subtitle {
