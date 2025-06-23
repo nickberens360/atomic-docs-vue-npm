@@ -33,7 +33,8 @@
     "release:patch": "npm version patch && npm publish",
     "release:minor": "npm version minor && npm publish",
     "release:major": "npm version major && npm publish",
-    "release:next": "npm version prepatch --preid=next && npm publish --tag next"
+    "release:next": "npm version prepatch --preid=next && npm publish --tag next",
+    "postrelease": "echo '✅ Release published to NPM! Now run `git push && git push --tags` to sync with your remote repository.'"
   },
   "peerDependencies": {
     "vue": "^3.2.0",
