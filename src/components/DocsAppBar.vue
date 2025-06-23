@@ -155,14 +155,13 @@ onUnmounted(() => {
   top: 0;
   left: 0;
   right: 0;
-  box-shadow: var(--atomic-docs-shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.1));
+  //box-shadow: var(--atomic-docs-shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.1));
   display: flex;
   align-items: center;
   height: var(--atomic-docs-appbar-height);
   width: 100%;
-  background-color: var(--atomic-docs-background-color, #f5f5f5);
+  //background-color: var(--atomic-docs-surface-color-dark, #f5f5f5);
   padding: 0 16px;
-  z-index: 100;
 }
 
 .atomic-docs-app-bar-content {

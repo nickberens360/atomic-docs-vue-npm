@@ -13,10 +13,10 @@
         class="atomic-docs-accordion__header"
         @click="toggleSection(index)"
       >
-        <span class="atomic-docs-accordion__title">{{ section.title }}</span>
         <span class="atomic-docs-accordion__icon">
           {{ activeSection === index ? '−' : '+' }}
         </span>
+        <span class="atomic-docs-accordion__title">{{ section.title }}</span>
       </button>
       <div
         class="atomic-docs-accordion__content"
@@ -76,6 +76,9 @@ onMounted(() => {
 });
 </script>
 <style scoped lang="scss">
+:deep(.atomic-docs-custom-nav-list) {
+  background: none !important;
+}
 .atomic-docs-accordion {
   //margin: var(--atomic-docs-spacing-md, 16px) 0;
   position: absolute;
@@ -110,7 +113,7 @@ onMounted(() => {
 
   &__header {
     display: flex;
-    justify-content: space-between;
+    justify-content: start;
     align-items: center;
     width: 100%;
     padding: var(--atomic-docs-spacing-sm, 8px) var(--atomic-docs-spacing-sm, 12px);
@@ -119,7 +122,8 @@ onMounted(() => {
     cursor: pointer;
     transition: background-color 0.2s ease, color 0.2s ease;
     color: var(--atomic-docs-text-primary, rgba(0, 0, 0, 0.87));
-    background-color: var(--atomic-docs-surface-color, #f5f5f5);
+    //background-color: var(--atomic-docs-surface-color, #f5f5f5);
+    background-color: transparent;
     border-radius: var(--atomic-docs-border-radius-sm, 4px);
 
     &:hover {
@@ -128,7 +132,7 @@ onMounted(() => {
 
     &--active {
       color: var(--atomic-docs-primary-color, #1976d2);
-      background-color: var(--atomic-docs-active-color, rgba(0, 0, 0, 0.08));
+      //background-color: var(--atomic-docs-active-color, rgba(0, 0, 0, 0.08));
       position: sticky;
       top: 0;
       z-index: 10;
@@ -136,9 +140,10 @@ onMounted(() => {
   }
 
   &__title {
-    font-size: var(--atomic-docs-font-size-xs, 13px);
+    font-size: var(--atomic-docs-font-size-md, 13px);
     font-weight: 500;
     color: inherit;
+    margin-left: var(--atomic-docs-spacing-xs, 4px);
   }
 
   &__icon {

@@ -132,8 +132,8 @@ html, body {
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
-  background-color: var(--atomic-docs-background-color, white);
+  //height: 100%;
+  background-color: var(--atomic-docs-surface-color-dark, white);
   border-radius: var(--atomic-docs-border-radius-sm, 4px);
   height: 100vh;
   overflow: auto;

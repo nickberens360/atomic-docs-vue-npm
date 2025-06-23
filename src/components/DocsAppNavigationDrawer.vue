@@ -114,8 +114,7 @@ watch(() => props.isRailOpen, (newValue) => {
   left: 0;
   bottom: 0;
   width: var(--atomic-docs-drawer-width);
-  background-color: var(--atomic-docs-background-color, #f5f5f5);
-  box-shadow: var(--atomic-docs-shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.1));
+  //background-color: var(--atomic-docs-surface-color-dark, #f5f5f5);
   transition: transform 0.3s ease, width 0.3s ease;
   overflow-y: auto;
   z-index: 100;

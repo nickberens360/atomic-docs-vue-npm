@@ -23,11 +23,13 @@ defineProps<Props>();
   display: flex;
   flex-direction: column;
   min-height: calc(100vh - var(--atomic-docs-appbar-height));
+  padding-right: 40px;
   padding-top: var(--atomic-docs-appbar-height);
-  transition: padding-top 0.2s ease-in-out;
-
+  transition: all 0.2s ease-in-out;
+  //background-color: var(--atomic-docs-surface-color-dark, #f5f5f5);
   .atomic-docs-navigation-drawer--open + & {
-    padding-left: var(--atomic-docs-drawer-width);
+    padding-left: calc(var(--atomic-docs-drawer-width) + 40px);
+    padding-right: 40px;
     transition: padding-left 0.3s ease;
   }
 

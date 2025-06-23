@@ -22,6 +22,7 @@ defineProps<Props>();
   margin-right: auto;
   margin-left: auto;
   background: var(--atomic-docs-background-color, white);
+  border-radius: var(--atomic-docs-border-radius-lg, 8px);
 
   // Default container with max-width
   max-width: 1280px;
