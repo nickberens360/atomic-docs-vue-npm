@@ -1,6 +1,6 @@
 {
   "name": "vue-atomic-docs",
-  "version": "1.0.19",
+  "version": "1.0.20-next.0",
   "description": "A Vue plugin to automatically generate documentation for your components.",
   "author": "Nick Berens nickberens360@gmail.com",
   "license": "MIT",
