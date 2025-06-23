@@ -1,6 +1,6 @@
 <template>
   <div class="typography-view">
-    <h2 class="typography-title">Typography System</h2>
+    <h2 class="typography-title">Typography System Test</h2>
     <p class="typography-description">
       The following styles are dynamically extracted by parsing your application's loaded stylesheets.
     </p>
