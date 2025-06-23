@@ -23,7 +23,8 @@ defineProps<Props>();
   margin-left: auto;
   background: var(--atomic-docs-background-color, white);
   border-radius: var(--atomic-docs-border-radius-lg, 8px);
-
+  box-shadow: 10px 10px 30px #bebebe,
+  -10px -10px 30px #ffffff;
   // Default container with max-width
   max-width: 1280px;
 

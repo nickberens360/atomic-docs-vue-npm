@@ -24,6 +24,8 @@
                 placeholder="Search Components"
                 class="atomic-docs-input"
                 autocomplete="one-time-code"
+                @focus="handleInputFocus"
+                @blur="handleInputBlur"
               >
               <span
                 v-if="filterText"
@@ -39,7 +41,6 @@
             <div
               v-show="isMenuOpen"
               class="atomic-docs-menu"
-              @mouseleave="isMenuOpen = false"
             >
               <DocsComponentNavigation
                 :filter-text="filterText"
@@ -119,33 +120,25 @@ function toggleTheme(value: boolean | null) {
   // No direct DOM manipulation - theme will be handled by class binding in parent
 }
 
-// Add event listeners for menu
-const handleMouseEnter = () => {
+// Handle input focus and blur events
+const handleInputFocus = () => {
   isMenuOpen.value = true;
 };
 
-const handleMouseLeave = () => {
-  isMenuOpen.value = false;
+const handleInputBlur = () => {
+  // Small delay to allow for clicking on menu items
+  setTimeout(() => {
+    isMenuOpen.value = false;
+  }, 200);
 };
 
-// Add event listeners when component is mounted
+// No event listeners needed for onMounted and onUnmounted
 onMounted(() => {
-  const searchContainer = document.querySelector('.atomic-docs-search-container');
-  if (searchContainer) {
-    searchContainer.addEventListener('mouseenter', handleMouseEnter);
-    searchContainer.addEventListener('mouseleave', handleMouseLeave);
-  }
-
   // No direct DOM manipulation for theme initialization
 });
 
-// Remove event listeners when component is unmounted
 onUnmounted(() => {
-  const searchContainer = document.querySelector('.atomic-docs-search-container');
-  if (searchContainer) {
-    searchContainer.removeEventListener('mouseenter', handleMouseEnter);
-    searchContainer.removeEventListener('mouseleave', handleMouseLeave);
-  }
+  // No event listeners to remove
 });
 </script>
 
@@ -155,6 +148,7 @@ onUnmounted(() => {
   top: 0;
   left: 0;
   right: 0;
+  z-index: 1000;
   //box-shadow: var(--atomic-docs-shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.1));
   display: flex;
   align-items: center;
