@@ -158,7 +158,7 @@ onUnmounted(() => {
   box-shadow: var(--atomic-docs-shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.1));
   display: flex;
   align-items: center;
-  height: 64px;
+  height: var(--atomic-docs-appbar-height);
   width: 100%;
   background-color: var(--atomic-docs-background-color, #f5f5f5);
   padding: 0 16px;

@@ -32,7 +32,12 @@ const routes: RouteRecordRaw[] = [
         path: 'colors',
         name: 'colors',
         component: () => import('./views/DocsColorsView.vue')
-      }
+      },
+      {
+        path: 'typography',
+        name: 'typography',
+        component: () => import('./views/DocsTypography.vue')
+      },
     ]
   }
 ];

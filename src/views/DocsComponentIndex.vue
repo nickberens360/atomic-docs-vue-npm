@@ -14,8 +14,7 @@
         :is-rail-open="isRailOpen"
         :is-nav-drawer-open="isNavDrawerOpen"
       />
-      <DocsMain>
-        <DocsContainer fluid>
+      <DocsMain fluid>
           <DocsRow
             class="h-100"
             :justify="isComponentDocsRoute ? 'center' : 'end'"
@@ -38,7 +37,6 @@
               </div>
             </DocsCol>
           </DocsRow>
-        </DocsContainer>
       </DocsMain>
     </div>
     <div v-else>
@@ -57,7 +55,6 @@ import DocsComponentNavigation from '../components/DocsComponentNavigation.vue';
 import DocsRow from '../components/DocsRow.vue';
 import DocsCol from '../components/DocsCol.vue';
 import DocsMain from '../components/DocsMain.vue';
-import DocsContainer from '../components/DocsContainer.vue';
 import DocsTextField from '../components/DocsTextField.vue';
 import DocsIcon from '../components/DocsIcon.vue';
 import DocsMenu from '../components/DocsMenu.vue';
@@ -138,7 +135,6 @@ html, body {
   height: 100%;
   background-color: var(--atomic-docs-background-color, white);
   border-radius: var(--atomic-docs-border-radius-sm, 4px);
-  padding: var(--atomic-docs-spacing-md, 16px);
   height: 100vh;
   overflow: auto;
 }

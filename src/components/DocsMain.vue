@@ -1,11 +1,19 @@
 <template>
   <main class="docs-main">
-    <slot />
+    <DocsContainer :fluid="fluid">
+      <slot />
+    </DocsContainer>
   </main>
 </template>
 
 <script setup lang="ts">
-// No props or special functionality needed
+import DocsContainer from './DocsContainer.vue';
+
+interface Props {
+  fluid?: boolean;
+}
+
+defineProps<Props>();
 </script>
 
 <style scoped lang="scss">
@@ -14,18 +22,18 @@
   max-width: 100%;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  padding-top: 18px;
+  min-height: calc(100vh - var(--atomic-docs-appbar-height));
+  padding-top: var(--atomic-docs-appbar-height);
   transition: padding-top 0.2s ease-in-out;
 
   .docs-navigation-drawer--open + & {
-    padding-left: 256px;
+    padding-left: var(--atomic-docs-drawer-width);
     transition: padding-left 0.3s ease;
   }
 
   // Adjust for the rail mode
   .docs-navigation-drawer--rail + & {
-    padding-left: 56px;
+    padding-left: var(--atomic-docs-drawer-rail-width);
     transition: padding-left 0.3s ease;
   }
 }

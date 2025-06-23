@@ -1,7 +1,5 @@
 <template>
-  <DocsContainer
-    class="component-details"
-  >
+  <div class="component-details">
     <div class="component-header">
       <h2 class="component-title">
         {{ componentName }}
@@ -22,13 +20,12 @@
         Loading...
       </template>
     </Suspense>
-  </DocsContainer>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { computed, inject } from 'vue';
 import DocsComponentNotDocumented from '../components/DocsComponentNotDocumented.vue';
-import DocsContainer from '../components/DocsContainer.vue';
 import { ComponentDocPlugin } from '../types';
 
 // Define a custom type for component definitions

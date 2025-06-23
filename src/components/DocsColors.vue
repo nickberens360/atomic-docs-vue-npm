@@ -193,7 +193,6 @@ const filteredExtractedColors = computed(() => {
 
 <style scoped lang="scss">
 .docs-colors {
-  padding: var(--atomic-docs-spacing-lg, 24px);
 }
 
 .docs-colors-title {

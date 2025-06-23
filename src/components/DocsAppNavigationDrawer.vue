@@ -13,7 +13,8 @@
       <DocsAccordion
         :sections="[
           { title: 'Components' },
-          { title: 'Colors' }
+          { title: 'Colors' },
+          { title: 'Typography' }
         ]"
       >
         <template #[`section-0`]>
@@ -27,9 +28,9 @@
                 class="docs-input"
                 autocomplete="one-time-code"
               >
-              <span 
-                v-if="filterText" 
-                class="docs-append-icon" 
+              <span
+                v-if="filterText"
+                class="docs-append-icon"
                 @click="filterText = ''"
               >
                 ✕
@@ -48,6 +49,19 @@
             >
               <span class="docs-icon docs-file-icon">🎨</span>
               <span class="docs-title">Color System</span>
+            </router-link>
+          </div>
+        </template>
+
+        <template #[`section-2`]>
+          <div class="docs-nav-item">
+            <router-link
+              to="/component-docs/typography"
+              class="docs-nav-link"
+              active-class="docs-nav-link--active"
+            >
+              <span class="docs-icon docs-file-icon">🔤</span>
+              <span class="docs-title">Typography System</span>
             </router-link>
           </div>
         </template>
@@ -96,10 +110,10 @@ watch(() => props.isRailOpen, (newValue) => {
 <style scoped lang="scss">
 .docs-navigation-drawer {
   position: fixed;
-  top: 64px; // Height of the app bar
+  top: var(--atomic-docs-appbar-height);
   left: 0;
   bottom: 0;
-  width: 256px;
+  width: var(--atomic-docs-drawer-width);
   background-color: var(--atomic-docs-background-color, #f5f5f5);
   box-shadow: var(--atomic-docs-shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.1));
   transition: transform 0.3s ease, width 0.3s ease;
@@ -116,7 +130,7 @@ watch(() => props.isRailOpen, (newValue) => {
 
   // Rail state (collapsed)
   &--rail {
-    width: 56px;
+    width: var(--atomic-docs-drawer-rail-width);
     overflow: hidden;
 
     .docs-navigation-content {
@@ -127,7 +141,7 @@ watch(() => props.isRailOpen, (newValue) => {
 
   // Expanded state (on hover when in rail mode)
   &--rail.docs-navigation-drawer--expanded {
-    width: 256px;
+    width: var(--atomic-docs-drawer-width);
 
     .docs-navigation-content {
       opacity: 1;

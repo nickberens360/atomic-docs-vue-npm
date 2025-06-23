@@ -15,7 +15,7 @@
 .atomic-docs {
   /* Base styles that apply to all elements within the atomic-docs namespace */
   color: var(--atomic-docs-text-primary);
-  font-family: var(--atomic-docs-font-family);
+  font-family: var(--atomic-docs-font-family), sans-serif;
   font-size: var(--atomic-docs-font-size-md);
   line-height: 1.5;
   box-sizing: border-box;
