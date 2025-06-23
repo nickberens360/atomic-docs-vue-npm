@@ -2,55 +2,78 @@
   <div class="typography-view">
     <h2 class="typography-title">Typography System</h2>
     <p class="typography-description">
-      These are the typography styles defined in your design system.
+      The following styles are dynamically extracted by parsing your application's loaded stylesheets.
     </p>
 
-    <div class="typography-examples">
-      <div class="typography-example">
-        <h1>Heading 1</h1>
-        <div class="typography-details">
-          <span>Font size: var(--atomic-docs-font-size-xxl, 32px)</span>
-          <span>Font weight: 500</span>
-        </div>
-      </div>
+    <div v-if="isLoading" class="loading-message">
+      <p>Analyzing stylesheets...</p>
+    </div>
 
-      <div class="typography-example">
-        <h2>Heading 2</h2>
-        <div class="typography-details">
-          <span>Font size: var(--atomic-docs-font-size-xl, 24px)</span>
-          <span>Font weight: 500</span>
+    <div v-else class="typography-sections">
+      <section v-if="typographyData.utilityClasses.length" class="typography-section">
+        <h3 class="section-title">Utility Classes</h3>
+        <p class="section-subtitle">Classes that apply specific typography styles.</p>
+        <div v-for="rule in typographyData.utilityClasses" :key="rule.selector" class="typography-example">
+          <p :class="rule.selector.substring(1)" class="element-preview">{{ rule.selector }}</p>
+          <div class="details-list">
+            <div v-for="(value, key) in rule.styles" :key="key" class="detail-item">
+              <span>{{ key }}:</span>
+              <code>{{ value }}</code>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
 
-      <div class="typography-example">
-        <h3>Heading 3</h3>
-        <div class="typography-details">
-          <span>Font size: var(--atomic-docs-font-size-lg, 20px)</span>
-          <span>Font weight: 500</span>
+      <section v-if="Object.keys(typographyData.elementStyles).length" class="typography-section">
+        <h3 class="section-title">Base Element Styles</h3>
+        <p class="section-subtitle">Default styles applied to common HTML tags.</p>
+        <div v-for="tag in sortedElementTags" :key="tag" class="typography-example">
+          <component :is="tag" class="element-preview">{{ tag.charAt(0).toUpperCase() + tag.slice(1) }} Default Style</component>
+          <div class="details-list">
+            <div v-for="(value, key) in typographyData.elementStyles[tag]" :key="key" class="detail-item">
+              <span>{{ key }}:</span>
+              <code>{{ value }}</code>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
 
-      <div class="typography-example">
-        <p>Body text</p>
-        <div class="typography-details">
-          <span>Font size: var(--atomic-docs-font-size-md, 16px)</span>
-          <span>Font weight: 400</span>
+      <section v-if="Object.keys(typographyData.variables).length" class="typography-section">
+        <h3 class="section-title">CSS Variables</h3>
+        <p class="section-subtitle">Typography-related custom properties found in your stylesheets.</p>
+        <div class="variables-table">
+          <div v-for="(value, name) in typographyData.variables" :key="name" class="variable-row">
+            <code class="variable-name">{{ name }}</code>
+            <code class="variable-value">{{ value }}</code>
+          </div>
         </div>
-      </div>
-
-      <div class="typography-example">
-        <p class="small-text">Small text</p>
-        <div class="typography-details">
-          <span>Font size: var(--atomic-docs-font-size-sm, 14px)</span>
-          <span>Font weight: 400</span>
-        </div>
-      </div>
+      </section>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-// No special functionality needed
+import { computed, ref, watch } from 'vue';
+import { useExtractedTypography } from '../utils/typographyExtractor';
+
+const { extractedTypography: typographyData } = useExtractedTypography();
+const isLoading = ref(true);
+
+const sortedElementTags = computed(() => {
+  // Sort h1-h6 tags numerically, then others alphabetically
+  return Object.keys(typographyData.value.elementStyles || {}).sort((a, b) => {
+    if (a.startsWith('h') && b.startsWith('h')) return parseInt(a.slice(1)) - parseInt(b.slice(1));
+    if (a === 'body') return -1;
+    if (b === 'body') return 1;
+    return a.localeCompare(b);
+  });
+});
+
+watch(typographyData, (newData) => {
+  if (newData.utilityClasses.length || Object.keys(newData.variables).length || Object.keys(newData.elementStyles).length) {
+    isLoading.value = false;
+  }
+}, { immediate: true, deep: true });
 </script>
 
 <style scoped lang="scss">
@@ -62,35 +85,89 @@
   font-size: var(--atomic-docs-font-size-xl, 24px);
   font-weight: 500;
   margin-bottom: var(--atomic-docs-spacing-md, 16px);
+  padding-bottom: var(--atomic-docs-spacing-sm, 8px);
+  border-bottom: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.12));
 }
 
-.typography-description {
+.typography-description, .section-subtitle {
   margin-bottom: var(--atomic-docs-spacing-lg, 24px);
   color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
 }
 
-.typography-examples {
+.section-subtitle {
+  margin-top: -16px;
+  font-size: 14px;
+}
+
+.typography-sections {
   display: flex;
   flex-direction: column;
-  gap: var(--atomic-docs-spacing-md, 16px);
+  gap: 48px;
+}
+
+.section-title {
+  font-size: var(--atomic-docs-font-size-lg, 20px);
+  font-weight: 500;
+  margin-bottom: var(--atomic-docs-spacing-md, 16px);
 }
 
 .typography-example {
-  padding: var(--atomic-docs-spacing-md, 16px);
+  padding: 16px;
   border: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.12));
-  border-radius: var(--atomic-docs-border-radius-sm, 4px);
+  border-radius: 4px;
+  margin-bottom: 8px;
+  overflow-x: auto;
+}
+.element-preview {
+  margin: 0 0 16px 0;
+  padding: 0;
 }
 
-.typography-details {
-  margin-top: var(--atomic-docs-spacing-sm, 8px);
-  font-size: var(--atomic-docs-font-size-sm, 14px);
-  color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
+.details-list {
+  background-color: var(--atomic-docs-surface-color, #f5f5f5);
+  padding: 12px;
+  border-radius: 4px;
+}
+
+.detail-item {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  justify-content: space-between;
+  font-size: 14px;
+  padding: 4px 0;
+  span {
+    margin-right: 16px;
+    color: var(--atomic-docs-text-secondary);
+  }
 }
 
-.small-text {
-  font-size: var(--atomic-docs-font-size-sm, 14px);
+.variables-table {
+  border: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.12));
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.variable-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+  border-bottom: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.12));
+  &:last-child {
+    border-bottom: none;
+  }
+}
+.variable-name {
+  color: var(--atomic-docs-primary-color, #1976d2);
+}
+code {
+  font-family: var(--atomic-docs-font-family-mono, monospace);
+  font-size: 13px;
+  background-color: transparent;
+  padding: 0;
+}
+.loading-message {
+  padding: var(--atomic-docs-spacing-lg, 24px);
+  text-align: center;
+  color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
+  font-style: italic;
 }
 </style>
