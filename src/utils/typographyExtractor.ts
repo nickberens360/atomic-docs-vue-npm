@@ -34,7 +34,8 @@ export function extractTypographyStyles(): TypographyInfo {
   const utilityClasses: StyleRule[] = [];
 
   Array.from(document.styleSheets).forEach(sheet => {
-    if (sheet.href && (sheet.href.includes('atomic-docs') || sheet.href.includes('fonts.googleapis'))) {
+    // This check is kept as a performance optimization for linked stylesheets
+    if (sheet.href && sheet.href.includes('atomic-docs')) {
       return;
     }
 
@@ -50,8 +51,14 @@ export function extractTypographyStyles(): TypographyInfo {
             for (const prop of style) {
               if (prop.startsWith('--')) {
                 const lowerProp = prop.toLowerCase();
-                if (lowerProp.includes('font') || lowerProp.includes('line-height') || lowerProp.includes('letter-spacing')) {
-                  variables[prop] = style.getPropertyValue(prop).trim();
+
+                // *** THE FIX IS HERE ***
+                // We now explicitly check that the variable name does NOT contain 'atomic-docs'.
+                if (!lowerProp.includes('atomic-docs')) {
+                  // Heuristic: if the variable name implies typography, store it
+                  if (lowerProp.includes('font') || lowerProp.includes('line-height') || lowerProp.includes('letter-spacing')) {
+                    variables[prop] = style.getPropertyValue(prop).trim();
+                  }
                 }
               }
             }
@@ -66,7 +73,7 @@ export function extractTypographyStyles(): TypographyInfo {
             }
           }
 
-          // 3. Find utility classes (starts with a '.', no complex selectors)
+          // 3. Find utility classes
           if (selector.startsWith('.') && !selector.includes(' ') && !selector.includes('>')) {
             const appliedStyles: Record<string, string> = {};
             for (const prop of TYPOGRAPHY_PROPERTIES) {
@@ -92,7 +99,6 @@ export function extractTypographyStyles(): TypographyInfo {
 
 /**
  * Vue composable that provides reactive access to typography styles.
- * THIS VERSION IS CORRECTED TO PREVENT INFINITE LOOPS.
  */
 export function useExtractedTypography() {
   const extractedTypography = ref<TypographyInfo>({
@@ -106,28 +112,18 @@ export function useExtractedTypography() {
   };
 
   onMounted(() => {
-    // A delay helps ensure the app's styles are fully rendered before the first run.
     setTimeout(updateTypography, 200);
 
-    // **THE FIX**: We find the application's root element.
     const appRoot = document.getElementById('app');
-
     if (appRoot) {
-      // We create an observer that ONLY watches the #app element.
       const observer = new MutationObserver(updateTypography);
-
-      // By attaching the observer here, it will not be triggered by changes
-      // inside the documentation UI, which prevents the infinite loop.
       observer.observe(appRoot, {
         attributes: true,
         childList: true,
         subtree: true,
         attributeFilter: ['style', 'class'],
       });
-
       return () => observer.disconnect();
-    } else {
-      console.warn('Atomic Docs: Could not find the main application root element (#app) to observe for style changes.');
     }
   });
 
