@@ -2,7 +2,7 @@
   <div class="typography-view">
     <h2 class="typography-title">Typography System</h2>
     <p class="typography-description">
-      These are the typography styles dynamically extracted from your application's computed styles.
+      The following typography styles are dynamically extracted from your application's rendered elements and their computed styles.
     </p>
 
     <div v-if="isLoading" class="loading-message">
@@ -10,58 +10,40 @@
     </div>
 
     <div v-else class="typography-sections">
-      <section v-if="typographyData['font-family']?.length" class="typography-section">
-        <h3 class="section-title">Font Families</h3>
-        <div v-for="family in typographyData['font-family']" :key="family" class="typography-example">
-          <p :style="{ fontFamily: family }">The quick brown fox jumps over the lazy dog.</p>
-          <div class="typography-details">
-            <code>{{ family }}</code>
+      <section class="typography-section">
+        <h3 class="section-title">Element Styles</h3>
+        <p class="section-subtitle">Styles applied to common HTML tags.</p>
+        <div v-for="tag in sortedElementTags" :key="tag" class="typography-example">
+          <component :is="tag" class="element-preview">
+            {{ tag.charAt(0).toUpperCase() + tag.slice(1) }} Heading
+          </component>
+          <div class="typography-details-grid">
+            <div class="detail-item">
+              <strong>Size:</strong> <code>{{ typographyData.elementStyles[tag]['font-size'] }}</code>
+            </div>
+            <div class="detail-item">
+              <strong>Weight:</strong> <code>{{ typographyData.elementStyles[tag]['font-weight'] }}</code>
+            </div>
+            <div class="detail-item">
+              <strong>Line Height:</strong> <code>{{ typographyData.elementStyles[tag]['line-height'] }}</code>
+            </div>
+            <div class="detail-item full-width">
+              <strong>Font Family:</strong> <code>{{ typographyData.elementStyles[tag]['font-family'] }}</code>
+            </div>
           </div>
         </div>
       </section>
 
-      <section v-if="typographyData['font-size']?.length" class="typography-section">
-        <h3 class="section-title">Font Sizes</h3>
+      <section v-if="typographyData.scales['font-size']?.size" class="typography-section">
+        <h3 class="section-title">Typography Scales</h3>
+        <p class="section-subtitle">All unique typography values found in the application.</p>
         <div v-for="size in sortedFontSizes" :key="size" class="typography-example">
-          <p :style="{ fontSize: size }">Font Size Example</p>
+          <p :style="{ fontSize: size }">Font Size</p>
           <div class="typography-details">
             <code>{{ size }}</code>
           </div>
         </div>
       </section>
-
-      <section v-if="typographyData['font-weight']?.length" class="typography-section">
-        <h3 class="section-title">Font Weights</h3>
-        <div v-for="weight in typographyData['font-weight']" :key="weight" class="typography-example">
-          <p :style="{ fontWeight: weight }">Font Weight Example</p>
-          <div class="typography-details">
-            <code>{{ weight }}</code>
-          </div>
-        </div>
-      </section>
-
-      <section v-if="typographyData['line-height']?.length" class="typography-section">
-        <h3 class="section-title">Line Heights</h3>
-        <div v-for="height in typographyData['line-height']" :key="height" class="typography-example">
-          <div :style="{ lineHeight: height }" class="line-height-box">
-            <p>This text demonstrates a line height of {{ height }}. The quick brown fox jumps over the lazy dog, showing how lines of text are spaced vertically.</p>
-          </div>
-          <div class="typography-details">
-            <code>{{ height }}</code>
-          </div>
-        </div>
-      </section>
-
-      <section v-if="typographyData['letter-spacing']?.length" class="typography-section">
-        <h3 class="section-title">Letter Spacing</h3>
-        <div v-for="spacing in typographyData['letter-spacing']" :key="spacing" class="typography-example">
-          <p :style="{ letterSpacing: spacing }">Letter Spacing Example</p>
-          <div class="typography-details">
-            <code>{{ spacing }}</code>
-          </div>
-        </div>
-      </section>
-
     </div>
   </div>
 </template>
@@ -73,25 +55,26 @@ import { useExtractedTypography } from '../utils/typographyExtractor';
 const { extractedTypography: typographyData } = useExtractedTypography();
 const isLoading = ref(true);
 
-// Computed property to sort font sizes from largest to smallest for display
-const sortedFontSizes = computed(() => {
-  const sizes = typographyData.value['font-size'];
-  if (!sizes) return [];
-  // Sort values numerically, parsing out units like 'px' or 'rem'
-  return [...sizes].sort((a, b) => {
-    const valA = parseFloat(a);
-    const valB = parseFloat(b);
-    return valB - valA;
+const sortedElementTags = computed(() => {
+  return Object.keys(typographyData.value.elementStyles || {}).sort((a, b) => {
+    if (a.startsWith('h') && b.startsWith('h')) {
+      return parseInt(a.slice(1)) - parseInt(b.slice(1));
+    }
+    return a.localeCompare(b);
   });
 });
 
-// Watch for the data to be loaded to turn off the loading indicator
+const sortedFontSizes = computed(() => {
+  const sizes = typographyData.value.scales?.['font-size'];
+  if (!sizes) return [];
+  return [...sizes].sort((a, b) => parseFloat(b) - parseFloat(a));
+});
+
 watch(typographyData, (newData) => {
-  if (Object.values(newData).some(arr => arr.length > 0)) {
+  if (Object.keys(newData.elementStyles || {}).length > 0 || Object.keys(newData.scales || {}).length > 0) {
     isLoading.value = false;
   }
 }, { immediate: true, deep: true });
-
 </script>
 
 <style scoped lang="scss">
@@ -107,15 +90,19 @@ watch(typographyData, (newData) => {
   border-bottom: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.12));
 }
 
-.typography-description {
+.typography-description, .section-subtitle {
   margin-bottom: var(--atomic-docs-spacing-lg, 24px);
   color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
+}
+.section-subtitle {
+  margin-top: -16px;
+  font-size: 14px;
 }
 
 .typography-sections {
   display: flex;
   flex-direction: column;
-  gap: var(--atomic-docs-spacing-xl, 32px);
+  gap: var(--atomic-docs-spacing-xl, 48px);
 }
 
 .section-title {
@@ -130,17 +117,31 @@ watch(typographyData, (newData) => {
   border-radius: var(--atomic-docs-border-radius-sm, 4px);
   margin-bottom: var(--atomic-docs-spacing-sm, 8px);
   overflow-x: auto;
+}
 
-  p {
-    margin: 0;
-    padding: 0;
+.element-preview {
+  margin: 0 0 16px 0;
+  padding: 0;
+}
+
+.typography-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px 16px;
+  background-color: var(--atomic-docs-surface-color, #f5f5f5);
+  padding: var(--atomic-docs-spacing-sm, 8px);
+  border-radius: var(--atomic-docs-border-radius-sm, 4px);
+}
+
+.detail-item {
+  font-size: 14px;
+  &.full-width {
+    grid-column: 1 / -1;
   }
 }
 
 .typography-details {
   margin-top: var(--atomic-docs-spacing-sm, 8px);
-  font-size: var(--atomic-docs-font-size-sm, 14px);
-  color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
   background-color: var(--atomic-docs-surface-color, #f5f5f5);
   padding: var(--atomic-docs-spacing-xs, 4px) var(--atomic-docs-spacing-sm, 8px);
   border-radius: var(--atomic-docs-border-radius-sm, 4px);
@@ -149,12 +150,7 @@ watch(typographyData, (newData) => {
 
 code {
   font-family: var(--atomic-docs-font-family-mono, monospace);
-}
-
-.line-height-box {
-  background-color: var(--atomic-docs-primary-color-light, rgba(25, 118, 210, 0.1));
-  outline: 1px dashed var(--atomic-docs-primary-color, #1976d2);
-  padding: var(--atomic-docs-spacing-xs);
+  font-size: 13px;
 }
 
 .loading-message {

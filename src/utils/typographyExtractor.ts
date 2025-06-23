@@ -1,5 +1,11 @@
 import { ref, onMounted } from 'vue';
 
+// Interface for the extracted typography data
+export interface TypographyInfo {
+  scales: Record<string, Set<string>>;
+  elementStyles: Record<string, Record<string, string>>;
+}
+
 // Target typography properties to extract
 const TYPOGRAPHY_PROPERTIES = [
   'font-family',
@@ -10,42 +16,45 @@ const TYPOGRAPHY_PROPERTIES = [
   'text-transform',
 ];
 
+// Target elements to analyze
+const TARGET_ELEMENTS = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p'];
+
 /**
- * Extracts typography CSS styles from the DOM.
- * @returns An object containing arrays of unique values for each typography property.
+ * Extracts typography CSS variables and element styles from the DOM.
+ * @returns An object containing typography scales and specific element styles.
  */
-export function extractTypographyStyles() {
-  const typography: Record<string, Set<string>> = {};
+export function extractTypographyStyles(): TypographyInfo {
+  const scales: Record<string, Set<string>> = {};
   TYPOGRAPHY_PROPERTIES.forEach(prop => {
-    typography[prop] = new Set();
+    scales[prop] = new Set();
   });
 
-  // Query all elements in the body
-  const allElements = document.querySelectorAll('body, body *');
+  const elementStyles: Record<string, Record<string, string>> = {};
 
+  // 1. Extract raw typography scales from all elements
+  const allElements = document.querySelectorAll('body, body *');
   allElements.forEach(element => {
-    // Prevent reading styles from the docs UI itself to avoid feedback loops
-    if (element.closest('.atomic-docs')) {
-      return;
-    }
+    if (element.closest('.atomic-docs')) return; // Exclude docs UI
 
     const style = window.getComputedStyle(element);
     TYPOGRAPHY_PROPERTIES.forEach(prop => {
-      const value = style.getPropertyValue(prop);
-      // Add the value if it's not the default/initial value and is not already present
-      if (value) {
-        typography[prop].add(value);
-      }
+      scales[prop].add(style.getPropertyValue(prop));
     });
   });
 
-  // Convert Sets to sorted arrays for consistent display
-  const result: Record<string, string[]> = {};
-  for (const prop in typography) {
-    result[prop] = Array.from(typography[prop]).sort();
-  }
+  // 2. Extract styles for specific target elements (h1, h2, etc.)
+  TARGET_ELEMENTS.forEach(tag => {
+    const element = document.querySelector(tag);
+    if (element && !element.closest('.atomic-docs')) {
+      elementStyles[tag] = {};
+      const style = window.getComputedStyle(element);
+      TYPOGRAPHY_PROPERTIES.forEach(prop => {
+        elementStyles[tag][prop] = style.getPropertyValue(prop);
+      });
+    }
+  });
 
-  return result;
+  return { scales, elementStyles };
 }
 
 
@@ -54,23 +63,19 @@ export function extractTypographyStyles() {
  * @returns An object containing the reactive extracted typography styles.
  */
 export function useExtractedTypography() {
-  const extractedTypography = ref<Record<string, string[]>>({});
+  const extractedTypography = ref<TypographyInfo>({
+    scales: {},
+    elementStyles: {}
+  });
 
   const updateTypography = () => {
     extractedTypography.value = extractTypographyStyles();
   };
 
   onMounted(() => {
-    // Initial extraction after a short delay to ensure all application styles are loaded
-    setTimeout(() => {
-      updateTypography();
-    }, 100);
+    setTimeout(updateTypography, 100);
 
-
-    // Set up a MutationObserver to watch for style changes
     const observer = new MutationObserver(updateTypography);
-
-    // Observe the document for attribute changes and DOM mutations that might affect styles
     observer.observe(document.body, {
       attributes: true,
       childList: true,
@@ -78,13 +83,8 @@ export function useExtractedTypography() {
       attributeFilter: ['style', 'class']
     });
 
-    // Clean up the observer when the component is unmounted
-    return () => {
-      observer.disconnect();
-    };
+    return () => observer.disconnect();
   });
 
-  return {
-    extractedTypography
-  };
+  return { extractedTypography };
 }
