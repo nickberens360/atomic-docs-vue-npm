@@ -47,7 +47,7 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
       const examplesDirName = options?.examplesDirName;
       const rawComponentSourceModules = options?.rawComponentSourceModules;
       const plugins = options?.plugins;
-      const enableDocs = options?.enableDocs ?? (process.env.NODE_ENV === 'development');
+      const enableDocs = options?.enableDocs;
 
       if (!enableDocs) {
         return;
