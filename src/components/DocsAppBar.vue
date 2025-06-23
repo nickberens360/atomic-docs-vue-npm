@@ -233,7 +233,7 @@ onUnmounted(() => {
   padding: 0 8px;
   font-size: 14px;
   color: var(--atomic-docs-text-primary, rgba(0, 0, 0, 0.87));
-  background-color: transparent;
+  //background-color: transparent;
 }
 
 .atomic-docs-menu-container {
