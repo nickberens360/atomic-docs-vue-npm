@@ -1,12 +1,17 @@
 import { ref, onMounted } from 'vue';
 
-// Interface for the extracted typography data
-export interface TypographyInfo {
-  scales: Record<string, Set<string>>;
-  elementStyles: Record<string, Record<string, string>>;
+// Define the data structures for our findings
+export interface StyleRule {
+  selector: string;
+  styles: Record<string, string>;
 }
 
-// Target typography properties to extract
+export interface TypographyInfo {
+  variables: Record<string, string>;
+  elementStyles: Record<string, Record<string, string>>;
+  utilityClasses: StyleRule[];
+}
+
 const TYPOGRAPHY_PROPERTIES = [
   'font-family',
   'font-size',
@@ -16,56 +21,82 @@ const TYPOGRAPHY_PROPERTIES = [
   'text-transform',
 ];
 
-// Target elements to analyze
-const TARGET_ELEMENTS = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p'];
+const TARGET_ELEMENTS = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'body'];
 
 /**
- * Extracts typography CSS variables and element styles from the DOM.
- * @returns An object containing typography scales and specific element styles.
+ * Extracts typography styles by parsing CSS stylesheets.
+ * This version identifies variables, element styles, and utility classes.
+ * @returns An object containing all extracted typography information.
  */
 export function extractTypographyStyles(): TypographyInfo {
-  const scales: Record<string, Set<string>> = {};
-  TYPOGRAPHY_PROPERTIES.forEach(prop => {
-    scales[prop] = new Set();
-  });
-
+  const variables: Record<string, string> = {};
   const elementStyles: Record<string, Record<string, string>> = {};
+  const utilityClasses: StyleRule[] = [];
 
-  // 1. Extract raw typography scales from all elements
-  const allElements = document.querySelectorAll('body, body *');
-  allElements.forEach(element => {
-    if (element.closest('.atomic-docs')) return; // Exclude docs UI
+  Array.from(document.styleSheets).forEach(sheet => {
+    if (sheet.href && (sheet.href.includes('atomic-docs') || sheet.href.includes('fonts.googleapis'))) {
+      return;
+    }
 
-    const style = window.getComputedStyle(element);
-    TYPOGRAPHY_PROPERTIES.forEach(prop => {
-      scales[prop].add(style.getPropertyValue(prop));
-    });
-  });
+    try {
+      Array.from(sheet.cssRules).forEach(rule => {
+        if (rule instanceof CSSStyleRule) {
+          const style = rule.style;
+          const selector = rule.selectorText;
+          const lowerSelector = selector.toLowerCase();
 
-  // 2. Extract styles for specific target elements (h1, h2, etc.)
-  TARGET_ELEMENTS.forEach(tag => {
-    const element = document.querySelector(tag);
-    if (element && !element.closest('.atomic-docs')) {
-      elementStyles[tag] = {};
-      const style = window.getComputedStyle(element);
-      TYPOGRAPHY_PROPERTIES.forEach(prop => {
-        elementStyles[tag][prop] = style.getPropertyValue(prop);
+          // 1. Find CSS variables in :root
+          if (lowerSelector === ':root') {
+            for (const prop of style) {
+              if (prop.startsWith('--')) {
+                const lowerProp = prop.toLowerCase();
+                if (lowerProp.includes('font') || lowerProp.includes('line-height') || lowerProp.includes('letter-spacing')) {
+                  variables[prop] = style.getPropertyValue(prop).trim();
+                }
+              }
+            }
+          }
+
+          // 2. Find styles for specific H tags and p tags
+          if (TARGET_ELEMENTS.includes(lowerSelector)) {
+            elementStyles[lowerSelector] = {};
+            for (const prop of TYPOGRAPHY_PROPERTIES) {
+              const value = style.getPropertyValue(prop);
+              if (value) elementStyles[lowerSelector][prop] = value;
+            }
+          }
+
+          // 3. Find utility classes (starts with a '.', no complex selectors)
+          if (selector.startsWith('.') && !selector.includes(' ') && !selector.includes('>')) {
+            const appliedStyles: Record<string, string> = {};
+            for (const prop of TYPOGRAPHY_PROPERTIES) {
+              const value = style.getPropertyValue(prop);
+              if (value) {
+                appliedStyles[prop] = value;
+              }
+            }
+            if (Object.keys(appliedStyles).length > 0) {
+              utilityClasses.push({ selector, styles: appliedStyles });
+            }
+          }
+        }
       });
+    } catch (e) {
+      console.warn(`Could not read CSS rules from stylesheet: ${sheet.href}`, e);
     }
   });
 
-  return { scales, elementStyles };
+  return { variables, elementStyles, utilityClasses };
 }
-
 
 /**
  * Vue composable that provides reactive access to typography styles.
- * @returns An object containing the reactive extracted typography styles.
  */
 export function useExtractedTypography() {
   const extractedTypography = ref<TypographyInfo>({
-    scales: {},
-    elementStyles: {}
+    variables: {},
+    elementStyles: {},
+    utilityClasses: [],
   });
 
   const updateTypography = () => {
@@ -73,16 +104,9 @@ export function useExtractedTypography() {
   };
 
   onMounted(() => {
-    setTimeout(updateTypography, 100);
-
+    setTimeout(updateTypography, 200);
     const observer = new MutationObserver(updateTypography);
-    observer.observe(document.body, {
-      attributes: true,
-      childList: true,
-      subtree: true,
-      attributeFilter: ['style', 'class']
-    });
-
+    observer.observe(document.body, { childList: true, subtree: true });
     return () => observer.disconnect();
   });
 
