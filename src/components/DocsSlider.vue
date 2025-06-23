@@ -1,25 +1,25 @@
 <template>
-  <div class="docs-slider">
-    <div v-if="label" class="docs-slider-label">
+  <div class="atomic-docs-slider">
+    <div v-if="label" class="atomic-docs-slider-label">
       {{ label }}
-      <span v-if="thumbLabel && isDragging" class="docs-slider-thumb-label">{{ modelValue }}</span>
+      <span v-if="thumbLabel && isDragging" class="atomic-docs-slider-thumb-label">{{ modelValue }}</span>
     </div>
-    <div class="docs-slider-track-container">
-      <div class="docs-slider-track"></div>
-      <div 
-        class="docs-slider-track-fill" 
+    <div class="atomic-docs-slider-track-container">
+      <div class="atomic-docs-slider-track"></div>
+      <div
+        class="atomic-docs-slider-track-fill"
         :style="{ width: `${calculateFillWidth()}%` }"
       ></div>
-      <div 
-        class="docs-slider-thumb"
+      <div
+        class="atomic-docs-slider-thumb"
         :style="{ left: `${calculateThumbPosition()}%` }"
         @mousedown="startDrag"
         @touchstart="startDrag"
       ></div>
     </div>
-    <div v-if="!hideDetails" class="docs-slider-details">
-      <div class="docs-slider-min-value">{{ min }}</div>
-      <div class="docs-slider-max-value">{{ max }}</div>
+    <div v-if="!hideDetails" class="atomic-docs-slider-details">
+      <div class="atomic-docs-slider-min-value">{{ min }}</div>
+      <div class="atomic-docs-slider-max-value">{{ max }}</div>
     </div>
   </div>
 </template>
@@ -109,7 +109,7 @@ const handleDrag = (event: MouseEvent | TouchEvent) => {
   if (!isDragging.value) return;
 
   // Get the track element
-  const trackElement = document.querySelector('.docs-slider-track-container') as HTMLElement;
+  const trackElement = document.querySelector('.atomic-docs-slider-track-container') as HTMLElement;
   if (!trackElement) return;
 
   const rect = trackElement.getBoundingClientRect();
@@ -152,7 +152,7 @@ const endDrag = () => {
 
 // Add click handler to track container
 onMounted(() => {
-  const trackContainer = document.querySelector('.docs-slider-track-container');
+  const trackContainer = document.querySelector('.atomic-docs-slider-track-container');
   if (trackContainer) {
     trackContainer.addEventListener('click', handleTrackClick as EventListener);
   }
@@ -160,7 +160,7 @@ onMounted(() => {
 
 // Clean up event listeners
 onUnmounted(() => {
-  const trackContainer = document.querySelector('.docs-slider-track-container');
+  const trackContainer = document.querySelector('.atomic-docs-slider-track-container');
   if (trackContainer) {
     trackContainer.removeEventListener('click', handleTrackClick as EventListener);
   }
@@ -174,7 +174,7 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.docs-slider {
+.atomic-docs-slider {
   width: 100%;
   padding: 8px 0;
 

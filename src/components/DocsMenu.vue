@@ -1,9 +1,9 @@
 <template>
-  <div class="docs-menu-container">
+  <div class="atomic-docs-menu-container">
     <!-- Activator slot -->
-    <div 
-      ref="activatorEl" 
-      class="docs-menu-activator"
+    <div
+      ref="activatorEl"
+      class="atomic-docs-menu-activator"
       @click="activator === 'parent' ? toggleMenu() : null"
       @mouseenter="openOnHover ? showMenu() : null"
       @mouseleave="openOnHover ? hideMenu() : null"
@@ -17,11 +17,11 @@
     </div>
 
     <!-- Menu content -->
-    <div 
-      v-if="isOpen" 
+    <div
+      v-if="isOpen"
       ref="menuEl"
-      class="docs-menu-content" 
-      :class="{ 'docs-menu-content--open': isOpen }"
+      class="atomic-docs-menu-content"
+      :class="{ 'atomic-docs-menu-content--open': isOpen }"
       @click="closeOnContentClick ? hideMenu() : null"
       @mouseenter="openOnHover ? clearHideTimeout() : null"
       @mouseleave="openOnHover ? hideMenu() : null"
@@ -156,10 +156,10 @@ function positionMenu() {
 // Handle click outside to close menu
 function handleClickOutside(event: MouseEvent) {
   if (
-    isOpen.value && 
-    activatorEl.value && 
-    menuEl.value && 
-    !activatorEl.value.contains(event.target as Node) && 
+    isOpen.value &&
+    activatorEl.value &&
+    menuEl.value &&
+    !activatorEl.value.contains(event.target as Node) &&
     !menuEl.value.contains(event.target as Node)
   ) {
     hideMenu();
@@ -176,17 +176,17 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.docs-menu-container {
+.atomic-docs-menu-container {
   position: relative;
   display: inline-block;
 }
 
-.docs-menu-activator {
+.atomic-docs-menu-activator {
   cursor: pointer;
   display: inline-flex;
 }
 
-.docs-menu-content {
+.atomic-docs-menu-content {
   position: fixed;
   z-index: var(--atomic-docs-z-index-modal, 1000);
   background-color: var(--atomic-docs-surface-color, white);

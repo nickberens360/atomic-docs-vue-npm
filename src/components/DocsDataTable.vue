@@ -1,10 +1,10 @@
 <template>
-  <div class="docs-data-table text-body-4">
-    <table class="docs-table">
+  <div class="atomic-docs-data-table text-body-4">
+    <table class="atomic-docs-table">
       <thead>
         <tr>
-          <th 
-            v-for="header in headers" 
+          <th
+            v-for="header in headers"
             :key="header.key"
             :class="header.align ? `text-${header.align}` : ''"
           >
@@ -17,15 +17,15 @@
           v-for="(item, index) in items"
           :key="index"
         >
-          <td 
-            v-for="header in headers" 
+          <td
+            v-for="header in headers"
             :key="`${index}-${header.key}`"
             :class="header.align ? `text-${header.align}` : ''"
           >
-            <slot 
-              :name="`item.${header.key}`" 
-              :value="item[header.key]" 
-              :item="item" 
+            <slot
+              :name="`item.${header.key}`"
+              :value="item[header.key]"
+              :item="item"
               :index="index"
               :headers="headers"
             >
@@ -68,14 +68,14 @@ const props = withDefaults(defineProps<Props>(), {
 </script>
 
 <style lang="scss" scoped>
-.docs-data-table {
+.atomic-docs-data-table {
   width: 100%;
   border-radius: var(--atomic-docs-border-radius-sm, 4px);
   overflow: hidden;
   box-shadow: var(--atomic-docs-shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
-.docs-table {
+.atomic-docs-table {
   width: 100%;
   border-collapse: collapse;
   background-color: var(--atomic-docs-background-color, white);
@@ -115,7 +115,7 @@ const props = withDefaults(defineProps<Props>(), {
 }
 
 @media (max-width: 600px) {
-  .docs-table {
+  .atomic-docs-table {
     th, td {
       padding: 8px 12px;
     }

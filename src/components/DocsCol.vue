@@ -1,14 +1,14 @@
 <template>
-  <div 
-    class="docs-col" 
+  <div
+    class="atomic-docs-col"
     :class="[
-      cols && `docs-col-${cols}`,
-      sm && `docs-col-sm-${sm}`,
-      md && `docs-col-md-${md}`,
-      lg && `docs-col-lg-${lg}`,
-      xl && `docs-col-xl-${xl}`,
-      offset && `docs-offset-${offset}`,
-      order && `docs-order-${order}`,
+      cols && `atomic-docs-col-${cols}`,
+      sm && `atomic-docs-col-sm-${sm}`,
+      md && `atomic-docs-col-md-${md}`,
+      lg && `atomic-docs-col-lg-${lg}`,
+      xl && `atomic-docs-col-xl-${xl}`,
+      offset && `atomic-docs-offset-${offset}`,
+      order && `atomic-docs-order-${order}`,
       align && `align-${align}`
     ]"
   >
@@ -39,7 +39,7 @@ $breakpoint-lg: 1264px;
 $breakpoint-xl: 1904px;
 
 // Column base styles
-.docs-col {
+.atomic-docs-col {
   padding: 12px;
   width: 100%;
   flex-basis: 0;
@@ -49,16 +49,16 @@ $breakpoint-xl: 1904px;
 
 // Generate column classes for different sizes
 @for $i from 1 through 12 {
-  .docs-col-#{$i} {
+  .atomic-docs-col-#{$i} {
     flex: 0 0 calc(#{$i} / 12 * 100%);
     max-width: calc(#{$i} / 12 * 100%);
   }
-  
-  .docs-offset-#{$i} {
+
+  .atomic-docs-offset-#{$i} {
     margin-left: calc(#{$i} / 12 * 100%);
   }
-  
-  .docs-order-#{$i} {
+
+  .atomic-docs-order-#{$i} {
     order: $i;
   }
 }
@@ -66,7 +66,7 @@ $breakpoint-xl: 1904px;
 // Responsive breakpoints
 @media (min-width: $breakpoint-sm) {
   @for $i from 1 through 12 {
-    .docs-col-sm-#{$i} {
+    .atomic-docs-col-sm-#{$i} {
       flex: 0 0 calc(#{$i} / 12 * 100%);
       max-width: calc(#{$i} / 12 * 100%);
     }
@@ -75,7 +75,7 @@ $breakpoint-xl: 1904px;
 
 @media (min-width: $breakpoint-md) {
   @for $i from 1 through 12 {
-    .docs-col-md-#{$i} {
+    .atomic-docs-col-md-#{$i} {
       flex: 0 0 calc(#{$i} / 12 * 100%);
       max-width: calc(#{$i} / 12 * 100%);
     }
@@ -84,7 +84,7 @@ $breakpoint-xl: 1904px;
 
 @media (min-width: $breakpoint-lg) {
   @for $i from 1 through 12 {
-    .docs-col-lg-#{$i} {
+    .atomic-docs-col-lg-#{$i} {
       flex: 0 0 calc(#{$i} / 12 * 100%);
       max-width: calc(#{$i} / 12 * 100%);
     }
@@ -93,7 +93,7 @@ $breakpoint-xl: 1904px;
 
 @media (min-width: $breakpoint-xl) {
   @for $i from 1 through 12 {
-    .docs-col-xl-#{$i} {
+    .atomic-docs-col-xl-#{$i} {
       flex: 0 0 calc(#{$i} / 12 * 100%);
       max-width: calc(#{$i} / 12 * 100%);
     }
@@ -101,23 +101,23 @@ $breakpoint-xl: 1904px;
 }
 
 // Alignment
-.docs-col {
+.atomic-docs-col {
   &.align-start {
     align-self: flex-start;
   }
-  
+
   &.align-end {
     align-self: flex-end;
   }
-  
+
   &.align-center {
     align-self: center;
   }
-  
+
   &.align-baseline {
     align-self: baseline;
   }
-  
+
   &.align-stretch {
     align-self: stretch;
   }

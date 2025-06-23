@@ -1,7 +1,7 @@
 <template>
   <div
-    class="docs-container"
-    :class="{ 'docs-container--fluid': fluid }"
+    class="atomic-docs-container"
+    :class="{ 'atomic-docs-container--fluid': fluid }"
   >
     <slot />
   </div>
@@ -16,7 +16,7 @@ defineProps<Props>();
 </script>
 
 <style scoped lang="scss">
-.docs-container {
+.atomic-docs-container {
   width: 100%;
   padding: var(--atomic-docs-spacing-sm, 12px);
   margin-right: auto;

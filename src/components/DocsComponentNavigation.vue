@@ -1,6 +1,6 @@
 <template>
   <div
-    class="docs-custom-nav-list"
+    class="atomic-docs-custom-nav-list"
     :class="bgColor"
   >
     <template
@@ -137,7 +137,7 @@ function handleNavClick(arg: NavItem): void {
 </script>
 
 <style lang="scss" scoped>
-.docs-custom-nav-list {
+.atomic-docs-custom-nav-list {
   padding: var(--atomic-docs-spacing-sm, 8px);
   border-radius: var(--atomic-docs-border-radius-sm, 4px);
   background-color: var(--atomic-docs-surface-color, white);

@@ -1,5 +1,5 @@
 <template>
-  <main class="docs-main">
+  <main class="atomic-docs-main">
     <DocsContainer :fluid="fluid">
       <slot />
     </DocsContainer>
@@ -17,7 +17,7 @@ defineProps<Props>();
 </script>
 
 <style scoped lang="scss">
-.docs-main {
+.atomic-docs-main {
   flex: 1 1 auto;
   max-width: 100%;
   display: flex;
@@ -26,13 +26,13 @@ defineProps<Props>();
   padding-top: var(--atomic-docs-appbar-height);
   transition: padding-top 0.2s ease-in-out;
 
-  .docs-navigation-drawer--open + & {
+  .atomic-docs-navigation-drawer--open + & {
     padding-left: var(--atomic-docs-drawer-width);
     transition: padding-left 0.3s ease;
   }
 
   // Adjust for the rail mode
-  .docs-navigation-drawer--rail + & {
+  .atomic-docs-navigation-drawer--rail + & {
     padding-left: var(--atomic-docs-drawer-rail-width);
     transition: padding-left 0.3s ease;
   }

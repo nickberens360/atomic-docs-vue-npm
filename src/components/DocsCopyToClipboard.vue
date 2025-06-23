@@ -1,6 +1,6 @@
 <template>
   <button
-    class="docs-copy-button"
+    class="atomic-docs-copy-button"
     :title="copied ? 'Copied!' : title || 'Copy to clipboard'"
     @click="copyToClipboard"
   >
@@ -8,7 +8,7 @@
       <DocsIcon :icon="copied ? 'mdi-check' : 'mdi-content-copy'" size="small" />
     </slot>
     <slot name="text">
-      <span v-if="showText" class="docs-copy-text">
+      <span v-if="showText" class="atomic-docs-copy-text">
         {{ copied ? 'Copied!' : buttonText }}
       </span>
     </slot>
@@ -63,7 +63,7 @@ const copyToClipboard = async () => {
 </script>
 
 <style scoped lang="scss">
-.docs-copy-button {
+.atomic-docs-copy-button {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
@@ -80,7 +80,7 @@ const copyToClipboard = async () => {
   }
 }
 
-.docs-copy-text {
+.atomic-docs-copy-text {
   font-size: var(--atomic-docs-font-size-sm, 14px);
 }
 </style>

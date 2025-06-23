@@ -1,22 +1,22 @@
 <template>
-  <div class="docs-tabs">
-    <div class="docs-tabs__headers">
+  <div class="atomic-docs-tabs">
+    <div class="atomic-docs-tabs__headers">
       <button
         v-for="(tab, index) in tabs"
         :key="index"
-        class="docs-tabs__tab-button"
-        :class="{ 'docs-tabs__tab-button--active': activeTab === index }"
+        class="atomic-docs-tabs__tab-button"
+        :class="{ 'atomic-docs-tabs__tab-button--active': activeTab === index }"
         @click="setActiveTab(index)"
       >
         {{ tab.title }}
       </button>
     </div>
-    <div class="docs-tabs__content">
+    <div class="atomic-docs-tabs__content">
       <div
         v-for="(tab, index) in tabs"
         :key="index"
-        class="docs-tabs__tab-content"
-        :class="{ 'docs-tabs__tab-content--active': activeTab === index }"
+        class="atomic-docs-tabs__tab-content"
+        :class="{ 'atomic-docs-tabs__tab-content--active': activeTab === index }"
       >
         <slot :name="`tab-${index}`"></slot>
       </div>
@@ -65,7 +65,7 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-.docs-tabs {
+.atomic-docs-tabs {
   margin: var(--atomic-docs-spacing-lg, 24px) 0;
 
   &__headers {
@@ -105,7 +105,7 @@ onMounted(() => {
 }
 
 @media (max-width: 600px) {
-  .docs-tabs {
+  .atomic-docs-tabs {
     &__headers {
       flex-wrap: wrap;
     }

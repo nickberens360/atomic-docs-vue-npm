@@ -1,6 +1,6 @@
 <template>
   <div
-    class="docs-markdown"
+    class="atomic-docs-markdown"
     v-html="renderedContent"
   />
 </template>
@@ -132,7 +132,7 @@ onMounted(() => {
 @use '../styles/variables.scss' as *;
 
 /* Main markdown container */
-.docs-markdown {
+.atomic-docs-markdown {
   /* Base typography */
   font-family: var(--atomic-docs-font-family);
   font-size: var(--atomic-docs-font-size-md);

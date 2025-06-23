@@ -1,26 +1,26 @@
 <template>
-  <div class="docs-accordion">
+  <div class="atomic-docs-accordion">
     <div
       v-for="(section, index) in sections"
       :key="index"
-      class="docs-accordion__section"
+      class="atomic-docs-accordion__section"
       :class="{
-        'docs-accordion__section--below-active': isSectionBelowActive(index),
-        'docs-accordion__section--active': activeSection === index
+        'atomic-docs-accordion__section--below-active': isSectionBelowActive(index),
+        'atomic-docs-accordion__section--active': activeSection === index
       }"
     >
       <button
-        class="docs-accordion__header"
+        class="atomic-docs-accordion__header"
         @click="toggleSection(index)"
       >
-        <span class="docs-accordion__title">{{ section.title }}</span>
-        <span class="docs-accordion__icon">
+        <span class="atomic-docs-accordion__title">{{ section.title }}</span>
+        <span class="atomic-docs-accordion__icon">
           {{ activeSection === index ? '−' : '+' }}
         </span>
       </button>
       <div
-        class="docs-accordion__content"
-        :class="{ 'docs-accordion__content--active': activeSection === index }"
+        class="atomic-docs-accordion__content"
+        :class="{ 'atomic-docs-accordion__content--active': activeSection === index }"
       >
         <slot :name="`section-${index}`" />
       </div>
@@ -76,7 +76,7 @@ onMounted(() => {
 });
 </script>
 <style scoped lang="scss">
-.docs-accordion {
+.atomic-docs-accordion {
   //margin: var(--atomic-docs-spacing-md, 16px) 0;
   position: absolute;
   height: 100%;
@@ -163,8 +163,8 @@ onMounted(() => {
 }
 
 /* Dark mode specific styles */
-:global(.atomic-docs.docs-app-theme--dark) {
-  .docs-accordion {
+:global(.atomic-docs.atomic-docs-app-theme--dark) {
+  .atomic-docs-accordion {
     &__header {
       &--active {
         /* Lighter background for better contrast in dark mode */
@@ -175,7 +175,7 @@ onMounted(() => {
 }
 
 @media (max-width: 600px) {
-  .docs-accordion {
+  .atomic-docs-accordion {
     &__header {
       padding: 6px var(--atomic-docs-spacing-sm, 8px);
     }

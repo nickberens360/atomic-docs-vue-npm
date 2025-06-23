@@ -1,7 +1,7 @@
 <template>
   <div
     ref="componentDom"
-    class="component-isolation-wrapper"
+    class="atomic-docs-isolation-wrapper"
   >
     <slot />
   </div>
@@ -24,7 +24,7 @@ const componentDom = ref<HTMLElement | null>(null);
 </script>
 
 <style scoped lang="scss">
-.component-isolation-wrapper {
+.atomic-docs-isolation-wrapper {
   /* Create a new stacking context */
   position: relative;
   //z-index: 0;

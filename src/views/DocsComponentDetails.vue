@@ -6,7 +6,7 @@
       </h2>
       <span
         v-if="props.relativePath"
-        class="docs-chip"
+        class="atomic-docs-chip"
       >
         {{ props.relativePath }}
       </span>
@@ -90,7 +90,7 @@ const currentComponent = computed<ComponentType>(() => {
 
 <style lang="scss" scoped>
 
-.docs-chip {
+.atomic-docs-chip {
   display: inline-flex;
   align-items: center;
   padding: 0 var(--atomic-docs-spacing-sm, 8px);

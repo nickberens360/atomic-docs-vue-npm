@@ -1,45 +1,45 @@
 <template>
-  <div class="docs-color-picker">
+  <div class="atomic-docs-color-picker">
     <!-- Color display and input -->
-    <div class="docs-color-picker-header">
-      <div 
-        class="docs-color-preview" 
+    <div class="atomic-docs-color-picker-header">
+      <div
+        class="atomic-docs-color-preview"
         :style="{ backgroundColor: modelValue }"
       />
-      <input 
-        v-model="colorValue" 
-        class="docs-color-input"
+      <input
+        v-model="colorValue"
+        class="atomic-docs-color-input"
         @change="updateColor"
       >
     </div>
 
     <!-- Color canvas -->
-    <div class="docs-color-canvas-container">
-      <canvas 
-        ref="saturationCanvas" 
-        class="docs-saturation-canvas"
+    <div class="atomic-docs-color-canvas-container">
+      <canvas
+        ref="saturationCanvas"
+        class="atomic-docs-saturation-canvas"
         @mousedown="startSaturationDrag"
         @touchstart="startSaturationDrag"
       />
-      <div 
-        class="docs-saturation-pointer" 
-        :style="{ 
-          left: `${saturationPointerPosition.x}%`, 
-          top: `${saturationPointerPosition.y}%` 
+      <div
+        class="atomic-docs-saturation-pointer"
+        :style="{
+          left: `${saturationPointerPosition.x}%`,
+          top: `${saturationPointerPosition.y}%`
         }"
       />
     </div>
 
     <!-- Hue slider -->
-    <div class="docs-hue-container">
-      <div 
+    <div class="atomic-docs-hue-container">
+      <div
         ref="hueTrack"
-        class="docs-hue-track"
+        class="atomic-docs-hue-track"
         @mousedown="startHueDrag"
         @touchstart="startHueDrag"
       />
-      <div 
-        class="docs-hue-thumb" 
+      <div
+        class="atomic-docs-hue-thumb"
         :style="{ left: `${huePosition}%` }"
       />
     </div>
@@ -47,23 +47,23 @@
     <!-- Alpha slider (optional) -->
     <div
       v-if="showAlpha"
-      class="docs-alpha-container"
+      class="atomic-docs-alpha-container"
     >
-      <div 
+      <div
         ref="alphaTrack"
-        class="docs-alpha-track"
+        class="atomic-docs-alpha-track"
         @mousedown="startAlphaDrag"
         @touchstart="startAlphaDrag"
       >
-        <div 
-          class="docs-alpha-gradient"
-          :style="{ 
-            backgroundImage: `linear-gradient(to right, transparent, ${getRgbaColor(currentHue, 1, 1, 1)})` 
+        <div
+          class="atomic-docs-alpha-gradient"
+          :style="{
+            backgroundImage: `linear-gradient(to right, transparent, ${getRgbaColor(currentHue, 1, 1, 1)})`
           }"
         />
       </div>
-      <div 
-        class="docs-alpha-thumb" 
+      <div
+        class="atomic-docs-alpha-thumb"
         :style="{ left: `${alphaPosition}%` }"
       />
     </div>
@@ -337,8 +337,8 @@ function handleSaturationDrag(event: MouseEvent | Touch) {
 
   // Update color
   colorValue.value = hsvToHex(
-    currentHue.value, 
-    currentSaturation.value, 
+    currentHue.value,
+    currentSaturation.value,
     currentValue.value,
     currentAlpha.value
   );
@@ -394,8 +394,8 @@ function handleHueDrag(event: MouseEvent | Touch) {
 
   // Update color
   colorValue.value = hsvToHex(
-    currentHue.value, 
-    currentSaturation.value, 
+    currentHue.value,
+    currentSaturation.value,
     currentValue.value,
     currentAlpha.value
   );
@@ -453,8 +453,8 @@ function handleAlphaDrag(event: MouseEvent | Touch) {
 
   // Update color
   colorValue.value = hsvToHex(
-    currentHue.value, 
-    currentSaturation.value, 
+    currentHue.value,
+    currentSaturation.value,
     currentValue.value,
     currentAlpha.value
   );
@@ -494,7 +494,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
-.docs-color-picker {
+.atomic-docs-color-picker {
   width: 300px;
   padding: 16px;
   background-color: white;
@@ -502,13 +502,13 @@ onUnmounted(() => {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.docs-color-picker-header {
+.atomic-docs-color-picker-header {
   display: flex;
   align-items: center;
   margin-bottom: 16px;
 }
 
-.docs-color-preview {
+.atomic-docs-color-preview {
   width: 32px;
   height: 32px;
   border-radius: 4px;
@@ -516,7 +516,7 @@ onUnmounted(() => {
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.docs-color-input {
+.atomic-docs-color-input {
   flex: 1;
   height: 32px;
   padding: 0 8px;
@@ -525,7 +525,7 @@ onUnmounted(() => {
   font-family: monospace;
 }
 
-.docs-color-canvas-container {
+.atomic-docs-color-canvas-container {
   position: relative;
   width: 100%;
   height: 150px;
@@ -534,13 +534,13 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
-.docs-saturation-canvas {
+.atomic-docs-saturation-canvas {
   width: 100%;
   height: 100%;
   cursor: crosshair;
 }
 
-.docs-saturation-pointer {
+.atomic-docs-saturation-pointer {
   position: absolute;
   width: 12px;
   height: 12px;
@@ -551,14 +551,14 @@ onUnmounted(() => {
   pointer-events: none;
 }
 
-.docs-hue-container {
+.atomic-docs-hue-container {
   position: relative;
   width: 100%;
   height: 12px;
   margin-bottom: 16px;
 }
 
-.docs-hue-track {
+.atomic-docs-hue-track {
   width: 100%;
   height: 100%;
   border-radius: 6px;
@@ -575,7 +575,7 @@ onUnmounted(() => {
   cursor: pointer;
 }
 
-.docs-hue-thumb {
+.atomic-docs-hue-thumb {
   position: absolute;
   top: 50%;
   width: 12px;
@@ -588,13 +588,13 @@ onUnmounted(() => {
   pointer-events: none;
 }
 
-.docs-alpha-container {
+.atomic-docs-alpha-container {
   position: relative;
   width: 100%;
   height: 12px;
 }
 
-.docs-alpha-track {
+.atomic-docs-alpha-track {
   width: 100%;
   height: 100%;
   border-radius: 6px;
@@ -608,12 +608,12 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
-.docs-alpha-gradient {
+.atomic-docs-alpha-gradient {
   width: 100%;
   height: 100%;
 }
 
-.docs-alpha-thumb {
+.atomic-docs-alpha-thumb {
   position: absolute;
   top: 50%;
   width: 12px;
@@ -627,12 +627,12 @@ onUnmounted(() => {
 }
 
 // Dark theme support
-.docs-app-theme--dark .docs-color-picker {
+.atomic-docs-app-theme--dark .atomic-docs-color-picker {
   background-color: #1e1e1e;
   color: white;
 }
 
-.docs-app-theme--dark .docs-color-input {
+.atomic-docs-app-theme--dark .atomic-docs-color-input {
   background-color: #333;
   color: white;
   border-color: rgba(255, 255, 255, 0.2);

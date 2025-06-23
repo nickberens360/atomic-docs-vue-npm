@@ -105,7 +105,7 @@ const isComponentDocsRoute = computed(() => {
 
 // Computed property for theme class
 const themeClass = computed(() => {
-  return isDark.value ? 'docs-app-theme--dark' : 'docs-app-theme--light';
+  return isDark.value ? 'atomic-docs-app-theme--dark' : 'atomic-docs-app-theme--light';
 });
 
 function handleNavClick(arg: ComponentItem): void {
@@ -155,17 +155,17 @@ html, body {
   animation: bounce-right 1s ease-in-out infinite;
 }
 
-.docs-title-block {
+.atomic-docs-title-block {
   display: block;
 }
 
-.docs-header-text {
+.atomic-docs-header-text {
   text-transform: uppercase;
   font-weight: bold;
   text-align: center;
 }
 
-.docs-divider {
+.atomic-docs-divider {
   background-color: var(--atomic-docs-primary-color, #1976d2);
   margin-top: var(--atomic-docs-spacing-md, 16px);
   margin-bottom: var(--atomic-docs-spacing-md, 16px);

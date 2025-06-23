@@ -1,50 +1,50 @@
 <template>
-  <div class="docs-colors">
-    <h2 class="docs-colors-title">
+  <div class="atomic-docs-colors">
+    <h2 class="atomic-docs-colors-title">
       Color System
     </h2>
-    <p class="docs-colors-description">
+    <p class="atomic-docs-colors-description">
       These are the colors defined in your design system.
     </p>
 
     <!-- Search input -->
-    <div class="docs-colors-search">
+    <div class="atomic-docs-colors-search">
       <input
         type="text"
         v-model="searchTerm"
         placeholder="Search by variable name..."
-        class="docs-colors-search-input"
+        class="atomic-docs-colors-search-input"
       />
     </div>
 
     <!-- User-defined colors section -->
-    <div v-if="filteredConfigColors.length > 0" class="docs-colors-section">
-      <h3 class="docs-colors-section-title">User-Defined Colors</h3>
-      <div class="docs-colors-grid">
+    <div v-if="filteredConfigColors.length > 0" class="atomic-docs-colors-section">
+      <h3 class="atomic-docs-colors-section-title">User-Defined Colors</h3>
+      <div class="atomic-docs-colors-grid">
         <div
           v-for="(colorItem, index) in filteredConfigColors"
           :key="'config-' + index"
-          class="docs-color-card"
+          class="atomic-docs-color-card"
         >
           <div
-            class="docs-color-preview"
+            class="atomic-docs-color-preview"
             :style="{ backgroundColor: colorItem.color }"
           />
-          <div class="docs-color-info">
-            <div class="docs-color-name">
+          <div class="atomic-docs-color-info">
+            <div class="atomic-docs-color-name">
               {{ colorItem.name }}
               <DocsCopyToClipboard
                 :text="colorItem.name"
                 title="Copy variable name"
-                class="docs-color-copy-btn"
+                class="atomic-docs-color-copy-btn"
               />
             </div>
-            <div class="docs-color-value">
+            <div class="atomic-docs-color-value">
               {{ colorItem.color }}
               <DocsCopyToClipboard
                 :text="colorItem.color"
                 title="Copy color value"
-                class="docs-color-copy-btn"
+                class="atomic-docs-color-copy-btn"
               />
             </div>
           </div>
@@ -53,36 +53,36 @@
     </div>
 
     <!-- Automatically extracted colors section -->
-    <div v-if="isUsingExtractedColors && filteredExtractedColors.length > 0" class="docs-colors-section">
-      <h3 class="docs-colors-section-title">Automatically Extracted Colors</h3>
-      <p class="docs-colors-note">
+    <div v-if="isUsingExtractedColors && filteredExtractedColors.length > 0" class="atomic-docs-colors-section">
+      <h3 class="atomic-docs-colors-section-title">Automatically Extracted Colors</h3>
+      <p class="atomic-docs-colors-note">
         <em>Note: These colors are automatically extracted from CSS variables in your application.</em>
       </p>
-      <div class="docs-colors-grid">
+      <div class="atomic-docs-colors-grid">
         <div
           v-for="(colorItem, index) in filteredExtractedColors"
           :key="'extracted-' + index"
-          class="docs-color-card"
+          class="atomic-docs-color-card"
         >
           <div
-            class="docs-color-preview"
+            class="atomic-docs-color-preview"
             :style="{ backgroundColor: colorItem.color }"
           />
-          <div class="docs-color-info">
-            <div class="docs-color-name">
+          <div class="atomic-docs-color-info">
+            <div class="atomic-docs-color-name">
               {{ colorItem.name }}
               <DocsCopyToClipboard
                 :text="colorItem.name"
                 title="Copy variable name"
-                class="docs-color-copy-btn"
+                class="atomic-docs-color-copy-btn"
               />
             </div>
-            <div class="docs-color-value">
+            <div class="atomic-docs-color-value">
               {{ colorItem.color }}
               <DocsCopyToClipboard
                 :text="colorItem.color"
                 title="Copy color value"
-                class="docs-color-copy-btn"
+                class="atomic-docs-color-copy-btn"
               />
             </div>
           </div>
@@ -192,25 +192,25 @@ const filteredExtractedColors = computed(() => {
 </script>
 
 <style scoped lang="scss">
-.docs-colors {
+.atomic-docs-colors {
 }
 
-.docs-colors-title {
+.atomic-docs-colors-title {
   font-size: var(--atomic-docs-font-size-xl, 24px);
   font-weight: 500;
   margin-bottom: var(--atomic-docs-spacing-md, 16px);
 }
 
-.docs-colors-description {
+.atomic-docs-colors-description {
   margin-bottom: var(--atomic-docs-spacing-lg, 24px);
   color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
 }
 
-.docs-colors-search {
+.atomic-docs-colors-search {
   margin-bottom: var(--atomic-docs-spacing-lg, 24px);
 }
 
-.docs-colors-search-input {
+.atomic-docs-colors-search-input {
   width: 100%;
   padding: var(--atomic-docs-spacing-sm, 8px) var(--atomic-docs-spacing-md, 16px);
   border: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.12));
@@ -226,11 +226,11 @@ const filteredExtractedColors = computed(() => {
   }
 }
 
-.docs-colors-section {
+.atomic-docs-colors-section {
   margin-bottom: var(--atomic-docs-spacing-xl, 32px);
 }
 
-.docs-colors-section-title {
+.atomic-docs-colors-section-title {
   font-size: var(--atomic-docs-font-size-lg, 20px);
   font-weight: 500;
   margin-bottom: var(--atomic-docs-spacing-md, 16px);
@@ -239,7 +239,7 @@ const filteredExtractedColors = computed(() => {
   border-bottom: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.12));
 }
 
-.docs-colors-note {
+.atomic-docs-colors-note {
   margin-bottom: var(--atomic-docs-spacing-md, 16px);
   color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
   font-size: var(--atomic-docs-font-size-sm, 14px);
@@ -249,47 +249,47 @@ const filteredExtractedColors = computed(() => {
   border-left: 3px solid var(--atomic-docs-primary-color, #1976d2);
 }
 
-.docs-colors-grid {
+.atomic-docs-colors-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: var(--atomic-docs-spacing-md, 16px);
 }
 
-.docs-color-card {
+.atomic-docs-color-card {
   border-radius: var(--atomic-docs-border-radius-md, 8px);
   overflow: hidden;
   box-shadow: var(--atomic-docs-shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
-.docs-color-preview {
+.atomic-docs-color-preview {
   height: 120px;
   width: 100%;
 }
 
-.docs-color-info {
+.atomic-docs-color-info {
   padding: var(--atomic-docs-spacing-md, 16px);
   background-color: var(--atomic-docs-background-color, white);
 }
 
-.docs-color-name {
+.atomic-docs-color-name {
   font-weight: 500;
   margin-bottom: var(--atomic-docs-spacing-xs, 4px);
 }
 
-.docs-color-value {
+.atomic-docs-color-value {
   font-family: var(--atomic-docs-font-family-mono, monospace);
   font-size: var(--atomic-docs-font-size-sm, 14px);
   color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
 }
 
-.docs-color-name, .docs-color-value {
+.atomic-docs-color-name, .atomic-docs-color-value {
   position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.docs-color-copy-btn {
+.atomic-docs-color-copy-btn {
   opacity: 0;
   background: transparent;
   border: none;
@@ -306,7 +306,7 @@ const filteredExtractedColors = computed(() => {
   }
 }
 
-.docs-color-card:hover .docs-color-copy-btn {
+.atomic-docs-color-card:hover .atomic-docs-color-copy-btn {
   opacity: 1;
 }
 </style>

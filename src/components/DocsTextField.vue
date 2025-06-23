@@ -1,7 +1,7 @@
 <template>
-  <div class="docs-text-field" :class="{ 'docs-text-field--solo': variant === 'solo' }">
-    <div class="docs-input-wrapper">
-      <span v-if="prependInnerIcon" class="docs-prepend-icon">
+  <div class="atomic-docs-text-field" :class="{ 'atomic-docs-text-field--solo': variant === 'solo' }">
+    <div class="atomic-docs-input-wrapper">
+      <span v-if="prependInnerIcon" class="atomic-docs-prepend-icon">
         <slot name="prepend-inner">
           {{ prependInnerIcon === 'mdi-magnify' ? '🔍' : prependInnerIcon }}
         </slot>
@@ -10,15 +10,15 @@
         :value="modelValue"
         :name="name"
         :placeholder="placeholder"
-        class="docs-input"
+        class="atomic-docs-input"
         :autocomplete="autocomplete"
         @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
       />
-      <span v-if="$slots['append-inner']" class="docs-append-icon">
+      <span v-if="$slots['append-inner']" class="atomic-docs-append-icon">
         <slot name="append-inner"></slot>
       </span>
     </div>
-    <div v-if="!hideDetails" class="docs-details">
+    <div v-if="!hideDetails" class="atomic-docs-details">
       <slot name="details"></slot>
     </div>
   </div>
@@ -46,12 +46,12 @@ defineEmits(['update:modelValue']);
 </script>
 
 <style scoped lang="scss">
-.docs-text-field {
+.atomic-docs-text-field {
   width: 100%;
   margin-bottom: 8px;
 
   &--solo {
-    .docs-input-wrapper {
+    .atomic-docs-input-wrapper {
       background-color: var(--atomic-docs-surface-color, white);
       border-radius: var(--atomic-docs-border-radius-sm, 4px);
       box-shadow: var(--atomic-docs-shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.1));
@@ -59,7 +59,7 @@ defineEmits(['update:modelValue']);
   }
 }
 
-.docs-input-wrapper {
+.atomic-docs-input-wrapper {
   display: flex;
   align-items: center;
   padding: var(--atomic-docs-spacing-sm, 8px) var(--atomic-docs-spacing-sm, 12px);
@@ -72,18 +72,18 @@ defineEmits(['update:modelValue']);
   }
 }
 
-.docs-prepend-icon, .docs-append-icon {
+.atomic-docs-prepend-icon, .atomic-docs-append-icon {
   font-size: var(--atomic-docs-font-size-md, 18px);
   color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.54));
   display: flex;
   align-items: center;
 }
 
-.docs-append-icon {
+.atomic-docs-append-icon {
   cursor: pointer;
 }
 
-.docs-input {
+.atomic-docs-input {
   flex: 1;
   border: none;
   outline: none;
@@ -93,7 +93,7 @@ defineEmits(['update:modelValue']);
   color: var(--atomic-docs-text-primary, rgba(0, 0, 0, 0.87));
 }
 
-.docs-details {
+.atomic-docs-details {
   font-size: var(--atomic-docs-font-size-xs, 12px);
   padding: var(--atomic-docs-spacing-xs, 4px) 0;
   color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));

@@ -1,9 +1,9 @@
 <template>
   <span
-    class="docs-icon"
+    class="atomic-docs-icon"
     :class="[
-      size && `docs-icon--size-${size}`,
-      color && `docs-icon--color-${color}`
+      size && `atomic-docs-icon--size-${size}`,
+      color && `atomic-docs-icon--color-${color}`
     ]"
     @click="$emit('click', $event)"
   >
@@ -62,7 +62,7 @@ function getIconContent(iconName?: string): string {
 </script>
 
 <style scoped lang="scss">
-.docs-icon {
+.atomic-docs-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;

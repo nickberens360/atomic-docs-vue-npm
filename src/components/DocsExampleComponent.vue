@@ -15,7 +15,7 @@
       <slot name="default" />
     </DocsComponentIsolation>
 
-    <div class="docs-tabs-example">
+    <div class="atomic-docs-tabs-example">
       <DocsTabs :tabs="tabsExample">
         <template #[`tab-0`]>
           <div class="tab-content">
@@ -336,7 +336,7 @@ const slotHeaders = computed(() => {
 }
 
 
-.docs-tabs-example {
+.atomic-docs-tabs-example {
   margin-bottom: var(--atomic-docs-spacing-xl, 32px);
 
   h3 {
@@ -415,7 +415,7 @@ const slotHeaders = computed(() => {
     background-color: var(--atomic-docs-surface-color, #f5f5f5);
   }
 
-  .docs-icon {
+  .atomic-docs-icon {
     font-size: 18px;
   }
 }

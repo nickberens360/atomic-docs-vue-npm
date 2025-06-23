@@ -1,5 +1,5 @@
 <template>
-  <div class="docs-source-code docs-markdown">
+  <div class="atomic-docs-source-code atomic-docs-markdown">
     <div
       v-if="source"
       class="source-section code-block-wrapper"
@@ -54,7 +54,7 @@ const highlightedSource = computed(() => {
  * Styles for code display are now consolidated in DocsMarkdown.vue
  * This component uses those styles for consistency
  */
-.docs-source-code {
+.atomic-docs-source-code {
   .source-section {
     margin-bottom: var(--atomic-docs-spacing-md, 16px);
   }

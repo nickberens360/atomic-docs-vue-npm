@@ -1,11 +1,11 @@
 <template>
-  <div 
-    class="docs-row" 
+  <div
+    class="atomic-docs-row"
     :class="[
       justify && `justify-${justify}`,
       align && `align-${align}`,
-      dense && 'docs-row--dense',
-      noGutters && 'docs-row--no-gutters'
+      dense && 'atomic-docs-row--dense',
+      noGutters && 'atomic-docs-row--no-gutters'
     ]"
   >
     <slot></slot>
@@ -24,66 +24,66 @@ defineProps<Props>();
 </script>
 
 <style scoped lang="scss">
-.docs-row {
+.atomic-docs-row {
   display: flex;
   flex-wrap: wrap;
   flex: 1 1 auto;
   margin: -12px;
-  
+
   &--dense {
     margin: -4px;
   }
-  
+
   &--no-gutters {
     margin: 0;
-    
+
     > * {
       padding: 0 !important;
     }
   }
-  
+
   // Justify content
   &.justify-start {
     justify-content: flex-start;
   }
-  
+
   &.justify-end {
     justify-content: flex-end;
   }
-  
+
   &.justify-center {
     justify-content: center;
   }
-  
+
   &.justify-space-between {
     justify-content: space-between;
   }
-  
+
   &.justify-space-around {
     justify-content: space-around;
   }
-  
+
   &.justify-space-evenly {
     justify-content: space-evenly;
   }
-  
+
   // Align items
   &.align-start {
     align-items: flex-start;
   }
-  
+
   &.align-end {
     align-items: flex-end;
   }
-  
+
   &.align-center {
     align-items: center;
   }
-  
+
   &.align-baseline {
     align-items: baseline;
   }
-  
+
   &.align-stretch {
     align-items: stretch;
   }

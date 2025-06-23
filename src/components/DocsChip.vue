@@ -1,15 +1,15 @@
 <template>
-  <div 
-    class="docs-chip" 
+  <div
+    class="atomic-docs-chip"
     :class="[
-      `docs-chip--${size}`, 
-      { 
-        'docs-chip--flat': variant === 'flat',
-        'docs-chip--rounded': rounded,
-        'docs-chip--label': label
+      `atomic-docs-chip--${size}`,
+      {
+        'atomic-docs-chip--flat': variant === 'flat',
+        'atomic-docs-chip--rounded': rounded,
+        'atomic-docs-chip--label': label
       }
     ]"
-    :style="{ 
+    :style="{
       backgroundColor: color ? color : undefined,
       width: width
     }"
@@ -33,7 +33,7 @@ defineProps<Props>();
 </script>
 
 <style scoped lang="scss">
-.docs-chip {
+.atomic-docs-chip {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -46,31 +46,31 @@ defineProps<Props>();
   white-space: nowrap;
   cursor: pointer;
   transition: background-color 0.2s, box-shadow 0.2s;
-  
+
   &--small {
     height: 24px;
     font-size: 12px;
     padding: 0 8px;
   }
-  
+
   &--large {
     height: 40px;
     font-size: 16px;
     padding: 0 16px;
   }
-  
+
   &--flat {
     box-shadow: none;
   }
-  
+
   &--rounded {
     border-radius: 9999px;
   }
-  
+
   &--label {
     border-radius: 4px;
   }
-  
+
   &:hover {
     background-color: rgba(0, 0, 0, 0.12);
   }

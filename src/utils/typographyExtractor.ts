@@ -75,15 +75,19 @@ export function extractTypographyStyles(): TypographyInfo {
 
           // 3. Find utility classes
           if (selector.startsWith('.') && !selector.includes(' ') && !selector.includes('>')) {
-            const appliedStyles: Record<string, string> = {};
-            for (const prop of TYPOGRAPHY_PROPERTIES) {
-              const value = style.getPropertyValue(prop);
-              if (value) {
-                appliedStyles[prop] = value;
+            // Skip utility classes that start with 'atomic-docs' or 'vue-inspector'
+            if (!selector.toLowerCase().includes('atomic-docs') &&
+                !selector.toLowerCase().startsWith('.vue-inspector')) {
+              const appliedStyles: Record<string, string> = {};
+              for (const prop of TYPOGRAPHY_PROPERTIES) {
+                const value = style.getPropertyValue(prop);
+                if (value) {
+                  appliedStyles[prop] = value;
+                }
               }
-            }
-            if (Object.keys(appliedStyles).length > 0) {
-              utilityClasses.push({ selector, styles: appliedStyles });
+              if (Object.keys(appliedStyles).length > 0) {
+                utilityClasses.push({ selector, styles: appliedStyles });
+              }
             }
           }
         }

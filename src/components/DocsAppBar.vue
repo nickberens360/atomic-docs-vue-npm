@@ -1,33 +1,33 @@
 <template>
-  <header class="docs-app-bar">
-    <div class="docs-app-bar-content">
-      <div class="docs-app-bar-title">
+  <header class="atomic-docs-app-bar">
+    <div class="atomic-docs-app-bar-content">
+      <div class="atomic-docs-app-bar-title">
         <button
-          class="docs-nav-icon-button"
+          class="atomic-docs-nav-icon-button"
           @click="toggleDrawer"
         >
-          <span class="docs-nav-icon">☰</span>
+          <span class="atomic-docs-nav-icon">☰</span>
         </button>
-        <span class="docs-title-text">🚀 Atomic Docs</span>
+        <span class="atomic-docs-title-text">🚀 Atomic Docs</span>
       </div>
 
-      <div class="docs-app-bar-actions">
+      <div class="atomic-docs-app-bar-actions">
         <div
-          class="docs-search-container"
+          class="atomic-docs-search-container"
         >
-          <div class="docs-text-field">
-            <div class="docs-input-wrapper">
-              <span class="docs-prepend-icon">🔍</span>
+          <div class="atomic-docs-text-field">
+            <div class="atomic-docs-input-wrapper">
+              <span class="atomic-docs-prepend-icon">🔍</span>
               <input
                 v-model="filterText"
                 name="filter-list"
                 placeholder="Search Components"
-                class="docs-input"
+                class="atomic-docs-input"
                 autocomplete="one-time-code"
               >
               <span
                 v-if="filterText"
-                class="docs-append-icon"
+                class="atomic-docs-append-icon"
                 @click="filterText = ''"
               >
                 ✕
@@ -35,10 +35,10 @@
             </div>
           </div>
 
-          <div class="docs-menu-container">
+          <div class="atomic-docs-menu-container">
             <div
               v-show="isMenuOpen"
-              class="docs-menu"
+              class="atomic-docs-menu"
               @mouseleave="isMenuOpen = false"
             >
               <DocsComponentNavigation
@@ -50,17 +50,17 @@
           </div>
         </div>
 
-        <div class="docs-theme-toggle">
-          <span class="docs-theme-icon">
+        <div class="atomic-docs-theme-toggle">
+          <span class="atomic-docs-theme-icon">
             {{ props.isDark ? '🌙' : '☀️' }}
           </span>
-          <label class="docs-switch">
+          <label class="atomic-docs-switch">
             <input
               type="checkbox"
               :checked="props.isDark"
               @change="toggleTheme(($event.target as HTMLInputElement).checked)"
             >
-            <span class="docs-slider" />
+            <span class="atomic-docs-slider" />
           </label>
         </div>
       </div>
@@ -130,7 +130,7 @@ const handleMouseLeave = () => {
 
 // Add event listeners when component is mounted
 onMounted(() => {
-  const searchContainer = document.querySelector('.docs-search-container');
+  const searchContainer = document.querySelector('.atomic-docs-search-container');
   if (searchContainer) {
     searchContainer.addEventListener('mouseenter', handleMouseEnter);
     searchContainer.addEventListener('mouseleave', handleMouseLeave);
@@ -141,7 +141,7 @@ onMounted(() => {
 
 // Remove event listeners when component is unmounted
 onUnmounted(() => {
-  const searchContainer = document.querySelector('.docs-search-container');
+  const searchContainer = document.querySelector('.atomic-docs-search-container');
   if (searchContainer) {
     searchContainer.removeEventListener('mouseenter', handleMouseEnter);
     searchContainer.removeEventListener('mouseleave', handleMouseLeave);
@@ -150,7 +150,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
-.docs-app-bar {
+.atomic-docs-app-bar {
   position: fixed; /* Fixed positioning on mobile */
   top: 0;
   left: 0;
@@ -165,19 +165,19 @@ onUnmounted(() => {
   z-index: 100;
 }
 
-.docs-app-bar-content {
+.atomic-docs-app-bar-content {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
 }
 
-.docs-app-bar-title {
+.atomic-docs-app-bar-title {
   display: flex;
   align-items: center;
 }
 
-.docs-nav-icon-button {
+.atomic-docs-nav-icon-button {
   background: none;
   border: none;
   cursor: pointer;
@@ -190,50 +190,50 @@ onUnmounted(() => {
   }
 }
 
-.docs-nav-icon {
+.atomic-docs-nav-icon {
   font-size: var(--atomic-docs-font-size-md, 18px);
   color: var(--atomic-docs-text-primary, rgba(0, 0, 0, 0.87));
 }
 
-.docs-title-text {
+.atomic-docs-title-text {
   font-size: 20px;
   font-weight: 500;
   color: var(--atomic-docs-text-primary, rgba(0, 0, 0, 0.87));
 }
 
-.docs-app-bar-actions {
+.atomic-docs-app-bar-actions {
   display: flex;
   align-items: center;
 }
 
-.docs-search-container {
+.atomic-docs-search-container {
   position: relative;
   margin-right: 16px;
 }
 
-.docs-text-field {
+.atomic-docs-text-field {
   width: 300px;
   background-color: var(--atomic-docs-surface-color, white);
   border-radius: var(--atomic-docs-border-radius-sm, 4px);
   box-shadow: var(--atomic-docs-shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
-.docs-input-wrapper {
+.atomic-docs-input-wrapper {
   display: flex;
   align-items: center;
   padding: 8px 12px;
 }
 
-.docs-prepend-icon, .docs-append-icon {
+.atomic-docs-prepend-icon, .atomic-docs-append-icon {
   font-size: var(--atomic-docs-font-size-md, 18px);
   color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.54));
 }
 
-.docs-append-icon {
+.atomic-docs-append-icon {
   cursor: pointer;
 }
 
-.docs-input {
+.atomic-docs-input {
   flex: 1;
   border: none;
   outline: none;
@@ -243,11 +243,11 @@ onUnmounted(() => {
   background-color: transparent;
 }
 
-.docs-menu-container {
+.atomic-docs-menu-container {
   position: relative;
 }
 
-.docs-menu {
+.atomic-docs-menu {
   position: absolute;
   top: 100%;
   left: 0;
@@ -261,32 +261,32 @@ onUnmounted(() => {
   margin-top: 4px;
 }
 
-.docs-theme-toggle {
+.atomic-docs-theme-toggle {
   display: flex;
   align-items: center;
   margin-right: 16px;
 }
 
-.docs-theme-icon {
+.atomic-docs-theme-icon {
   margin-right: 8px;
   font-size: var(--atomic-docs-font-size-lg, 20px);
 }
 
 /* Custom switch styling */
-.docs-switch {
+.atomic-docs-switch {
   position: relative;
   display: inline-block;
   width: 40px;
   height: 20px;
 }
 
-.docs-switch input {
+.atomic-docs-switch input {
   opacity: 0;
   width: 0;
   height: 0;
 }
 
-.docs-slider {
+.atomic-docs-slider {
   position: absolute;
   cursor: pointer;
   top: 0;
@@ -298,7 +298,7 @@ onUnmounted(() => {
   border-radius: 20px;
 }
 
-.docs-slider:before {
+.atomic-docs-slider:before {
   position: absolute;
   content: "";
   height: 16px;
@@ -310,11 +310,11 @@ onUnmounted(() => {
   border-radius: 50%;
 }
 
-input:checked + .docs-slider {
+input:checked + .atomic-docs-slider {
   background-color: var(--atomic-docs-primary-color, #2196F3);
 }
 
-input:checked + .docs-slider:before {
+input:checked + .atomic-docs-slider:before {
   transform: translateX(20px);
 }
 

@@ -1,19 +1,19 @@
 <template>
   <div
     v-if="navItems.type === 'directory'"
-    class="docs-recursive-list-group"
+    class="atomic-docs-recursive-list-group"
   >
     <div
-      class="docs-recursive-list-header"
+      class="atomic-docs-recursive-list-header"
       @click="toggleExpanded($event)"
     >
-      <span class="docs-icon docs-folder-icon">🗂️</span>
-      <span class="docs-title">{{ navItems.label }}</span>
-      <span class="docs-expand-icon">{{ expanded ? '▲' : '▼' }}</span>
+      <span class="atomic-docs-icon atomic-docs-folder-icon">🗂️</span>
+      <span class="atomic-docs-title">{{ navItems.label }}</span>
+      <span class="atomic-docs-expand-icon">{{ expanded ? '▲' : '▼' }}</span>
     </div>
     <div
       v-if="expanded"
-      class="docs-recursive-list-children"
+      class="atomic-docs-recursive-list-children"
     >
       <template
         v-for="(child, i) in sortedChildren"
@@ -27,46 +27,46 @@
 
         <div
           v-else
-          class="docs-recursive-list-item"
+          class="atomic-docs-recursive-list-item"
           :class="{ 'not-documented': child.isDocumented === false }"
           @click="emit('nav-click', child)"
         >
           <span
             v-if="child.isDocumented"
-            class="docs-icon docs-file-icon"
+            class="atomic-docs-icon atomic-docs-file-icon"
           >
             📄
           </span>
           <span
             v-else
-            class="docs-icon docs-file-icon"
+            class="atomic-docs-icon atomic-docs-file-icon"
           >
             ❌
           </span>
-          <span class="docs-title">{{ child.label }}</span>
+          <span class="atomic-docs-title">{{ child.label }}</span>
         </div>
       </template>
     </div>
   </div>
   <div
     v-else
-    class="docs-recursive-list-item"
+    class="atomic-docs-recursive-list-item"
     :class="{ 'not-documented': navItems.isDocumented === false }"
     @click="emit('nav-click', navItems)"
   >
     <span
       v-if="navItems.isDocumented"
-      class="docs-icon docs-file-icon"
+      class="atomic-docs-icon atomic-docs-file-icon"
     >
       📄
     </span>
     <span
       v-else
-      class="docs-icon docs-file-icon"
+      class="atomic-docs-icon atomic-docs-file-icon"
     >
       ❌
     </span>
-    <span class="docs-title">{{ navItems.label }}</span>
+    <span class="atomic-docs-title">{{ navItems.label }}</span>
   </div>
 </template>
 
@@ -104,11 +104,11 @@ const sortedChildren = computed<NavItem[]>(() => {
 </script>
 
 <style lang="scss" scoped>
-.docs-recursive-list-group {
+.atomic-docs-recursive-list-group {
   margin-bottom: var(--atomic-docs-spacing-xs, 4px);
 }
 
-.docs-recursive-list-header {
+.atomic-docs-recursive-list-header {
   display: flex;
   align-items: center;
   padding: var(--atomic-docs-spacing-sm, 8px) var(--atomic-docs-spacing-md, 16px);
@@ -122,7 +122,7 @@ const sortedChildren = computed<NavItem[]>(() => {
   }
 }
 
-.docs-recursive-list-item {
+.atomic-docs-recursive-list-item {
   display: flex;
   align-items: center;
   padding: var(--atomic-docs-spacing-sm, 8px) var(--atomic-docs-spacing-md, 16px);
@@ -137,31 +137,31 @@ const sortedChildren = computed<NavItem[]>(() => {
   }
 }
 
-.docs-recursive-list-children {
+.atomic-docs-recursive-list-children {
   padding-left: var(--atomic-docs-spacing-md, 16px);
 }
 
-.docs-icon {
+.atomic-docs-icon {
   font-size: var(--atomic-docs-font-size-md, 16px);
   margin-right: var(--atomic-docs-spacing-sm, 8px);
   color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
 }
 
-.docs-title {
+.atomic-docs-title {
   flex: 1;
 }
 
-.docs-expand-icon {
+.atomic-docs-expand-icon {
   font-size: var(--atomic-docs-font-size-md, 16px);
   color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
 }
 
-.docs-recursive-list-item.not-documented {
+.atomic-docs-recursive-list-item.not-documented {
   font-style: italic;
   opacity: 0.5;
   color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
 
-  .docs-icon {
+  .atomic-docs-icon {
     color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
   }
 }

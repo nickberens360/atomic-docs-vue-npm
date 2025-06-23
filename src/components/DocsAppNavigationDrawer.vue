@@ -1,15 +1,15 @@
 <template>
   <aside
-    class="docs-navigation-drawer"
+    class="atomic-docs-navigation-drawer"
     :class="{
-      'docs-navigation-drawer--open': props.isNavDrawerOpen,
-      'docs-navigation-drawer--rail': props.isRailOpen,
-      'docs-navigation-drawer--expanded': isExpanded
+      'atomic-docs-navigation-drawer--open': props.isNavDrawerOpen,
+      'atomic-docs-navigation-drawer--rail': props.isRailOpen,
+      'atomic-docs-navigation-drawer--expanded': isExpanded
     }"
     @mouseenter="handleMouseEnter"
     @mouseleave="handleMouseLeave"
   >
-    <div class="docs-navigation-content">
+    <div class="atomic-docs-navigation-content">
       <DocsAccordion
         :sections="[
           { title: 'Components' },
@@ -18,19 +18,19 @@
         ]"
       >
         <template #[`section-0`]>
-          <div class="docs-text-field">
-            <div class="docs-input-wrapper">
-              <span class="docs-prepend-icon">🔍</span>
+          <div class="atomic-docs-text-field">
+            <div class="atomic-docs-input-wrapper">
+              <span class="atomic-docs-prepend-icon">🔍</span>
               <input
                 v-model="filterText"
                 name="filter-components"
                 placeholder="Search Components"
-                class="docs-input"
+                class="atomic-docs-input"
                 autocomplete="one-time-code"
               >
               <span
                 v-if="filterText"
-                class="docs-append-icon"
+                class="atomic-docs-append-icon"
                 @click="filterText = ''"
               >
                 ✕
@@ -41,27 +41,27 @@
         </template>
 
         <template #[`section-1`]>
-          <div class="docs-nav-item">
+          <div class="atomic-docs-nav-item">
             <router-link
               to="/component-docs/colors"
-              class="docs-nav-link"
-              active-class="docs-nav-link--active"
+              class="atomic-docs-nav-link"
+              active-class="atomic-docs-nav-link--active"
             >
-              <span class="docs-icon docs-file-icon">🎨</span>
-              <span class="docs-title">Color System</span>
+              <span class="atomic-docs-icon atomic-docs-file-icon">🎨</span>
+              <span class="atomic-docs-title">Color System</span>
             </router-link>
           </div>
         </template>
 
         <template #[`section-2`]>
-          <div class="docs-nav-item">
+          <div class="atomic-docs-nav-item">
             <router-link
               to="/component-docs/typography"
-              class="docs-nav-link"
-              active-class="docs-nav-link--active"
+              class="atomic-docs-nav-link"
+              active-class="atomic-docs-nav-link--active"
             >
-              <span class="docs-icon docs-file-icon">🔤</span>
-              <span class="docs-title">Typography System</span>
+              <span class="atomic-docs-icon atomic-docs-file-icon">🔤</span>
+              <span class="atomic-docs-title">Typography System</span>
             </router-link>
           </div>
         </template>
@@ -108,7 +108,7 @@ watch(() => props.isRailOpen, (newValue) => {
 </script>
 
 <style scoped lang="scss">
-.docs-navigation-drawer {
+.atomic-docs-navigation-drawer {
   position: fixed;
   top: var(--atomic-docs-appbar-height);
   left: 0;
@@ -133,40 +133,40 @@ watch(() => props.isRailOpen, (newValue) => {
     width: var(--atomic-docs-drawer-rail-width);
     overflow: hidden;
 
-    .docs-navigation-content {
+    .atomic-docs-navigation-content {
       opacity: 0;
       visibility: hidden;
     }
   }
 
   // Expanded state (on hover when in rail mode)
-  &--rail.docs-navigation-drawer--expanded {
+  &--rail.atomic-docs-navigation-drawer--expanded {
     width: var(--atomic-docs-drawer-width);
 
-    .docs-navigation-content {
+    .atomic-docs-navigation-content {
       opacity: 1;
       visibility: visible;
     }
   }
 }
 
-.docs-navigation-content {
+.atomic-docs-navigation-content {
   transition: opacity 0.2s ease, visibility 0.2s ease;
   padding: 4px;
   height: 100%;
 }
 
-.docs-navigation-card {
+.atomic-docs-navigation-card {
   background-color: transparent;
   border-radius: var(--atomic-docs-border-radius-sm, 4px);
   height: 100%;
 }
 
-.docs-nav-item {
+.atomic-docs-nav-item {
   margin: 4px 0;
 }
 
-.docs-nav-link {
+.atomic-docs-nav-link {
   display: flex;
   align-items: center;
   padding: 8px 16px;
@@ -186,16 +186,16 @@ watch(() => props.isRailOpen, (newValue) => {
   }
 }
 
-.docs-icon {
+.atomic-docs-icon {
   font-size: 16px;
   margin-right: 8px;
 }
 
-.docs-title {
+.atomic-docs-title {
   flex: 1;
 }
 
-.docs-text-field {
+.atomic-docs-text-field {
   width: 100%;
   background-color: var(--atomic-docs-background-color, white);
   border-radius: var(--atomic-docs-border-radius-sm, 4px);
@@ -203,22 +203,22 @@ watch(() => props.isRailOpen, (newValue) => {
   border: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.23));
 }
 
-.docs-input-wrapper {
+.atomic-docs-input-wrapper {
   display: flex;
   align-items: center;
   padding: 4px 12px;
 }
 
-.docs-prepend-icon, .docs-append-icon {
+.atomic-docs-prepend-icon, .atomic-docs-append-icon {
   font-size: var(--atomic-docs-font-size-md, 18px);
   color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.54));
 }
 
-.docs-append-icon {
+.atomic-docs-append-icon {
   cursor: pointer;
 }
 
-.docs-input {
+.atomic-docs-input {
   flex: 1;
   border: none;
   outline: none;

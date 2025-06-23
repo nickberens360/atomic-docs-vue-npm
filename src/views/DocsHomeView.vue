@@ -1,5 +1,5 @@
 <template>
-  <div class="docs-home">
+  <div class="atomic-docs-home">
     <RouterView />
   </div>
 </template>
@@ -9,7 +9,7 @@
 </script>
 
 <style scoped>
-.docs-home {
+.atomic-docs-home {
   width: 100%;
   height: 100%;
 }
