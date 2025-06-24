@@ -18,7 +18,14 @@
         ]"
       >
         <template #[`section-0`]>
-          <div class="atomic-docs-text-field">
+          <DocsComponentFilter
+            persist-open
+            :background-color="false"
+            flat
+            input-variant="plain"
+            input-bg-color="transparent"
+          />
+<!--          <div class="atomic-docs-text-field">
             <div class="atomic-docs-input-wrapper">
               <span class="atomic-docs-prepend-icon">🔍</span>
               <input
@@ -37,7 +44,7 @@
               </span>
             </div>
           </div>
-          <DocsComponentNavigation :filter-text="filterText" />
+          <DocsComponentNavigation :filter-text="filterText" />-->
         </template>
 
         <template #[`section-1`]>
@@ -74,6 +81,7 @@
 import { ref, watch } from 'vue';
 import DocsComponentNavigation from "./DocsComponentNavigation.vue";
 import DocsAccordion from "./DocsAccordion.vue";
+import DocsComponentFilter from "@/components/DocsComponentFilter.vue";
 
 // Define refs
 const filterText = ref('');

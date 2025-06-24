@@ -12,44 +12,7 @@
       </div>
 
       <div class="atomic-docs-app-bar-actions">
-        <div
-          class="atomic-docs-search-container"
-        >
-          <div class="atomic-docs-text-field">
-            <div class="atomic-docs-input-wrapper">
-              <span class="atomic-docs-prepend-icon">🔍</span>
-              <input
-                v-model="filterText"
-                name="filter-list"
-                placeholder="Search Components"
-                class="atomic-docs-input"
-                autocomplete="one-time-code"
-                @focus="handleInputFocus"
-                @blur="handleInputBlur"
-              >
-              <span
-                v-if="filterText"
-                class="atomic-docs-append-icon"
-                @click="filterText = ''"
-              >
-                ✕
-              </span>
-            </div>
-          </div>
-
-          <div class="atomic-docs-menu-container">
-            <div
-              v-show="isMenuOpen"
-              class="atomic-docs-menu"
-            >
-              <DocsComponentNavigation
-                :filter-text="filterText"
-                :on-nav-click="handleNavClick"
-                bg-color="surface"
-              />
-            </div>
-          </div>
-        </div>
+        <DocsComponentFilter input-variant="solo" />
 
         <div class="atomic-docs-theme-toggle">
           <span class="atomic-docs-theme-icon">
@@ -70,10 +33,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useRouter, useRoute } from "vue-router";
-import DocsComponentNavigation from "./DocsComponentNavigation.vue";
-import { ComponentItem } from '../types';
+import { computed, onMounted, onUnmounted } from 'vue'
+import { useRoute } from "vue-router";
+import DocsComponentFilter from "@/components/DocsComponentFilter.vue";
 
 // Define props and emits
 const props = defineProps<{
@@ -85,24 +47,12 @@ const emit = defineEmits<{
   (e: 'toggle-drawer'): void
 }>();
 
-const router = useRouter();
 const route = useRoute();
-const filterText = ref('');
-const isMenuOpen = ref(false);
 
 // Computed property to check if the current route is 'componentDocs'
 const isComponentDocsRoute = computed(() => {
   return (route.name as any) === 'componentDocs';
 });
-
-function handleNavClick(arg: ComponentItem): void {
-  router.push({
-    name: 'componentDoc' as any,
-    params: { componentName: arg.exampleComponent },
-    query: { relativePath: arg.relativePath }
-  });
-  isMenuOpen.value = false;
-}
 
 // Function to toggle the drawer and rail
 function toggleDrawer() {
@@ -120,17 +70,6 @@ function toggleTheme(value: boolean | null) {
   // No direct DOM manipulation - theme will be handled by class binding in parent
 }
 
-// Handle input focus and blur events
-const handleInputFocus = () => {
-  isMenuOpen.value = true;
-};
-
-const handleInputBlur = () => {
-  // Small delay to allow for clicking on menu items
-  setTimeout(() => {
-    isMenuOpen.value = false;
-  }, 200);
-};
 
 // No event listeners needed for onMounted and onUnmounted
 onMounted(() => {
@@ -148,7 +87,7 @@ onUnmounted(() => {
   top: 0;
   left: 0;
   right: 0;
-  z-index: 1000;
+  z-index: 1000; /* Ensure it stays above other content */
   //box-shadow: var(--atomic-docs-shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.1));
   display: flex;
   align-items: center;
@@ -199,60 +138,6 @@ onUnmounted(() => {
   align-items: center;
 }
 
-.atomic-docs-search-container {
-  position: relative;
-  margin-right: 16px;
-}
-
-.atomic-docs-text-field {
-  width: 300px;
-  background-color: var(--atomic-docs-surface-color, white);
-  border-radius: var(--atomic-docs-border-radius-sm, 4px);
-  box-shadow: var(--atomic-docs-shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.1));
-}
-
-.atomic-docs-input-wrapper {
-  display: flex;
-  align-items: center;
-  padding: 8px 12px;
-}
-
-.atomic-docs-prepend-icon, .atomic-docs-append-icon {
-  font-size: var(--atomic-docs-font-size-md, 18px);
-  color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.54));
-}
-
-.atomic-docs-append-icon {
-  cursor: pointer;
-}
-
-.atomic-docs-input {
-  flex: 1;
-  border: none;
-  outline: none;
-  padding: 0 8px;
-  font-size: 14px;
-  color: var(--atomic-docs-text-primary, rgba(0, 0, 0, 0.87));
-  //background-color: transparent;
-}
-
-.atomic-docs-menu-container {
-  position: relative;
-}
-
-.atomic-docs-menu {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 300px;
-  max-height: 80vh; /* Limit height to 80% of viewport height */
-  overflow-y: auto; /* Enable vertical scrolling */
-  background-color: var(--atomic-docs-surface-color, white);
-  border-radius: var(--atomic-docs-border-radius-sm, 4px);
-  box-shadow: var(--atomic-docs-shadow-md, 0 4px 8px rgba(0, 0, 0, 0.1));
-  z-index: 100;
-  margin-top: 4px;
-}
 
 .atomic-docs-theme-toggle {
   display: flex;
