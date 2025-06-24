@@ -18,7 +18,8 @@ export const fuzzyMatch = (text: string, pattern: string): boolean => {
     }
 
     // Check if pattern appears after a delimiter
-    const delimiterPattern = new RegExp(`[-_\\s]${lowerPattern}`, 'i');
+    const escapedPattern = lowerPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const delimiterPattern = new RegExp(`[-_\\s]${escapedPattern}`, 'i');
     return delimiterPattern.test(lowerText);
   }
 
