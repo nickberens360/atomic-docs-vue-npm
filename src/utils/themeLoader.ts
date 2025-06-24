@@ -46,7 +46,7 @@ export function initPrismTheme(isDarkMode: boolean): void {
         mutation.target instanceof HTMLElement
       ) {
         const element = mutation.target as HTMLElement;
-        const isDark = element.classList.contains('docs-app-theme--dark');
+        const isDark = element.classList.contains('atomic-docs-app-theme--dark');
         loadPrismTheme(isDark);
       }
     });

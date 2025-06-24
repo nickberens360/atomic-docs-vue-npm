@@ -137,7 +137,7 @@ onMounted(() => {
   font-family: var(--atomic-docs-font-family);
   font-size: var(--atomic-docs-font-size-md);
   line-height: 1.5;
-  color: var(--atomic-docs-text-primary);
+  //color: var(--atomic-docs-text-primary);
 
   /* Headings */
   h1 {
@@ -269,6 +269,13 @@ onMounted(() => {
     padding: 0;
     white-space: pre-wrap;
     word-break: break-all;
+  }
+
+  /* Override Prism.js text shadow in dark mode */
+  .atomic-docs-app-theme--dark & {
+    pre, code {
+      text-shadow: none !important;
+    }
   }
 }
 </style>
