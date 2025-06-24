@@ -92,7 +92,7 @@ const emit = defineEmits<{
 }>();
 
 // State
-const expanded = ref(true);
+const expanded = ref(false);
 
 // Methods
 const toggleExpanded = (event: Event) => {
