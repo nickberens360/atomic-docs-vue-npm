@@ -402,11 +402,17 @@ const filteredPropItems = computed(() => {
   });
 });
 
+interface EventItem {
+  event: string;
+  payload?: string;
+  description?: string;
+}
+
 const filteredEventItems = computed(() => {
   if (!searchTerm.value) {
     return props.eventItems;
   }
-  return props.eventItems.filter((item: any) => {
+  return props.eventItems.filter((item: EventItem) => {
     // Assuming event items have 'event', 'payload', 'description' fields
     return fuzzyMatch(item.event, searchTerm.value) ||
       fuzzyMatch(item.payload, searchTerm.value) ||
