@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div ref="componentRef">
     <div
       class="atomic-docs-search-container"
     >
@@ -61,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter } from "vue-router";
 import DocsComponentNavigation from "@/components/DocsComponentNavigation.vue";
 import { ComponentItem } from '../types';
@@ -107,6 +107,7 @@ const mappedInputBgColor = computed(() => {
 const router = useRouter();
 const filterText = ref('');
 const isMenuOpen = ref(props.persistOpen);
+const componentRef = ref<HTMLElement | null>(null);
 
 function handleNavClick(arg: ComponentItem): void {
   router.push({
@@ -134,6 +135,24 @@ const handleInputBlur = () => {
     }, 200);
   }
 };
+
+// Handle clicks outside the component
+const handleClickOutside = (event: MouseEvent) => {
+  if (isMenuOpen.value && componentRef.value && !componentRef.value.contains(event.target as Node)) {
+    if (!props.persistOpen) {
+      isMenuOpen.value = false;
+    }
+  }
+};
+
+// Add and remove event listeners
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside);
+});
 </script>
 
 <style scoped lang="scss">

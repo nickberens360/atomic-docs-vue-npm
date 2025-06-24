@@ -18,14 +18,26 @@
         ]"
       >
         <template #[`section-0`]>
-          <DocsComponentFilter
-            persist-open
-            :background-color="false"
-            flat
-            input-variant="outlined"
-            input-bg-color="background"
-            input-size="sm"
-          />
+          <div class="atomic-docs-text-field">
+            <div class="atomic-docs-input-wrapper">
+              <span class="atomic-docs-prepend-icon">🔍</span>
+              <input
+                v-model="filterText"
+                name="filter-components"
+                placeholder="Search Components"
+                class="atomic-docs-input"
+                autocomplete="one-time-code"
+              >
+              <span
+                v-if="filterText"
+                class="atomic-docs-append-icon"
+                @click="filterText = ''"
+              >
+                ✕
+              </span>
+            </div>
+          </div>
+          <DocsComponentNavigation :filter-text="filterText" />
         </template>
 
         <template #[`section-1`]>
@@ -62,7 +74,6 @@
 import { ref, watch } from 'vue';
 import DocsComponentNavigation from "./DocsComponentNavigation.vue";
 import DocsAccordion from "./DocsAccordion.vue";
-import DocsComponentFilter from "@/components/DocsComponentFilter.vue";
 
 // Define refs
 const filterText = ref('');
@@ -101,15 +112,11 @@ watch(() => props.isRailOpen, (newValue) => {
   position: relative;
   width: unset;
 }
-:deep(.atomic-docs-text-field) {
-  max-width: 85%;
-  margin: 0 auto;
-}
 :deep(.atomic-docs-accordion) {
   padding-left: 16px;
 }
 :deep(.atomic-docs-accordion__section--active) {
-  background-color: #ebebeb;
+  background-color: var(--atomic-docs-surface-color-dark);
 }
 .atomic-docs-navigation-drawer {
   position: fixed;
@@ -196,10 +203,10 @@ watch(() => props.isRailOpen, (newValue) => {
 }
 
 .atomic-docs-text-field {
-  width: 100%;
+  max-width: 85%;
+  margin: 0 auto;
   background-color: var(--atomic-docs-background-color, white);
   border-radius: var(--atomic-docs-border-radius-sm, 4px);
-  margin: 8px 0;
   border: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.23));
 }
 
