@@ -1,5 +1,9 @@
 <template>
-  <div class="atomic-docs-text-field" :class="{ 'atomic-docs-text-field--solo': variant === 'solo' }">
+  <div
+    class="atomic-docs-text-field"
+    :class="{ 'atomic-docs-text-field--solo': variant === 'solo' }"
+    :style="{ backgroundColor: mappedBgColor }"
+  >
     <div class="atomic-docs-input-wrapper">
       <span v-if="prependInnerIcon" class="atomic-docs-prepend-icon">
         <slot name="prepend-inner">
@@ -25,6 +29,8 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+
 interface Props {
   modelValue?: string;
   name?: string;
@@ -34,12 +40,21 @@ interface Props {
   hideDetails?: boolean;
   autocomplete?: string;
   density?: 'default' | 'comfortable' | 'compact';
+  bgColor?: 'background' | 'surface' | 'surface-dark' | false;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   variant: 'outlined',
   hideDetails: false,
-  density: 'default'
+  density: 'default',
+  bgColor: false
+});
+
+const mappedBgColor = computed(() => {
+  if (props.bgColor === false) return 'transparent';
+  if (props.bgColor === 'background') return 'var(--atomic-docs-background-color)';
+  if (props.bgColor === 'surface') return 'var(--atomic-docs-surface-color)';
+  if (props.bgColor === 'surface-dark') return 'var(--atomic-docs-surface-color-dark)';
 });
 
 defineEmits(['update:modelValue']);

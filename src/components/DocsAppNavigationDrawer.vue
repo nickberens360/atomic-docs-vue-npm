@@ -115,9 +115,9 @@ watch(() => props.isRailOpen, (newValue) => {
 :deep(.atomic-docs-accordion) {
   padding-left: 16px;
 }
-:deep(.atomic-docs-accordion__section--active) {
-  background-color: var(--atomic-docs-surface-color-dark);
-}
+//:deep(.atomic-docs-accordion__section--active) {
+//  background-color: var(--atomic-docs-surface-color-dark);
+//}
 .atomic-docs-navigation-drawer {
   position: fixed;
   top: var(--atomic-docs-appbar-height);

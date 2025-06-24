@@ -24,7 +24,7 @@ interface Component {
   [key: string]: any; // Add index signature to allow string indexing
 }
 
-interface PropItem {
+export interface PropItem {
   name: string;
   type: string;
   required: string;
