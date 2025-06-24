@@ -103,7 +103,11 @@ const toggleExpanded = (event: Event) => {
 // Computed properties
 const sortedChildren = computed<NavItem[]>(() => {
   if (props.navItems.type !== 'directory') return [];
-  return Object.values(props.navItems.children || {}).sort((a) => a.type === 'directory' ? -1 : 1);
+  return Object.values(props.navItems.children || {}).sort((a, b) => {
+    if (a.type === 'directory' && b.type !== 'directory') return -1;
+    if (a.type !== 'directory' && b.type === 'directory') return 1;
+    return a.label.localeCompare(b.label);
+  })
 });
 </script>
 
