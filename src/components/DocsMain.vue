@@ -26,7 +26,6 @@ defineProps<Props>();
   padding-right: 40px;
   padding-top: var(--atomic-docs-appbar-height);
   transition: all 0.2s ease-in-out;
-  //background-color: var(--atomic-docs-surface-color-dark, #f5f5f5);
   .atomic-docs-navigation-drawer--open + & {
     padding-left: calc(var(--atomic-docs-drawer-width) + 40px);
     padding-right: 40px;

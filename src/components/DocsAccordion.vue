@@ -65,12 +65,17 @@ const isSectionBelowActive = (index: number) => {
   return activeSection.value !== null && index > activeSection.value;
 };
 
-// Set the first section with content as active if no default is provided
+// No longer automatically opening the first section by default
 onMounted(() => {
-  if (activeSection.value === null) {
-    const firstSectionWithContent = hasSlotContent.value.findIndex(has => has);
-    if (firstSectionWithContent !== -1) {
-      activeSection.value = firstSectionWithContent;
+  // If a specific default section is provided, use it
+  if (activeSection.value !== null) {
+    // Validate that the section exists and has content
+    if (activeSection.value < props.sections.length &&
+        hasSlotContent.value[activeSection.value]) {
+      // Keep the specified default section
+    } else {
+      // Invalid default section, reset to null (all closed)
+      activeSection.value = null;
     }
   }
 });
@@ -98,6 +103,7 @@ onMounted(() => {
       flex-direction: column;
       flex: 1;
       min-height: 0; // Important for Firefox
+      box-shadow: var(--atomic-docs-shadow-lg, 0 4px 8px rgba(0, 0, 0, 0.1));
     }
 
     // Sections below active will be sticky to the bottom
