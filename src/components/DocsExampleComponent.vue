@@ -218,7 +218,8 @@ import {
   generatePropsItems,
   getPropsHeaders,
   getEventHeaders,
-  getSlotHeaders
+  getSlotHeaders,
+  PropItem
 } from '../utils/docGenerator';
 import {
   extractTemplateContent,
@@ -356,7 +357,7 @@ const filteredPropItems = computed(() => {
   if (!debouncedSearchTerm.value) {
     return basePropItems.value;
   }
-  return basePropItems.value.filter(item => {
+  return (basePropItems.value as PropItem[]).filter((item) => {
     // Search across relevant string fields in prop items
     return fuzzyMatch(item.name, debouncedSearchTerm.value) ||
       fuzzyMatch(item.type, debouncedSearchTerm.value) ||
@@ -370,27 +371,33 @@ interface EventItem {
   description?: string;
 }
 
+interface SlotItem {
+  name: string;
+  content?: string;
+  description?: string;
+}
+
 const filteredEventItems = computed(() => {
   if (!debouncedSearchTerm.value) {
-    return props.eventItems;
+    return props.eventItems as EventItem[];
   }
-  return props.eventItems.filter((item: EventItem) => {
+  return (props.eventItems as EventItem[]).filter((item) => {
     // Assuming event items have 'event', 'payload', 'description' fields
     return fuzzyMatch(item.event, debouncedSearchTerm.value) ||
-      fuzzyMatch(item.payload, debouncedSearchTerm.value) ||
-      fuzzyMatch(item.description, debouncedSearchTerm.value);
+      fuzzyMatch(item.payload ?? '', debouncedSearchTerm.value) ||
+      fuzzyMatch(item.description ?? '', debouncedSearchTerm.value);
   });
 });
 
 const filteredSlotItems = computed(() => {
   if (!debouncedSearchTerm.value) {
-    return props.slotItems;
+    return props.slotItems as SlotItem[];
   }
-  return props.slotItems.filter((item: any) => {
+  return (props.slotItems as SlotItem[]).filter((item) => {
     // Assuming slot items have 'name', 'content', 'description' fields
     return fuzzyMatch(item.name, debouncedSearchTerm.value) ||
-      fuzzyMatch(item.content, debouncedSearchTerm.value) ||
-      fuzzyMatch(item.description, debouncedSearchTerm.value);
+      fuzzyMatch(item.content ?? '', debouncedSearchTerm.value) ||
+      fuzzyMatch(item.description ?? '', debouncedSearchTerm.value);
   });
 });
 
