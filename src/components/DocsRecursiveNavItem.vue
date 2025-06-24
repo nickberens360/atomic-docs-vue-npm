@@ -8,7 +8,6 @@
       :class="{ 'atomic-docs-recursive-list-header-active': expanded }"
       @click="toggleExpanded($event)"
     >
-      does this work?
       <span class="atomic-docs-icon atomic-docs-folder-icon">🗂️</span>
       <span class="atomic-docs-expand-icon">{{ expanded ? '-' : '+' }}</span>
       <span class="atomic-docs-title">{{ navItems.label }}</span>
