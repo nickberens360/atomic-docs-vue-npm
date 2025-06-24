@@ -212,7 +212,7 @@
   setup
   lang="ts"
 >
-import {computed, inject, ref, onMounted} from 'vue';
+import {computed, inject, ref, onMounted, watch} from 'vue';
 import {useRoute} from 'vue-router';
 import {
   generatePropsItems,
@@ -225,6 +225,7 @@ import {
   extractScriptContent,
   extractStyleContent
 } from '../utils/sourceCodeExtractors';
+import { fuzzyMatch, debounce } from '../utils/stringUtils'; // Import the extracted functions
 import DocsDataTable from './DocsDataTable.vue';
 import DocsTabs from './DocsTabs.vue';
 import DocsSourceCode from './DocsSourceCode.vue';
@@ -280,56 +281,17 @@ const tabsExample = [
 
 // --- Search Filter Logic ---
 const searchTerm = ref('');
+const debouncedSearchTerm = ref('');
 
-// Fuzzy search function (reused from DocsColors/DocsTypography)
-const fuzzyMatch = (text: string, pattern: string): boolean => {
-  if (!pattern) return true;
+// Create a debounced function to update the debouncedSearchTerm
+const updateDebouncedSearchTerm = debounce((value: string) => {
+  debouncedSearchTerm.value = value;
+}, 300); // 300ms debounce delay
 
-  const lowerText = String(text).toLowerCase(); // Ensure text is a string
-  const lowerPattern = pattern.toLowerCase();
-
-  // For short search terms (1-2 chars), require word boundary matches
-  if (lowerPattern.length <= 2) {
-    // Check if pattern is at the start of the text
-    if (lowerText.startsWith(lowerPattern)) {
-      return true;
-    }
-
-    // Check if pattern appears after a delimiter
-    const delimiterPattern = new RegExp(`[-_\\s]${lowerPattern}`, 'i');
-    return delimiterPattern.test(lowerText);
-  }
-
-  // For longer terms, prioritize word boundaries
-  const words = lowerText.split(/[-_\s]/);
-
-  // Check if pattern starts at the beginning of any word
-  for (const word of words) {
-    if (word.startsWith(lowerPattern)) {
-      return true;
-    }
-  }
-
-  // Fall back to standard fuzzy search with consecutive character bonus
-  let patternIdx = 0;
-  let textIdx = 0;
-  let consecutiveMatches = 0;
-  let maxConsecutive = 0;
-
-  while (patternIdx < lowerPattern.length && textIdx < lowerText.length) {
-    if (lowerPattern[patternIdx] === lowerText[textIdx]) {
-      patternIdx++;
-      consecutiveMatches++;
-      maxConsecutive = Math.max(maxConsecutive, consecutiveMatches);
-    } else {
-      consecutiveMatches = 0;
-    }
-    textIdx++;
-  }
-
-  // Require at least 2 consecutive matches for longer patterns
-  return patternIdx === lowerPattern.length && maxConsecutive >= 2;
-};
+// Watch for changes to searchTerm and update debouncedSearchTerm with debounce
+watch(searchTerm, (newValue) => {
+  updateDebouncedSearchTerm(newValue);
+});
 
 
 // Load and process the raw component source and component module
@@ -391,14 +353,14 @@ const basePropItems = computed(() => {
 });
 
 const filteredPropItems = computed(() => {
-  if (!searchTerm.value) {
+  if (!debouncedSearchTerm.value) {
     return basePropItems.value;
   }
   return basePropItems.value.filter(item => {
     // Search across relevant string fields in prop items
-    return fuzzyMatch(item.name, searchTerm.value) ||
-      fuzzyMatch(item.type, searchTerm.value) ||
-      fuzzyMatch(item.default, searchTerm.value);
+    return fuzzyMatch(item.name, debouncedSearchTerm.value) ||
+      fuzzyMatch(item.type, debouncedSearchTerm.value) ||
+      fuzzyMatch(item.default, debouncedSearchTerm.value);
   });
 });
 
@@ -409,26 +371,26 @@ interface EventItem {
 }
 
 const filteredEventItems = computed(() => {
-  if (!searchTerm.value) {
+  if (!debouncedSearchTerm.value) {
     return props.eventItems;
   }
   return props.eventItems.filter((item: EventItem) => {
     // Assuming event items have 'event', 'payload', 'description' fields
-    return fuzzyMatch(item.event, searchTerm.value) ||
-      fuzzyMatch(item.payload, searchTerm.value) ||
-      fuzzyMatch(item.description, searchTerm.value);
+    return fuzzyMatch(item.event, debouncedSearchTerm.value) ||
+      fuzzyMatch(item.payload, debouncedSearchTerm.value) ||
+      fuzzyMatch(item.description, debouncedSearchTerm.value);
   });
 });
 
 const filteredSlotItems = computed(() => {
-  if (!searchTerm.value) {
+  if (!debouncedSearchTerm.value) {
     return props.slotItems;
   }
   return props.slotItems.filter((item: any) => {
     // Assuming slot items have 'name', 'content', 'description' fields
-    return fuzzyMatch(item.name, searchTerm.value) ||
-      fuzzyMatch(item.content, searchTerm.value) ||
-      fuzzyMatch(item.description, searchTerm.value);
+    return fuzzyMatch(item.name, debouncedSearchTerm.value) ||
+      fuzzyMatch(item.content, debouncedSearchTerm.value) ||
+      fuzzyMatch(item.description, debouncedSearchTerm.value);
   });
 });
 
