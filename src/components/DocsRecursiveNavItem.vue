@@ -8,8 +8,9 @@
       :class="{ 'atomic-docs-recursive-list-header-active': expanded }"
       @click="toggleExpanded($event)"
     >
-      <span class="atomic-docs-icon atomic-docs-folder-icon">🗂️</span>
-      <span class="atomic-docs-expand-icon">{{ expanded ? '-' : '+' }}</span>
+      <span class="atomic-docs-icon atomic-docs-folder-icon">
+        {{ expanded ? '📂' : '📁' }}
+      </span>
       <span class="atomic-docs-title">{{ navItems.label }}</span>
     </div>
     <div
@@ -20,31 +21,33 @@
         v-for="(child, i) in sortedChildren"
         :key="i"
       >
-        <DocsRecursiveNavItem
-          v-if="child.type === 'directory'"
-          :nav-items="child"
-          @nav-click="emit('nav-click', $event)"
-        />
+        <div class="atomic-docs-tree-item">
+          <DocsRecursiveNavItem
+            v-if="child.type === 'directory'"
+            :nav-items="child"
+            @nav-click="emit('nav-click', $event)"
+          />
 
-        <div
-          v-else
-          class="atomic-docs-recursive-list-item"
-          :class="{ 'not-documented': child.isDocumented === false }"
-          @click="emit('nav-click', child)"
-        >
-          <span
-            v-if="child.isDocumented"
-            class="atomic-docs-icon atomic-docs-file-icon"
-          >
-            📄
-          </span>
-          <span
+          <div
             v-else
-            class="atomic-docs-icon atomic-docs-file-icon"
+            class="atomic-docs-recursive-list-item"
+            :class="{ 'not-documented': child.isDocumented === false }"
+            @click="emit('nav-click', child)"
           >
-            ❌
-          </span>
-          <span class="atomic-docs-title">{{ child.label }}</span>
+            <span
+              v-if="child.isDocumented"
+              class="atomic-docs-icon atomic-docs-file-icon"
+            >
+              📄
+            </span>
+            <span
+              v-else
+              class="atomic-docs-icon atomic-docs-file-icon"
+            >
+              ❌
+            </span>
+            <span class="atomic-docs-title">{{ child.label }}</span>
+          </div>
         </div>
       </template>
     </div>
@@ -105,6 +108,14 @@ const sortedChildren = computed<NavItem[]>(() => {
 </script>
 
 <style lang="scss" scoped>
+// Tree structure variables
+$tree-base: 48px;
+$tree-indent: $tree-base;
+$tree-line-offset: $tree-base * 0.42; // ~10px when tree-base is 24px
+$tree-branch-width: $tree-base * 0.58; // ~14px when tree-base is 24px
+$tree-line-color: var(--atomic-docs-text-color-secondary);
+$tree-line-thickness: 1px;
+
 .atomic-docs-recursive-list-group {
   margin-bottom: var(--atomic-docs-spacing-xs, 4px);
 }
@@ -140,11 +151,37 @@ const sortedChildren = computed<NavItem[]>(() => {
 }
 
 .atomic-docs-recursive-list-children {
-  padding-left: var(--atomic-docs-spacing-md, 16px);
+  position: relative;
+  padding-left: $tree-indent;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: $tree-line-offset;
+    height: 100%;
+    width: $tree-line-thickness;
+    background-color: $tree-line-color;
+  }
+}
+
+.atomic-docs-tree-item {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 16px;
+    left: -$tree-branch-width;
+    width: $tree-branch-width;
+    height: $tree-line-thickness;
+    background-color: $tree-line-color;
+  }
 }
 
 .atomic-docs-icon {
-  display: none;
+  display: inline-block;
+  //display: none;
   font-size: var(--atomic-docs-font-size-md, 16px);
   margin-right: var(--atomic-docs-spacing-sm, 8px);
   color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
@@ -152,14 +189,6 @@ const sortedChildren = computed<NavItem[]>(() => {
 
 .atomic-docs-title {
   flex: 1;
-}
-
-.atomic-docs-expand-icon {
-  position: relative;
-  display: inline-block;
-  margin-right: 4px;
-  font-size: var(--atomic-docs-font-size-md, 16px);
-  color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
 }
 
 .atomic-docs-recursive-list-item.not-documented {
