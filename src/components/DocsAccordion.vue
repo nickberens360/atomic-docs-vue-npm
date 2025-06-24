@@ -76,23 +76,21 @@ onMounted(() => {
 });
 </script>
 <style scoped lang="scss">
-:deep(.atomic-docs-custom-nav-list) {
-  background: none !important;
-}
 .atomic-docs-accordion {
-  //margin: var(--atomic-docs-spacing-md, 16px) 0;
   position: absolute;
   height: 100%;
   top: 0;
   bottom: 0;
   right: 0;
-  left: 0;
+  left: 20px;
   display: flex;
   flex-direction: column;
 
   &__section {
     margin-bottom: var(--atomic-docs-spacing-xs, 4px);
     overflow: hidden;
+    background-color: var(--atomic-docs-background-color, #fff);
+    border-radius: var(--atomic-docs-border-radius-md, 8px);
 
     // Active section should be able to grow
     &--active {

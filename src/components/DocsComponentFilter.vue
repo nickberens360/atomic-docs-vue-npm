@@ -13,7 +13,7 @@
           'atomic-docs-text-field--underlined': props.inputVariant === 'underlined',
           'atomic-docs-text-field--plain': props.inputVariant === 'plain'
         }"
-        :style="{ backgroundColor: props.inputBgColor }"
+        :style="{ backgroundColor: mappedInputBgColor }"
       >
         <div class="atomic-docs-input-wrapper">
           <span class="atomic-docs-prepend-icon">🔍</span>
@@ -41,10 +41,10 @@
           v-show="isMenuOpen"
           class="atomic-docs-menu"
           :class="{
-            'no-background': backgroundColor === false,
+            'no-background': props.backgroundColor === false,
             'atomic-docs-menu--flat': props.flat
           }"
-          :style="backgroundColor !== false ? { backgroundColor } : {}"
+          :style="props.backgroundColor !== false ? { backgroundColor: mappedBackgroundColor } : {}"
         >
           <DocsComponentNavigation
             :filter-text="filterText"
@@ -58,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from "vue-router";
 import DocsComponentNavigation from "@/components/DocsComponentNavigation.vue";
 import { ComponentItem } from '../types';
@@ -66,18 +66,37 @@ import { ComponentItem } from '../types';
 // Define props
 interface Props {
   persistOpen?: boolean;
-  backgroundColor?: string | false;
+  backgroundColor?: 'background' | 'surface' | 'surface-dark' | false;
   flat?: boolean;
   inputVariant?: 'outlined' | 'filled' | 'solo' | 'underlined' | 'plain';
-  inputBgColor?: string;
+  inputBgColor?: 'background' | 'surface' | 'surface-dark' | false;
+  closeOnClick?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   persistOpen: false,
-  backgroundColor: 'white',
+  backgroundColor: 'background',
   flat: false,
   inputVariant: 'filled',
-  inputBgColor: 'var(--atomic-docs-background-color)'
+  inputBgColor: 'background',
+  closeOnClick: false
+});
+
+// Computed properties to map color values to CSS variables
+const mappedBackgroundColor = computed(() => {
+  if (props.backgroundColor === false) return false;
+  if (props.backgroundColor === 'background') return 'var(--atomic-docs-background-color)';
+  if (props.backgroundColor === 'surface') return 'var(--atomic-docs-surface-color)';
+  if (props.backgroundColor === 'surface-dark') return 'var(--atomic-docs-surface-color-dark)';
+  return props.backgroundColor;
+});
+
+const mappedInputBgColor = computed(() => {
+  if (props.inputBgColor === false) return 'transparent';
+  if (props.inputBgColor === 'background') return 'var(--atomic-docs-background-color)';
+  if (props.inputBgColor === 'surface') return 'var(--atomic-docs-surface-color)';
+  if (props.inputBgColor === 'surface-dark') return 'var(--atomic-docs-surface-color-dark)';
+  return props.inputBgColor;
 });
 
 const router = useRouter();
@@ -90,7 +109,8 @@ function handleNavClick(arg: ComponentItem): void {
     params: { componentName: arg.exampleComponent },
     query: { relativePath: arg.relativePath }
   });
-  if (!props.persistOpen) {
+  // Only close the menu if persistOpen is false AND closeOnClick is true
+  if (!props.persistOpen && props.closeOnClick) {
     isMenuOpen.value = false;
   }
 }
@@ -101,8 +121,8 @@ const handleInputFocus = () => {
 };
 
 const handleInputBlur = () => {
-  // Only close the menu if persistOpen is false
-  if (!props.persistOpen) {
+  // Only close the menu if persistOpen is false AND closeOnClick is true
+  if (!props.persistOpen && props.closeOnClick) {
     // Small delay to allow for clicking on menu items
     setTimeout(() => {
       isMenuOpen.value = false;

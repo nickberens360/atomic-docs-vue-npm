@@ -140,10 +140,5 @@ function handleNavClick(arg: NavItem): void {
 .atomic-docs-custom-nav-list {
   padding: var(--atomic-docs-spacing-sm, 8px);
   border-radius: var(--atomic-docs-border-radius-sm, 4px);
-  background-color: var(--atomic-docs-surface-color, white);
-
-  &.background {
-    background-color: var(--atomic-docs-background-color, #f5f5f5);
-  }
 }
 </style>

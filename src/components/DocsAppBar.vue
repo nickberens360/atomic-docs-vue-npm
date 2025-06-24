@@ -12,7 +12,11 @@
       </div>
 
       <div class="atomic-docs-app-bar-actions">
-        <DocsComponentFilter input-variant="solo" />
+        <DocsComponentFilter
+          input-variant="solo"
+          background-color="background"
+          :close-on-click="false"
+        />
 
         <div class="atomic-docs-theme-toggle">
           <span class="atomic-docs-theme-icon">

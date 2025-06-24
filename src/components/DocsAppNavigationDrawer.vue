@@ -22,29 +22,9 @@
             persist-open
             :background-color="false"
             flat
-            input-variant="plain"
-            input-bg-color="transparent"
+            input-variant="underlined"
+            :input-bg-color="false"
           />
-<!--          <div class="atomic-docs-text-field">
-            <div class="atomic-docs-input-wrapper">
-              <span class="atomic-docs-prepend-icon">🔍</span>
-              <input
-                v-model="filterText"
-                name="filter-components"
-                placeholder="Search Components"
-                class="atomic-docs-input"
-                autocomplete="one-time-code"
-              >
-              <span
-                v-if="filterText"
-                class="atomic-docs-append-icon"
-                @click="filterText = ''"
-              >
-                ✕
-              </span>
-            </div>
-          </div>
-          <DocsComponentNavigation :filter-text="filterText" />-->
         </template>
 
         <template #[`section-1`]>
