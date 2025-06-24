@@ -1,5 +1,5 @@
 <template>
-  <div ref="componentRef">
+  <div>
     <div
       class="atomic-docs-search-container"
     >
@@ -61,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from "vue-router";
 import DocsComponentNavigation from "@/components/DocsComponentNavigation.vue";
 import { ComponentItem } from '../types';
@@ -134,40 +134,6 @@ const handleInputBlur = () => {
     }, 200);
   }
 };
-
-// Reference to the component root element
-const componentRef = ref<HTMLElement | null>(null);
-
-// Handle clicks outside the component
-const handleClickOutside = (event: MouseEvent) => {
-  if (componentRef.value && !componentRef.value.contains(event.target as Node) && isMenuOpen.value) {
-    isMenuOpen.value = false;
-  }
-};
-
-// Set up and clean up event listeners
-onMounted(() => {
-  // If menu is initially open, add the event listener
-  if (isMenuOpen.value) {
-    document.addEventListener('click', handleClickOutside);
-  }
-});
-
-onBeforeUnmount(() => {
-  // Always remove the event listener when component is unmounted
-  document.removeEventListener('click', handleClickOutside);
-});
-
-// Watch for menu open/close to add/remove event listeners
-watch(isMenuOpen, (newValue) => {
-  if (newValue && !props.persistOpen) {
-    // Add event listener when menu opens
-    document.addEventListener('click', handleClickOutside);
-  } else {
-    // Remove event listener when menu closes
-    document.removeEventListener('click', handleClickOutside);
-  }
-});
 </script>
 
 <style scoped lang="scss">
