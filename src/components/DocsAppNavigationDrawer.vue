@@ -100,9 +100,13 @@ watch(() => props.isRailOpen, (newValue) => {
   position: relative;
   width: unset;
 }
+:deep(.atomic-docs-accordion__title) {
+  color: white;
+}
 .atomic-docs-navigation-drawer {
   position: fixed;
   top: var(--atomic-docs-appbar-height);
+  background: var(--atomic-docs-primary-color);
   left: 0;
   bottom: 0;
   width: var(--atomic-docs-drawer-width);
