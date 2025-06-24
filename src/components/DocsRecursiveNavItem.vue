@@ -9,8 +9,8 @@
       @click="toggleExpanded($event)"
     >
       <span class="atomic-docs-icon atomic-docs-folder-icon">🗂️</span>
+      <span class="atomic-docs-expand-icon">{{ expanded ? '-' : '+' }}</span>
       <span class="atomic-docs-title">{{ navItems.label }}</span>
-      <span class="atomic-docs-expand-icon">{{ expanded ? '▲' : '▼' }}</span>
     </div>
     <div
       v-if="expanded"
@@ -111,6 +111,7 @@ const sortedChildren = computed<NavItem[]>(() => {
 
 .atomic-docs-recursive-list-header {
   display: flex;
+  font-weight: bold;
   align-items: center;
   padding: var(--atomic-docs-spacing-sm, 8px) var(--atomic-docs-spacing-md, 16px);
   cursor: pointer;
@@ -143,6 +144,7 @@ const sortedChildren = computed<NavItem[]>(() => {
 }
 
 .atomic-docs-icon {
+  display: none;
   font-size: var(--atomic-docs-font-size-md, 16px);
   margin-right: var(--atomic-docs-spacing-sm, 8px);
   color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
@@ -153,6 +155,9 @@ const sortedChildren = computed<NavItem[]>(() => {
 }
 
 .atomic-docs-expand-icon {
+  position: relative;
+  display: inline-block;
+  margin-right: 4px;
   font-size: var(--atomic-docs-font-size-md, 16px);
   color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
 }

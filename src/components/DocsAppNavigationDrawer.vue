@@ -101,8 +101,15 @@ watch(() => props.isRailOpen, (newValue) => {
   position: relative;
   width: unset;
 }
+:deep(.atomic-docs-text-field) {
+  max-width: 85%;
+  margin: 0 auto;
+}
 :deep(.atomic-docs-accordion) {
   padding-left: 16px;
+}
+:deep(.atomic-docs-accordion__section--active) {
+  background-color: #ebebeb;
 }
 .atomic-docs-navigation-drawer {
   position: fixed;

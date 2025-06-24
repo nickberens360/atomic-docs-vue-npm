@@ -163,7 +163,7 @@ onMounted(() => {
       overflow-y: auto; // Make content scrollable
       max-height: none; // Remove the hardcoded height
       height: 100%; // Fill the available space
-      padding: var(--atomic-docs-spacing-xs, 4px) var(--atomic-docs-spacing-sm, 12px) var(--atomic-docs-spacing-sm, 8px);
+      //padding: var(--atomic-docs-spacing-xs, 4px) var(--atomic-docs-spacing-sm, 12px) var(--atomic-docs-spacing-sm, 8px);
     }
   }
 }

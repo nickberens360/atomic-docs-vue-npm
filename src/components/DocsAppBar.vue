@@ -154,6 +154,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   margin-right: 16px;
+  margin-left: 16px;
 }
 
 .atomic-docs-theme-icon {

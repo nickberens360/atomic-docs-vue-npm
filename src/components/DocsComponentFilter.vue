@@ -139,7 +139,7 @@ const handleInputBlur = () => {
 <style scoped lang="scss">
 .atomic-docs-search-container {
   position: relative;
-  margin-right: 16px;
+  //margin-right: 16px;
 }
 
 .atomic-docs-text-field {
