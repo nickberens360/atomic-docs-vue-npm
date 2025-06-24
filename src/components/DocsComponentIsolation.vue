@@ -16,8 +16,7 @@ const componentDocPlugin = inject<ComponentDocPlugin>('componentDocPlugin');
 
 // Get the configured font or use a default system font stack if not provided
 const componentFont = computed(() => {
-  return componentDocPlugin?.options?.componentFont ||
-    '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"';
+  return componentDocPlugin?.options?.componentFont ?? 'inherit';
 });
 
 const componentDom = ref<HTMLElement | null>(null);

@@ -6,7 +6,7 @@
       style="max-width: 900px;"
     >
       <slot name="description">
-        <p>
+        <p style="margin-bottom: 18px;">
           {{ description }}
         </p>
       </slot>
@@ -19,16 +19,39 @@
       <DocsTabs :tabs="tabsExample">
         <template #[`tab-0`]>
           <div class="tab-content">
-            <h2 class="example-component__heading">
+            <!-- Universal Search Input for Tables -->
+            <div class="atomic-docs-table-search">
+              <DocsTextField
+                v-model="searchTerm"
+                name="table-search"
+                placeholder="Search API documentation..."
+                prepend-inner-icon="mdi-magnify"
+                hide-details
+                bg-color="background"
+              >
+                <template #append-inner>
+                  <span
+                    v-if="searchTerm"
+                    class="atomic-docs-append-icon"
+                    @click="searchTerm = ''"
+                  >
+                    ✕
+                  </span>
+                </template>
+              </DocsTextField>
+            </div>
+
+
+            <h2 class="atomic-docs-example-component__heading">
               Props
             </h2>
             <slot
-              v-if="computedPropItems.length > 0 || $slots.props"
+              v-if="filteredPropItems.length > 0 || $slots.props"
               name="props"
             >
               <DocsDataTable
                 :headers="propHeaders"
-                :items="computedPropItems"
+                :items="filteredPropItems"
                 hide-default-footer
               >
                 <template
@@ -49,17 +72,17 @@
               No props documented.
             </p>
 
-            <div class="example-component__events">
-              <h2 class="example-component__heading">
+            <div class="atomic-docs-example-component__events">
+              <h2 class="atomic-docs-example-component__heading">
                 Events
               </h2>
               <slot
-                v-if="eventItems.length > 0 || $slots.events"
+                v-if="filteredEventItems.length > 0 || $slots.events"
                 name="events"
               >
                 <DocsDataTable
                   :headers="eventHeaders"
-                  :items="eventItems"
+                  :items="filteredEventItems"
                   hide-default-footer
                 >
                   <template
@@ -81,17 +104,17 @@
               </p>
             </div>
 
-            <div class="example-component__slots">
-              <h2 class="example-component__heading">
+            <div class="atomic-docs-example-component__slots">
+              <h2 class="atomic-docs-example-component__heading">
                 Slots
               </h2>
               <slot
-                v-if="slotItems.length > 0 || $slots.slots"
+                v-if="filteredSlotItems.length > 0 || $slots.slots"
                 name="slots"
               >
                 <DocsDataTable
                   :headers="slotHeaders"
-                  :items="slotItems"
+                  :items="filteredSlotItems"
                   hide-default-footer
                 >
                   <template
@@ -207,8 +230,9 @@ import DocsTabs from './DocsTabs.vue';
 import DocsSourceCode from './DocsSourceCode.vue';
 import DocsComponentIsolation from './DocsComponentIsolation.vue';
 import {ComponentDocPlugin} from '../types';
-import DocsIcon from "./DocsIcon.vue";
+// Removed unused import DocsIcon from "./DocsIcon.vue";
 import DocsCopyToClipboard from './DocsCopyToClipboard.vue';
+import DocsTextField from './DocsTextField.vue'; // Import the DocsTextField component
 
 const route = useRoute();
 // Inject the plugin
@@ -254,6 +278,58 @@ const tabsExample = [
   { title: 'Styles' },
 ];
 
+// --- Search Filter Logic ---
+const searchTerm = ref('');
+
+// Fuzzy search function (reused from DocsColors/DocsTypography)
+const fuzzyMatch = (text: string, pattern: string): boolean => {
+  if (!pattern) return true;
+
+  const lowerText = String(text).toLowerCase(); // Ensure text is a string
+  const lowerPattern = pattern.toLowerCase();
+
+  // For short search terms (1-2 chars), require word boundary matches
+  if (lowerPattern.length <= 2) {
+    // Check if pattern is at the start of the text
+    if (lowerText.startsWith(lowerPattern)) {
+      return true;
+    }
+
+    // Check if pattern appears after a delimiter
+    const delimiterPattern = new RegExp(`[-_\\s]${lowerPattern}`, 'i');
+    return delimiterPattern.test(lowerText);
+  }
+
+  // For longer terms, prioritize word boundaries
+  const words = lowerText.split(/[-_\s]/);
+
+  // Check if pattern starts at the beginning of any word
+  for (const word of words) {
+    if (word.startsWith(lowerPattern)) {
+      return true;
+    }
+  }
+
+  // Fall back to standard fuzzy search with consecutive character bonus
+  let patternIdx = 0;
+  let textIdx = 0;
+  let consecutiveMatches = 0;
+  let maxConsecutive = 0;
+
+  while (patternIdx < lowerPattern.length && textIdx < lowerText.length) {
+    if (lowerPattern[patternIdx] === lowerText[textIdx]) {
+      patternIdx++;
+      consecutiveMatches++;
+      maxConsecutive = Math.max(maxConsecutive, consecutiveMatches);
+    } else {
+      consecutiveMatches = 0;
+    }
+    textIdx++;
+  }
+
+  // Require at least 2 consecutive matches for longer patterns
+  return patternIdx === lowerPattern.length && maxConsecutive >= 2;
+};
 
 
 // Load and process the raw component source and component module
@@ -297,8 +373,8 @@ onMounted(async () => {
   }
 });
 
-// Computed properties
-const computedPropItems = computed(() => {
+// Computed properties for filtered data
+const basePropItems = computed(() => {
   // Use the propItems prop if it's provided and not empty
   if (props.propItems && props.propItems.length > 0) {
     return props.propItems;
@@ -313,6 +389,43 @@ const computedPropItems = computed(() => {
   }
   return [];
 });
+
+const filteredPropItems = computed(() => {
+  if (!searchTerm.value) {
+    return basePropItems.value;
+  }
+  return basePropItems.value.filter(item => {
+    // Search across relevant string fields in prop items
+    return fuzzyMatch(item.name, searchTerm.value) ||
+      fuzzyMatch(item.type, searchTerm.value) ||
+      fuzzyMatch(item.default, searchTerm.value);
+  });
+});
+
+const filteredEventItems = computed(() => {
+  if (!searchTerm.value) {
+    return props.eventItems;
+  }
+  return props.eventItems.filter((item: any) => {
+    // Assuming event items have 'event', 'payload', 'description' fields
+    return fuzzyMatch(item.event, searchTerm.value) ||
+      fuzzyMatch(item.payload, searchTerm.value) ||
+      fuzzyMatch(item.description, searchTerm.value);
+  });
+});
+
+const filteredSlotItems = computed(() => {
+  if (!searchTerm.value) {
+    return props.slotItems;
+  }
+  return props.slotItems.filter((item: any) => {
+    // Assuming slot items have 'name', 'content', 'description' fields
+    return fuzzyMatch(item.name, searchTerm.value) ||
+      fuzzyMatch(item.content, searchTerm.value) ||
+      fuzzyMatch(item.description, searchTerm.value);
+  });
+});
+
 
 const propHeaders = computed(() => {
   return getPropsHeaders();
@@ -332,7 +445,7 @@ const slotHeaders = computed(() => {
   scoped
   lang="scss"
 >
-.example-component {
+.atomic-docs-example-component {
   &__heading {
     font-size: var(--atomic-docs-font-size-lg, 1.2em);
     font-weight: bold;
@@ -341,6 +454,9 @@ const slotHeaders = computed(() => {
   }
 }
 
+.atomic-docs-table-search {
+  margin-bottom: var(--atomic-docs-spacing-lg, 24px);
+}
 
 .atomic-docs-tabs-example {
   margin-bottom: var(--atomic-docs-spacing-xl, 32px);
@@ -368,21 +484,6 @@ const slotHeaders = computed(() => {
 
       li {
         margin-bottom: var(--atomic-docs-spacing-sm, 8px);
-      }
-    }
-  }
-
-  .code-example {
-    background-color: var(--atomic-docs-surface-color, #f5f5f5);
-    padding: var(--atomic-docs-spacing-md, 16px);
-    border-radius: var(--atomic-docs-border-radius-sm, 4px);
-    margin-top: var(--atomic-docs-spacing-md, 16px);
-
-    pre {
-      margin: 0;
-
-      code {
-        font-family: var(--atomic-docs-font-family-mono, monospace);
       }
     }
   }
