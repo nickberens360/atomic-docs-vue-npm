@@ -22,7 +22,10 @@
             <h2 class="example-component__heading">
               Props
             </h2>
-            <slot name="props">
+            <slot
+              v-if="computedPropItems.length > 0 || $slots.props"
+              name="props"
+            >
               <DocsDataTable
                 :headers="propHeaders"
                 :items="computedPropItems"
@@ -42,6 +45,9 @@
                 </template>
               </DocsDataTable>
             </slot>
+            <p v-else>
+              No props documented.
+            </p>
 
             <div class="example-component__events">
               <h2 class="example-component__heading">
