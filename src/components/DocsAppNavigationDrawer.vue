@@ -96,13 +96,16 @@ watch(() => props.isRailOpen, (newValue) => {
 </script>
 
 <style scoped lang="scss">
+:deep(.atomic-docs-menu) {
+  position: relative;
+  width: unset;
+}
 .atomic-docs-navigation-drawer {
   position: fixed;
   top: var(--atomic-docs-appbar-height);
   left: 0;
   bottom: 0;
   width: var(--atomic-docs-drawer-width);
-  //background-color: var(--atomic-docs-surface-color-dark, #f5f5f5);
   transition: transform 0.3s ease, width 0.3s ease;
   overflow-y: auto;
   z-index: 100;

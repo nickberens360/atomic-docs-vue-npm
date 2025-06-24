@@ -101,17 +101,14 @@ onMounted(() => {
     &--active {
       display: flex;
       flex-direction: column;
-      flex: 1;
+      //flex: 1;
       min-height: 0; // Important for Firefox
-      box-shadow: var(--atomic-docs-shadow-lg, 0 4px 8px rgba(0, 0, 0, 0.1));
     }
 
-    // Sections below active will be sticky to the bottom
+    // Sections below active with normal behavior
     &--below-active {
-      position: sticky;
-      bottom: 0;
+      position: relative;
       z-index: 5; // Lower than the active header z-index
-      margin-top: auto; // Push to the bottom when there's space
     }
   }
 
@@ -162,7 +159,7 @@ onMounted(() => {
     transition: max-height 0.2s ease, flex 0.2s ease;
 
     &--active {
-      flex: 1;
+      //flex: 1;
       overflow-y: auto; // Make content scrollable
       max-height: none; // Remove the hardcoded height
       height: 100%; // Fill the available space
