@@ -27,6 +27,9 @@ defineProps<Props>();
   //-10px -10px 30px #ffffff;
   // Default container with max-width
   max-width: 1280px;
+  height: 90vh;
+  border-bottom: 16px solid var(--atomic-docs-background-color, rgba(0, 0, 0, 0.12));
+  overflow: auto;
 
   // Fluid container takes full width
   &--fluid {

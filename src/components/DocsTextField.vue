@@ -55,7 +55,6 @@ const mappedBgColor = computed(() => {
   if (props.bgColor === 'background') return 'var(--atomic-docs-background-color)';
   if (props.bgColor === 'surface') return 'var(--atomic-docs-surface-color)';
   if (props.bgColor === 'surface-dark') return 'var(--atomic-docs-surface-color-dark)';
-  return props.bgColor;
 });
 
 defineEmits(['update:modelValue']);
