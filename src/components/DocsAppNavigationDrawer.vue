@@ -22,8 +22,9 @@
             persist-open
             :background-color="false"
             flat
-            input-variant="underlined"
-            :input-bg-color="false"
+            input-variant="outlined"
+            input-bg-color="background"
+            input-size="sm"
           />
         </template>
 
@@ -100,13 +101,12 @@ watch(() => props.isRailOpen, (newValue) => {
   position: relative;
   width: unset;
 }
-:deep(.atomic-docs-accordion__title) {
-  color: white;
+:deep(.atomic-docs-accordion) {
+  padding-left: 16px;
 }
 .atomic-docs-navigation-drawer {
   position: fixed;
   top: var(--atomic-docs-appbar-height);
-  background: var(--atomic-docs-primary-color);
   left: 0;
   bottom: 0;
   width: var(--atomic-docs-drawer-width);
@@ -146,7 +146,6 @@ watch(() => props.isRailOpen, (newValue) => {
 
 .atomic-docs-navigation-content {
   transition: opacity 0.2s ease, visibility 0.2s ease;
-  padding: 4px;
   height: 100%;
 }
 

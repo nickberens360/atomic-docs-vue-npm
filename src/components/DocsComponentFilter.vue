@@ -15,7 +15,10 @@
         }"
         :style="{ backgroundColor: mappedInputBgColor }"
       >
-        <div class="atomic-docs-input-wrapper">
+        <div
+          class="atomic-docs-input-wrapper"
+          :class="`atomic-docs-input-wrapper--${props.inputSize}`"
+        >
           <span class="atomic-docs-prepend-icon">🔍</span>
           <input
             v-model="filterText"
@@ -71,6 +74,7 @@ interface Props {
   inputVariant?: 'outlined' | 'filled' | 'solo' | 'underlined' | 'plain';
   inputBgColor?: 'background' | 'surface' | 'surface-dark' | false;
   closeOnClick?: boolean;
+  inputSize?: 'sm' | 'md' | 'lg';
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -79,7 +83,8 @@ const props = withDefaults(defineProps<Props>(), {
   flat: false,
   inputVariant: 'filled',
   inputBgColor: 'background',
-  closeOnClick: false
+  closeOnClick: false,
+  inputSize: 'md'
 });
 
 // Computed properties to map color values to CSS variables
@@ -206,6 +211,22 @@ const handleInputBlur = () => {
 
   &:focus-within {
     border-color: var(--atomic-docs-primary-color, #1976d2);
+  }
+
+  // Size variants
+  &--sm {
+    height: 32px;
+    padding: 4px 8px;
+  }
+
+  &--md {
+    height: 40px; // Default size as specified
+    padding: 8px 12px;
+  }
+
+  &--lg {
+    height: 48px;
+    padding: 12px 16px;
   }
 }
 

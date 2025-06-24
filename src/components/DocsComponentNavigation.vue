@@ -138,7 +138,6 @@ function handleNavClick(arg: NavItem): void {
 
 <style lang="scss" scoped>
 .atomic-docs-custom-nav-list {
-  padding: var(--atomic-docs-spacing-sm, 8px);
   border-radius: var(--atomic-docs-border-radius-sm, 4px);
 }
 </style>

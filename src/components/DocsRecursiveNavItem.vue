@@ -5,6 +5,7 @@
   >
     <div
       class="atomic-docs-recursive-list-header"
+      :class="{ 'atomic-docs-recursive-list-header-active': expanded }"
       @click="toggleExpanded($event)"
     >
       <span class="atomic-docs-icon atomic-docs-folder-icon">🗂️</span>
@@ -116,7 +117,7 @@ const sortedChildren = computed<NavItem[]>(() => {
   border-radius: var(--atomic-docs-border-radius-sm, 4px);
   transition: background-color 0.2s;
   color: var(--atomic-docs-text-primary, rgba(0, 0, 0, 0.87));
-
+  font-size: var(--atomic-docs-font-size-sm, 14px);
   &:hover {
     background-color: var(--atomic-docs-hover-color, rgba(0, 0, 0, 0.04));
   }

@@ -112,7 +112,7 @@ onUnmounted(() => {
 .atomic-docs-app-bar-title {
   width: var(--atomic-docs-drawer-width);
   height: 100%;
-  background: var(--atomic-docs-primary-color);
+  //background: var(--atomic-docs-primary-color);
   padding: 0 16px;
   display: flex;
   align-items: center;
@@ -133,15 +133,15 @@ onUnmounted(() => {
 
 .atomic-docs-nav-icon {
   font-size: var(--atomic-docs-font-size-xl, 18px);
-  color: white;
-  //color: var(--atomic-docs-text-primary, rgba(0, 0, 0, 0.87));
+  //color: white;
+  color: var(--atomic-docs-text-primary, rgba(0, 0, 0, 0.87));
 }
 
 .atomic-docs-title-text {
   font-size: 20px;
   font-weight: 500;
-  color: white;
-  //color: var(--atomic-docs-text-primary, rgba(0, 0, 0, 0.87));
+  //color: white;
+  color: var(--atomic-docs-text-primary, rgba(0, 0, 0, 0.87));
 }
 
 .atomic-docs-app-bar-actions {
