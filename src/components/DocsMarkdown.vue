@@ -9,12 +9,12 @@
   setup
   lang="ts"
 >
-import {computed, onMounted, createApp, h} from 'vue';
+import { computed, onMounted, createApp, h, inject, ref } from 'vue'; // Removed watch, onUnmounted
 import MarkdownIt from 'markdown-it';
+import type { Renderer, Token } from 'markdown-it';
 // Import Prism.js
 import Prism from 'prismjs';
-// Import theme loader utility instead of static Prism theme
-import { initPrismTheme } from '../utils/themeLoader';
+// Removed 'initPrismTheme' import as it's no longer used
 import DocsCopyToClipboard from './DocsCopyToClipboard.vue';
 // Import language support
 import 'prismjs/components/prism-markup';
@@ -26,10 +26,10 @@ import 'prismjs/components/prism-json';
 import 'prismjs/components/prism-markdown';
 
 // Create a custom markdown-it-prism plugin
-const markdownItPrism = (md) => {
+const markdownItPrism = (md: MarkdownIt) => {
   const highlight = md.options.highlight;
 
-  md.options.highlight = (str, lang) => {
+  md.options.highlight = (str: string, lang: string) => {
     // If a language is specified and Prism has it, use Prism for highlighting
     if (lang && Prism.languages[lang]) {
       try {
@@ -40,7 +40,7 @@ const markdownItPrism = (md) => {
     }
 
     // Fall back to original highlight function if available
-    return highlight ? highlight(str, lang) : str;
+    return highlight ? highlight(str, lang, {}) : str;
   };
 };
 
@@ -48,10 +48,6 @@ const md = new MarkdownIt({
   html: true,
   linkify: true,
   typographer: true,
-  highlight: (str, lang) => {
-    // This will be overridden by our plugin, but we need it here for TypeScript
-    return str;
-  }
 });
 
 // Apply our custom Prism plugin
@@ -59,7 +55,7 @@ markdownItPrism(md);
 
 // Customize the renderer to add copy buttons to code blocks
 const originalFence = md.renderer.rules.fence!;
-md.renderer.rules.fence = (tokens, idx, options, env, slf) => {
+md.renderer.rules.fence = (tokens: Token[], idx: number, options: MarkdownIt.Options, env: any, slf: Renderer) => {
   const token = tokens[idx];
   const code = token.content.trim();
   const language = token.info || '';
@@ -86,9 +82,10 @@ const props = defineProps({
   }
 });
 
-// Initialize Prism theme with default light theme
-// The MutationObserver in initPrismTheme will handle theme changes
-initPrismTheme(false);
+// Inject the isDark theme state (still available if needed for other Markdown styling)
+const isDark = inject<Ref<boolean>>('isDark', ref(false));
+
+// Removed activeThemeStylesheet ref and watch/onUnmounted logic
 
 const renderedContent = computed(() => {
   return md.render(props.content);
@@ -257,8 +254,6 @@ onMounted(() => {
     background-color: var(--atomic-docs-surface-color);
     padding: var(--atomic-docs-spacing-md);
     border-radius: 0 0 var(--atomic-docs-border-radius-sm) var(--atomic-docs-border-radius-sm);
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
     overflow-x: auto;
     margin-top: 0;
     margin-bottom: 0;
@@ -269,13 +264,6 @@ onMounted(() => {
     padding: 0;
     white-space: pre-wrap;
     word-break: break-all;
-  }
-
-  /* Override Prism.js text shadow in dark mode */
-  .atomic-docs-app-theme--dark & {
-    pre, code {
-      text-shadow: none !important;
-    }
   }
 }
 </style>
