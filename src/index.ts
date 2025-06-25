@@ -159,4 +159,5 @@ export { default as DocsChip } from './components/DocsChip.vue';
 export { default as DocsTabs } from './components/DocsTabs.vue';
 export { default as DocsColors } from './components/DocsColors.vue';
 export { default as DocsMarkdown } from './components/DocsMarkdown.vue';
+export { default as DocsMarkdownMDX } from './components/DocsMarkdownMDX.vue';
 export { atomicDocsVitePlugin } from './vitePlugin';
