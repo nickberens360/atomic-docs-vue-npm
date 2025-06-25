@@ -34,11 +34,7 @@ export default defineConfig({
         exports: 'named', // Keeping this as 'named' per your provided file
         // assetFileNames is less relevant for CSS when cssCodeSplit is false,
         // but can still be used for other assets like images or fonts if any.
-        assetFileNames: (assetInfo) => {
-          // This condition for 'style.css' will no longer be met if CSS is inlined.
-          // if (assetInfo.name === 'style.css') return 'vue-atomic-docs.css';
-          return assetInfo.name ?? 'assets/[name]-[hash][extname]';
-        },
+        assetFileNames: 'assets/[name]-[hash][extname]',
       },
     },
     cssCodeSplit: false, // <--- This line inlines CSS into the JS bundles

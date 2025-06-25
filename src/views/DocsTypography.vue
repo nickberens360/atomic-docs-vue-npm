@@ -274,7 +274,7 @@ watch(typographyData, (newData) => {
   color: var(--atomic-docs-primary-color, #1976d2);
 }
 code {
-  font-family: var(--atomic-docs-font-family-mono, monospace);
+  font-family: var(--atomic-docs-font-family-mono, monospace), sans-serif;
   font-size: 13px;
   background-color: transparent;
   padding: 0;

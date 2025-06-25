@@ -131,7 +131,7 @@ onMounted(() => {
 /* Main markdown container */
 .atomic-docs-markdown {
   /* Base typography */
-  font-family: var(--atomic-docs-font-family);
+  font-family: var(--atomic-docs-font-family),sans-serif;
   font-size: var(--atomic-docs-font-size-md);
   line-height: 1.5;
   //color: var(--atomic-docs-text-primary);
@@ -216,7 +216,7 @@ onMounted(() => {
     background-color: var(--atomic-docs-surface-color);
     padding: 0.2rem 0.4rem;
     border-radius: var(--atomic-docs-border-radius-sm);
-    font-family: var(--atomic-docs-font-family-mono);
+    font-family: var(--atomic-docs-font-family-mono), sans-serif;
   }
 
   .code-block-wrapper {
@@ -232,7 +232,7 @@ onMounted(() => {
     padding: 0.5rem var(--atomic-docs-spacing-md);
     border-top-left-radius: var(--atomic-docs-border-radius-sm);
     border-top-right-radius: var(--atomic-docs-border-radius-sm);
-    font-family: var(--atomic-docs-font-family-mono);
+    font-family: var(--atomic-docs-font-family-mono), sans-serif;
     font-size: 0.85rem;
   }
 

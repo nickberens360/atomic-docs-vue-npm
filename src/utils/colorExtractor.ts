@@ -5,6 +5,21 @@
 import { ref, onMounted } from 'vue';
 
 /**
+ * Validates an alpha value (0-1 or 0-100%)
+ * @param alpha The alpha value string to validate
+ * @returns Boolean indicating if the alpha value is valid
+ */
+function isValidAlphaValue(alpha: string): boolean {
+  if (alpha.endsWith('%')) {
+    const percent = parseFloat(alpha);
+    return !isNaN(percent) && percent >= 0 && percent <= 100;
+  } else {
+    const num = parseFloat(alpha);
+    return !isNaN(num) && num >= 0 && num <= 1;
+  }
+}
+
+/**
  * Determines if a CSS value represents a color
  * @param value The CSS value to check
  * @param element Optional element to use for resolving CSS variables
@@ -76,17 +91,10 @@ function isColorValue(value: string, element?: Element): boolean {
           }
         });
 
-        // If RGBA, check alpha value (0-1 or 0-100%)
+        // If RGBA, check alpha value
         let validAlpha = true;
         if (values.length === 4) {
-          const alpha = values[3];
-          if (alpha.endsWith('%')) {
-            const percent = parseFloat(alpha);
-            validAlpha = !isNaN(percent) && percent >= 0 && percent <= 100;
-          } else {
-            const num = parseFloat(alpha);
-            validAlpha = !isNaN(num) && num >= 0 && num <= 1;
-          }
+          validAlpha = isValidAlphaValue(values[3]);
         }
 
         return validRGB && validAlpha;
@@ -117,17 +125,10 @@ function isColorValue(value: string, element?: Element): boolean {
           return false; // S and L must be percentages
         });
 
-        // If HSLA, check alpha value (0-1 or 0-100%)
+        // If HSLA, check alpha value
         let validAlpha = true;
         if (values.length === 4) {
-          const alpha = values[3];
-          if (alpha.endsWith('%')) {
-            const percent = parseFloat(alpha);
-            validAlpha = !isNaN(percent) && percent >= 0 && percent <= 100;
-          } else {
-            const num = parseFloat(alpha);
-            validAlpha = !isNaN(num) && num >= 0 && num <= 1;
-          }
+          validAlpha = isValidAlphaValue(values[3]);
         }
 
         return validHue && validSL && validAlpha;
@@ -223,11 +224,11 @@ function formatColorValue(value: string): string {
  * @returns Array of color objects with name and color properties
  */
 export function extractCssColorVariables() {
-  const colors = [];
+  const colors: { name: string; color: string }[] = [];
   const processedVars = new Set(); // To avoid duplicates
 
   // Function to extract variables from a computed style
-  const extractFromComputedStyle = (element) => {
+  const extractFromComputedStyle = (element: Element) => {
     const styles = window.getComputedStyle(element);
 
     // Get all CSS variables from the element
@@ -301,7 +302,8 @@ export function extractCssColorVariables() {
  * @returns Object containing the extracted colors
  */
 export function useExtractedColors() {
-  const extractedColors = ref([]);
+  const extractedColors = ref<{ name: string; color: string }[]>([]);
+  let cleanup: (() => void) | undefined;
 
   const updateColors = () => {
     extractedColors.value = extractCssColorVariables();
@@ -319,13 +321,14 @@ export function useExtractedColors() {
       attributeFilter: ['style', 'class']
     });
 
-    // Clean up the observer when the component is unmounted
-    return () => {
+    // Store the cleanup function
+    cleanup = () => {
       observer.disconnect();
     };
   });
 
   return {
-    extractedColors
+    extractedColors,
+    cleanup
   };
 }
