@@ -99,17 +99,21 @@ watch(isDark, async (newValue) => {
     activePrismThemeStylesheet.value = null;
   }
 
-  // Dynamically import the correct theme stylesheet URL
-  const themeUrl = newValue
-    ? (await import('prismjs/themes/prism-okaidia.css?url')).default
-    : (await import('prismjs/themes/prism-solarizedlight.css?url')).default;
+  try {
+    // Dynamically import the correct theme stylesheet URL
+    const themeUrl = newValue
+      ? (await import('prismjs/themes/prism-okaidia.css?url')).default
+      : (await import('prismjs/themes/prism-solarizedlight.css?url')).default;
 
-  // Create and append the new link element
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = themeUrl;
-  document.head.appendChild(link);
-  activePrismThemeStylesheet.value = link;
+    // Create and append the new link element
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = themeUrl;
+    document.head.appendChild(link);
+    activePrismThemeStylesheet.value = link;
+  } catch (error) {
+    console.error('Failed to load Prism theme:', error);
+  }
 }, { immediate: true }); // Run immediately on component mount
 
 // On component unmount, remove the active stylesheet to clean up
