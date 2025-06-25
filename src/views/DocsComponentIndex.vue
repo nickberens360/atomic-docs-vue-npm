@@ -45,19 +45,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, inject, provide, watch, onUnmounted } from 'vue'; // Added watch, onUnmounted
+import { ref, computed, inject, provide, watch, onUnmounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import DocsAppBar from '../components/DocsAppBar.vue';
 import DocsAppNavigationDrawer from '../components/DocsAppNavigationDrawer.vue';
-import DocsComponentNavigation from '../components/DocsComponentNavigation.vue';
 import DocsRow from '../components/DocsRow.vue';
 import DocsCol from '../components/DocsCol.vue';
 import DocsMain from '../components/DocsMain.vue';
-import DocsTextField from '../components/DocsTextField.vue';
-import DocsIcon from '../components/DocsIcon.vue';
-import DocsMenu from '../components/DocsMenu.vue';
 import DocsMarkdown from '../components/DocsMarkdown.vue';
 import { ComponentDocPlugin } from '../types';
+import Prism from 'prismjs';
 // Import base styles
 import '../styles';
 // Import README content
@@ -79,8 +76,8 @@ const componentDocPlugin = inject<ComponentDocPlugin | undefined>('componentDocP
 
 const isDocsEnabled = computed(() => !!componentDocPlugin);
 
-// Local state for theme and navigation
-const isDark = ref(false);
+// Initialize theme from localStorage or default to false
+const isDark = ref(localStorage.getItem('theme') === 'dark');
 
 // Provide isDark globally
 provide('isDark', isDark);
@@ -93,11 +90,8 @@ const activePrismThemeStylesheet = ref<HTMLLinkElement | null>(null);
 
 // Watch for changes in isDark to dynamically load/unload Prism themes
 watch(isDark, async (newValue) => {
-  // Remove previous theme stylesheet if it exists
-  if (activePrismThemeStylesheet.value) {
-    document.head.removeChild(activePrismThemeStylesheet.value);
-    activePrismThemeStylesheet.value = null;
-  }
+  // Save theme preference to localStorage
+  localStorage.setItem('theme', newValue ? 'dark' : 'light');
 
   try {
     // Dynamically import the correct theme stylesheet URL
@@ -105,12 +99,29 @@ watch(isDark, async (newValue) => {
       ? (await import('prismjs/themes/prism-okaidia.css?url')).default
       : (await import('prismjs/themes/prism-solarizedlight.css?url')).default;
 
-    // Create and append the new link element
+    // Create new link element
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = themeUrl;
+
+    // Wait for new theme to load before removing old one to prevent flash
+    link.onload = () => {
+      if (activePrismThemeStylesheet.value) {
+        document.head.removeChild(activePrismThemeStylesheet.value);
+      }
+      activePrismThemeStylesheet.value = link;
+
+      // Re-highlight all code blocks after theme change
+      setTimeout(() => {
+        Prism.highlightAll();
+      }, 50);
+    };
+
+    link.onerror = () => {
+      console.error('Failed to load Prism theme stylesheet');
+    };
+
     document.head.appendChild(link);
-    activePrismThemeStylesheet.value = link;
   } catch (error) {
     console.error('Failed to load Prism theme:', error);
   }
@@ -154,6 +165,7 @@ function handleNavClick(arg: ComponentItem): void {
   });
 }
 </script>
+
 <style>
 html, body {
   display: unset;
@@ -162,7 +174,6 @@ html, body {
   height: 100%;
 }
 </style>
-
 
 <style scoped lang="scss">
 .atomic-docs {
@@ -175,6 +186,7 @@ html, body {
   height: 100vh;
   overflow: auto;
 }
+
 @keyframes bounce-right {
   0% {
     transform: translateX(0);
@@ -211,5 +223,4 @@ html, body {
 .readme-content {
   max-width: 900px;
 }
-
 </style>

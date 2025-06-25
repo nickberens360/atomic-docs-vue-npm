@@ -265,17 +265,5 @@ onMounted(() => {
     white-space: pre-wrap;
     word-break: break-all;
   }
-
-  /* Override Prism.js text shadow in dark mode */
-  //.atomic-docs-app-theme--dark & {
-  //  pre[class*="language-"] {
-  //    text-shadow: none !important;
-  //  }
-  //}
-  //.atomic-docs-app-theme--light & {
-  //  pre[class*="language-"] {
-  //    text-shadow: none !important;
-  //  }
-  //}
 }
 </style>
