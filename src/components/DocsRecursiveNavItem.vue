@@ -5,7 +5,10 @@
   >
     <div
       class="atomic-docs-recursive-list-header"
-      :class="{ 'atomic-docs-recursive-list-header-active': expanded }"
+      :class="{
+        'atomic-docs-recursive-list-header-active': expanded,
+        'not-documented': !hasDocumentedComponents
+      }"
       @click="toggleExpanded($event)"
     >
       <span class="atomic-docs-icon atomic-docs-folder-icon">
@@ -130,6 +133,24 @@ const sortedChildren = computed<NavItem[]>(() => {
     return a.label.localeCompare(b.label);
   })
 });
+
+// Computed property to check if a directory has any documented components
+const hasDocumentedComponents = computed(() => {
+  if (props.navItems.type !== 'directory') return true;
+
+  // Recursive function to check if a directory has any documented components
+  const checkForDocumented = (item: NavItem): boolean => {
+    if (item.type === 'component') {
+      return item.isDocumented === true;
+    } else if (item.type === 'directory') {
+      // Check all children recursively
+      return Object.values(item.children || {}).some(child => checkForDocumented(child));
+    }
+    return false;
+  };
+
+  return checkForDocumented(props.navItems);
+});
 </script>
 
 <style lang="scss" scoped>
@@ -217,6 +238,16 @@ $tree-line-thickness: 1px;
 }
 
 .atomic-docs-recursive-list-item.not-documented {
+  font-style: italic;
+  opacity: 0.5;
+  color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
+
+  .atomic-docs-icon {
+    color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
+  }
+}
+
+.atomic-docs-recursive-list-header.not-documented {
   font-style: italic;
   opacity: 0.5;
   color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
