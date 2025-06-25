@@ -7,7 +7,7 @@
       class="atomic-docs-recursive-list-header"
       :class="{
         'atomic-docs-recursive-list-header-active': expanded,
-        'not-documented': !hasDocumentedComponents
+        'not-documented': hasNoDocumentedComponents
       }"
       @click="toggleExpanded($event)"
     >
@@ -150,6 +150,29 @@ const hasDocumentedComponents = computed(() => {
   };
 
   return checkForDocumented(props.navItems);
+});
+
+// Computed property to check if a directory has no documented components
+// and all its subdirectories also have no documented components
+const hasNoDocumentedComponents = computed(() => {
+  if (props.navItems.type !== 'directory') return false;
+
+  // Recursive function to check if a directory has no documented components
+  const checkForNoDocumented = (item: NavItem): boolean => {
+    if (item.type === 'component') {
+      return item.isDocumented !== true; // Return true if component is NOT documented
+    } else if (item.type === 'directory') {
+      // Check if directory has any children
+      const children = Object.values(item.children || {});
+      if (children.length === 0) return true; // Empty directory has no documented components
+
+      // Check all children recursively - ALL must have no documented components
+      return children.every(child => checkForNoDocumented(child));
+    }
+    return true; // Default case (not a component or directory)
+  };
+
+  return checkForNoDocumented(props.navItems);
 });
 </script>
 
