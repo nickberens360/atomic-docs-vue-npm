@@ -75,7 +75,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, inject, provide } from 'vue';
 // import DocsRecursiveNavItem from './DocsRecursiveNavItem.vue';
 import { NavItem } from '../types';
 
@@ -91,13 +91,34 @@ const emit = defineEmits<{
   (e: 'nav-click', item: NavItem): void;
 }>();
 
-// State
-const expanded = ref(false);
+// Get or create expanded item ID tracking
+const parentExpandedItemId = inject('expandedItemId', null);
+const expandedItemId = parentExpandedItemId || ref<string | null>(null);
+
+// If this is the root component, provide the expanded item ID to all children
+if (!parentExpandedItemId) {
+  provide('expandedItemId', expandedItemId);
+}
+
+// Generate a unique ID for this item
+const itemId = props.navItems.relativePath || props.navItems.label;
+
+// Computed property to determine if this item is expanded
+const expanded = computed(() => {
+  return expandedItemId.value === itemId;
+});
 
 // Methods
 const toggleExpanded = (event: Event) => {
   event.stopPropagation();
-  expanded.value = !expanded.value;
+
+  // If this item is already expanded, collapse it
+  // Otherwise, expand this item (which will collapse others)
+  if (expanded.value) {
+    expandedItemId.value = null;
+  } else {
+    expandedItemId.value = itemId;
+  }
 };
 
 // Computed properties
