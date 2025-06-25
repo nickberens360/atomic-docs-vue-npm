@@ -52,9 +52,6 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
       if (!enableDocs) {
         return;
       }
-      if (!enableDocs) {
-        return;
-      }
       if (!componentModules) {
         console.error('Component docs plugin failed to initialize: componentModules is required');
         return;
