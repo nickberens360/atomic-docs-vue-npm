@@ -5,7 +5,10 @@
   >
     <div
       class="atomic-docs-recursive-list-header"
-      :class="{ 'atomic-docs-recursive-list-header-active': expanded }"
+      :class="{
+        'atomic-docs-recursive-list-header-active': expanded,
+        'atomic-docs-recursive-list-header--no-documented-files': directoryHasNoDocumentedFiles // Apply this class
+      }"
       @click="toggleExpanded($event)"
     >
       <span class="atomic-docs-icon atomic-docs-folder-icon">
@@ -76,8 +79,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-// import DocsRecursiveNavItem from './DocsRecursiveNavItem.vue';
-import { NavItem } from '../types';
+import { NavItem, ComponentItem, DirectoryItem } from '../types';
 
 // Define props
 interface Props {
@@ -109,6 +111,38 @@ const sortedChildren = computed<NavItem[]>(() => {
     return a.label.localeCompare(b.label);
   })
 });
+
+/**
+ * Helper function that recursively checks if any component within the given item
+ * (or its subdirectories) is documented.
+ */
+const checkDocumentedDescendants = (item: NavItem): boolean => {
+  if (item.type === 'component') {
+    return item.isDocumented === true;
+  }
+
+  // If it's a directory, recursively check its children
+  if (item.type === 'directory' && item.children) {
+    for (const key in item.children) {
+      const child = item.children[key];
+      if (checkDocumentedDescendants(child)) {
+        return true; // Found a documented component
+      }
+    }
+  }
+  return false; // No documented components found
+};
+
+/**
+ * Computed property to determine if the current directory navItem has no documented files
+ * within itself or its subdirectories.
+ */
+const directoryHasNoDocumentedFiles = computed(() => {
+  // This computed property will only be true for directories.
+  // It returns true if the current navItem is a directory AND
+  // the recursive check finds NO documented descendants.
+  return props.navItems.type === 'directory' && !checkDocumentedDescendants(props.navItems);
+});
 </script>
 
 <style lang="scss" scoped>
@@ -136,6 +170,13 @@ $tree-line-thickness: 1px;
   font-size: var(--atomic-docs-font-size-sm, 14px);
   &:hover {
     background-color: var(--atomic-docs-hover-color, rgba(0, 0, 0, 0.04));
+  }
+
+  // New style for directories with no documented files
+  &--no-documented-files {
+    opacity: 0.7; // Example: make it slightly faded
+    font-style: italic; // Example: make text italic
+    color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6)); // Example: change color
   }
 }
 
