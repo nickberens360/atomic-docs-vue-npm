@@ -11,7 +11,7 @@
   >
     <div class="atomic-docs-navigation-content">
       <DocsAccordion
-        :sections="[
+        v-model="activeComponentsSection" :sections="[
           { title: 'Components' },
           { title: 'Colors' },
           { title: 'Typography' }
@@ -37,7 +37,9 @@
               </span>
             </div>
           </div>
-          <DocsComponentNavigation :filter-text="filterText" />
+          <DocsComponentNavigation
+            :filter-text="filterText"
+            :force-expand-all="Boolean(filterText)" />
         </template>
 
         <template #[`section-1`]>
@@ -77,6 +79,7 @@ import DocsAccordion from "./DocsAccordion.vue";
 
 // Define refs
 const filterText = ref('');
+const activeComponentsSection = ref<number | null>(0); // Initialize Components section as open
 
 // Define props
 const props = defineProps<{
@@ -85,6 +88,16 @@ const props = defineProps<{
 }>();
 
 const isExpanded = ref(false);
+
+// Watch filterText to automatically open/close the Components accordion section
+watch(filterText, (newValue) => {
+  if (newValue.length > 0) {
+    activeComponentsSection.value = 0; // Open Components section if filterText is not empty
+  } else {
+    activeComponentsSection.value = null; // Close Components section if filterText is empty
+  }
+});
+
 
 // Handle expand-on-hover functionality
 const handleMouseEnter = () => {

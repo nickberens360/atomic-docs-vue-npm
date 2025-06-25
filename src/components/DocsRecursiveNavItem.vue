@@ -7,7 +7,7 @@
       class="atomic-docs-recursive-list-header"
       :class="{
         'atomic-docs-recursive-list-header-active': expanded,
-        'atomic-docs-recursive-list-header--no-documented-files': directoryHasNoDocumentedFiles // Apply this class
+        'atomic-docs-recursive-list-header--no-documented-files': directoryHasNoDocumentedFiles
       }"
       @click="toggleExpanded($event)"
     >
@@ -28,7 +28,7 @@
           <DocsRecursiveNavItem
             v-if="child.type === 'directory'"
             :nav-items="child"
-            @nav-click="emit('nav-click', $event)"
+            :force-expand="forceExpand" @nav-click="emit('nav-click', $event)"
           />
 
           <div
@@ -78,12 +78,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue'; // Import watch
 import { NavItem, ComponentItem, DirectoryItem } from '../types';
 
 // Define props
 interface Props {
   navItems: NavItem;
+  forceExpand?: boolean; // New prop for forced expansion
 }
 
 const props = defineProps<Props>();
@@ -95,6 +96,26 @@ const emit = defineEmits<{
 
 // State
 const expanded = ref(false);
+
+// Watch for changes in forceExpand prop to update local expanded state
+watch(() => props.forceExpand, (newValue) => {
+  if (newValue) {
+    expanded.value = true; // Force expand when true
+  } else {
+    // Only collapse if it was forced open and now it's not,
+    // otherwise, let user control manual collapse.
+    // Or, if you want it to collapse completely when filter is empty, use:
+    // expanded.value = false;
+    // For this use case, we want it to close only if the filter is removed and it was forced open by the filter.
+    // If the user manually expanded it, it should remain open until they close it.
+    // A simpler approach for the filter: if filterText is empty, all should collapse back to default state.
+    if (!newValue && props.navItems.type === 'directory') {
+      // Only collapse if it's a directory and forceExpand becomes false
+      expanded.value = false;
+    }
+  }
+}, { immediate: true }); // Run immediately on component mount to respect initial forceExpand value
+
 
 // Methods
 const toggleExpanded = (event: Event) => {
