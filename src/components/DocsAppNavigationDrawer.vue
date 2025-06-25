@@ -79,7 +79,7 @@ import DocsAccordion from "./DocsAccordion.vue";
 
 // Define refs
 const filterText = ref('');
-const activeComponentsSection = ref<number | null>(0); // Initialize Components section as open by default
+const activeComponentsSection = ref<number | null>(0); // Initialize Components section as open
 
 // Define props
 const props = defineProps<{
@@ -92,10 +92,10 @@ const isExpanded = ref(false);
 // Watch filterText to automatically open/close the Components accordion section
 watch(filterText, (newValue) => {
   if (newValue.length > 0) {
-    activeComponentsSection.value = 0; // Always open Components section if filterText is not empty
+    activeComponentsSection.value = 0; // Open Components section if filterText is not empty
+  } else {
+    activeComponentsSection.value = null; // Close Components section if filterText is empty
   }
-  // Removed the else block: This ensures that activeComponentsSection remains 0 (open)
-  // when filterText becomes empty, thus keeping the accordion section open.
 });
 
 
