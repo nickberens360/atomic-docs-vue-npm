@@ -16,10 +16,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref } from 'vue'; // Removed watch, onUnmounted
-// Import Prism.js
+import { computed, inject, ref, type Ref } from 'vue';
 import Prism from 'prismjs';
-// Removed 'initPrismTheme' import as it's no longer used
 
 const props = defineProps({
   source: {
@@ -29,27 +27,30 @@ const props = defineProps({
   language: {
     type: String,
     default: 'markup',
-    validator: (value) => ['markup', 'javascript', 'css'].includes(value)
+    // Add a type check to ensure value is a string before validation
+    validator: (value: unknown) =>
+      typeof value === 'string' && ['markup', 'javascript', 'css'].includes(value)
   }
 });
 
-// Inject the isDark theme state (still available if needed for other component styling)
+// Inject the isDark theme state
 const isDark = inject<Ref<boolean>>('isDark', ref(false));
-
-// Removed activeThemeStylesheet ref and watch/onUnmounted logic
 
 // Computed property for highlighted source
 const highlightedSource = computed(() => {
-  if (!props.source) return '';
-  return Prism.highlight(props.source, Prism.languages[props.language], props.language);
+  if (!props.source) {
+    return '';
+  }
+  // Check if the language is supported by Prism before highlighting
+  if (props.language && Prism.languages[props.language]) {
+    return Prism.highlight(props.source, Prism.languages[props.language], props.language);
+  }
+  // Fallback to un-highlighted source if language is not supported
+  return props.source;
 });
 </script>
 
 <style scoped lang="scss">
-/*
- * Styles for code display are now consolidated in DocsMarkdown.vue
- * This component uses those styles for consistency
- */
 .atomic-docs-source-code {
   .source-section {
     margin-bottom: var(--atomic-docs-spacing-md, 16px);

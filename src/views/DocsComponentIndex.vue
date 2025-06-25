@@ -55,8 +55,6 @@ import DocsMain from '../components/DocsMain.vue';
 import DocsMarkdown from '../components/DocsMarkdown.vue';
 import { ComponentDocPlugin } from '../types';
 import Prism from 'prismjs';
-// Import base styles
-import '../styles';
 // Import README content
 import readmeContent from '../../README.md?raw';
 
