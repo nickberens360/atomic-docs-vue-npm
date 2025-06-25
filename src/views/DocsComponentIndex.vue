@@ -25,7 +25,7 @@
                 v-if="isComponentDocsRoute"
                 class="readme-content"
               >
-                <DocsMarkdown :content="readmeContent" />
+                <ReadmeContent />
               </div>
               <Suspense>
                 <RouterView :key="route.path" />
@@ -52,11 +52,10 @@ import DocsAppNavigationDrawer from '../components/DocsAppNavigationDrawer.vue';
 import DocsRow from '../components/DocsRow.vue';
 import DocsCol from '../components/DocsCol.vue';
 import DocsMain from '../components/DocsMain.vue';
-import DocsMarkdown from '../components/DocsMarkdown.vue';
 import { ComponentDocPlugin } from '../types';
 import Prism from 'prismjs';
-// Import README content
-import readmeContent from '../../README.md?raw';
+// Import pre-compiled README content
+import ReadmeContent from '../components/ReadmeContent.vue';
 
 // Import the ComponentItem interface from the types used in ComponentNavigation
 interface ComponentItem {

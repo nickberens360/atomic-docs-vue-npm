@@ -46,6 +46,8 @@
     }
   },
   "dependencies": {
+    "@mdx-js/rollup": "^3.0.0",
+    "@mdx-js/vue": "^3.0.0",
     "markdown-it": "^14.1.0",
     "prismjs": "^1.30.0"
   },
