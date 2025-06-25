@@ -92,7 +92,7 @@ const isExpanded = ref(false);
 // Watch filterText to automatically open/close the Components accordion section
 watch(filterText, (newValue) => {
   if (newValue.length > 0) {
-    activeComponentsSection.value = null; // Open Components section if filterText is not empty
+    activeComponentsSection.value = 0; // Open Components section if filterText is not empty
   } else {
     activeComponentsSection.value = null; // Close Components section if filterText is empty
   }
