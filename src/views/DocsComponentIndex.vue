@@ -15,28 +15,27 @@
         :is-nav-drawer-open="isNavDrawerOpen"
       />
       <DocsMain fluid>
-          <DocsRow
-            class="h-100"
-            :justify="isComponentDocsRoute ? 'center' : 'end'"
-          >
-            <DocsCol cols="12">
-              <div class="content">
-                <!-- Add README content when on the main route -->
-                <div
-                  v-if="isComponentDocsRoute"
-                  class="readme-content"
-                >
-                  <DocsMarkdown :content="readmeContent" />
-                </div>
-                <Suspense>
-                  <RouterView :key="route.path" />
-                  <template #fallback>
-                    Loading...
-                  </template>
-                </Suspense>
+        <DocsRow
+          class="h-100"
+          :justify="isComponentDocsRoute ? 'center' : 'end'"
+        >
+          <DocsCol cols="12">
+            <div class="content">
+              <div
+                v-if="isComponentDocsRoute"
+                class="readme-content"
+              >
+                <DocsMarkdown :content="readmeContent" />
               </div>
-            </DocsCol>
-          </DocsRow>
+              <Suspense>
+                <RouterView :key="route.path" />
+                <template #fallback>
+                  Loading...
+                </template>
+              </Suspense>
+            </div>
+          </DocsCol>
+        </DocsRow>
       </DocsMain>
     </div>
     <div v-else>
@@ -46,8 +45,7 @@
 </template>
 
 <script setup lang="ts">
-
-import { ref, computed, inject } from 'vue';
+import { ref, computed, inject, provide, watch, onUnmounted } from 'vue'; // Added watch, onUnmounted
 import { useRouter, useRoute } from 'vue-router';
 import DocsAppBar from '../components/DocsAppBar.vue';
 import DocsAppNavigationDrawer from '../components/DocsAppNavigationDrawer.vue';
@@ -83,8 +81,44 @@ const isDocsEnabled = computed(() => !!componentDocPlugin);
 
 // Local state for theme and navigation
 const isDark = ref(false);
+
+// Provide isDark globally
+provide('isDark', isDark);
+
 const isRailOpen = ref(false);
 const isNavDrawerOpen = ref(true);
+
+// Reactive reference to the currently active Prism theme stylesheet link element
+const activePrismThemeStylesheet = ref<HTMLLinkElement | null>(null);
+
+// Watch for changes in isDark to dynamically load/unload Prism themes
+watch(isDark, async (newValue) => {
+  // Remove previous theme stylesheet if it exists
+  if (activePrismThemeStylesheet.value) {
+    document.head.removeChild(activePrismThemeStylesheet.value);
+    activePrismThemeStylesheet.value = null;
+  }
+
+  // Dynamically import the correct theme stylesheet URL
+  const themeUrl = newValue
+    ? (await import('prismjs/themes/prism-okaidia.css?url')).default
+    : (await import('prismjs/themes/prism-solarizedlight.css?url')).default;
+
+  // Create and append the new link element
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = themeUrl;
+  document.head.appendChild(link);
+  activePrismThemeStylesheet.value = link;
+}, { immediate: true }); // Run immediately on component mount
+
+// On component unmount, remove the active stylesheet to clean up
+onUnmounted(() => {
+  if (activePrismThemeStylesheet.value) {
+    document.head.removeChild(activePrismThemeStylesheet.value);
+    activePrismThemeStylesheet.value = null;
+  }
+});
 
 // Function to toggle theme
 function toggleTheme(value: boolean) {

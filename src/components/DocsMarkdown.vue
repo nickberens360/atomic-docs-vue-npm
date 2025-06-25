@@ -9,13 +9,12 @@
   setup
   lang="ts"
 >
-import { computed, onMounted, createApp, h } from 'vue';
+import { computed, onMounted, createApp, h, inject, ref } from 'vue'; // Removed watch, onUnmounted
 import MarkdownIt from 'markdown-it';
 import type { Renderer, Token } from 'markdown-it';
 // Import Prism.js
 import Prism from 'prismjs';
-// Import theme loader utility instead of static Prism theme
-import { initPrismTheme } from '../utils/themeLoader';
+// Removed 'initPrismTheme' import as it's no longer used
 import DocsCopyToClipboard from './DocsCopyToClipboard.vue';
 // Import language support
 import 'prismjs/components/prism-markup';
@@ -83,9 +82,10 @@ const props = defineProps({
   }
 });
 
-// Initialize Prism theme with default light theme
-// The MutationObserver in initPrismTheme will handle theme changes
-initPrismTheme(false);
+// Inject the isDark theme state (still available if needed for other Markdown styling)
+const isDark = inject<Ref<boolean>>('isDark', ref(false));
+
+// Removed activeThemeStylesheet ref and watch/onUnmounted logic
 
 const renderedContent = computed(() => {
   return md.render(props.content);
@@ -267,24 +267,15 @@ onMounted(() => {
   }
 
   /* Override Prism.js text shadow in dark mode */
-  .atomic-docs-app-theme--dark & {
-    pre[class*="language-"] {
-      text-shadow: none !important;
-    }
-  }
-  .atomic-docs-app-theme--light & {
-    pre[class*="language-"] {
-      text-shadow: none !important;
-    }
-    .token.function {
-      color: green;
-    }
-    .token.string {
-      color: blue;
-    }
-    .token.keyword {
-      color: darkorange;
-    }
-  }
+  //.atomic-docs-app-theme--dark & {
+  //  pre[class*="language-"] {
+  //    text-shadow: none !important;
+  //  }
+  //}
+  //.atomic-docs-app-theme--light & {
+  //  pre[class*="language-"] {
+  //    text-shadow: none !important;
+  //  }
+  //}
 }
 </style>

@@ -16,15 +16,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, inject, ref } from 'vue'; // Removed watch, onUnmounted
 // Import Prism.js
 import Prism from 'prismjs';
-// Import theme loader utility instead of static Prism theme
-import { initPrismTheme } from '../utils/themeLoader';
-// Import language support
-import 'prismjs/components/prism-markup';
-import 'prismjs/components/prism-javascript';
-import 'prismjs/components/prism-css';
+// Removed 'initPrismTheme' import as it's no longer used
 
 const props = defineProps({
   source: {
@@ -38,9 +33,10 @@ const props = defineProps({
   }
 });
 
-// Initialize Prism theme with default light theme
-// The MutationObserver in initPrismTheme will handle theme changes
-initPrismTheme(false);
+// Inject the isDark theme state (still available if needed for other component styling)
+const isDark = inject<Ref<boolean>>('isDark', ref(false));
+
+// Removed activeThemeStylesheet ref and watch/onUnmounted logic
 
 // Computed property for highlighted source
 const highlightedSource = computed(() => {
