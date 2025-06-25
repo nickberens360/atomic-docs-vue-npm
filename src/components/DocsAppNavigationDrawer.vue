@@ -116,7 +116,7 @@ watch(() => props.isRailOpen, (newValue) => {
   padding-left: 16px;
 }
 :deep(.atomic-docs-accordion__section--active) {
-  max-height: 90vh;
+  max-height: 81vh;
 }
 .atomic-docs-navigation-drawer {
   position: fixed;
