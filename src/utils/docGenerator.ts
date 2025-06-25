@@ -43,7 +43,11 @@ export function getPropType(prop: Prop): string {
     }
     return prop.type ? prop.type.name : 'Type Undefined';
   } catch (error) {
-    console.warn(`Could not determine prop type: ${error.message}`);
+    if (error instanceof Error) {
+      console.warn(`Could not determine prop type: ${error.message}`);
+    } else {
+      console.warn(`An unknown error occurred while determining prop type: ${String(error)}`);
+    }
     return 'Unknown';
   }
 }
@@ -59,7 +63,11 @@ export function getPropDefault(prop: Prop): string {
     }
     return JSON.stringify(prop.default);
   } catch (error) {
-    console.warn(`Could not determine prop default value: ${error.message}`);
+    if (error instanceof Error) {
+      console.warn(`Could not determine prop default value: ${error.message}`);
+    } else {
+      console.warn(`An unknown error occurred while determining prop default value: ${String(error)}`);
+    }
     return 'undefined';
   }
 }
@@ -85,7 +93,11 @@ export function generatePropsItems(component: Component): PropItem[] {
               default: getPropDefault(prop),
             };
           } catch (error) {
-            console.warn(`Could not process prop ${propName}: ${error.message}`);
+            if (error instanceof Error) {
+              console.warn(`Could not process prop ${propName}: ${error.message}`);
+            } else {
+              console.warn(`An unknown error occurred while processing prop ${propName}: ${String(error)}`);
+            }
             return {
               name: propName,
               type: 'Unknown',
@@ -96,7 +108,11 @@ export function generatePropsItems(component: Component): PropItem[] {
         });
       }
     } catch (error) {
-      console.warn(`Error accessing __vccOpts props: ${error.message}`);
+      if (error instanceof Error) {
+        console.warn(`Error accessing __vccOpts props: ${error.message}`);
+      } else {
+        console.warn(`An unknown error occurred while accessing __vccOpts props: ${String(error)}`);
+      }
     }
 
     // If no props extracted yet, try other methods
@@ -116,7 +132,11 @@ export function generatePropsItems(component: Component): PropItem[] {
                   default: prop.default !== undefined ? JSON.stringify(prop.default) : 'undefined',
                 };
               } catch (error) {
-                console.warn(`Could not process prop ${propName} from setup component: ${error.message}`);
+                if (error instanceof Error) {
+                  console.warn(`Could not process prop ${propName} from setup component: ${error.message}`);
+                } else {
+                  console.warn(`An unknown error occurred while processing prop ${propName} from setup component: ${String(error)}`);
+                }
                 return {
                   name: propName,
                   type: 'Unknown',
@@ -128,7 +148,11 @@ export function generatePropsItems(component: Component): PropItem[] {
           }
         }
       } catch (error) {
-        console.warn(`Error processing component with setup function: ${error.message}`);
+        if (error instanceof Error) {
+          console.warn(`Error processing component with setup function: ${error.message}`);
+        } else {
+          console.warn(`An unknown error occurred while processing component with setup function: ${String(error)}`);
+        }
       }
     }
 
@@ -148,7 +172,11 @@ export function generatePropsItems(component: Component): PropItem[] {
                 default: getPropDefault(prop),
               };
             } catch (error) {
-              console.warn(`Could not process prop ${propName} from options API: ${error.message}`);
+              if (error instanceof Error) {
+                console.warn(`Could not process prop ${propName} from options API: ${error.message}`);
+              } else {
+                console.warn(`An unknown error occurred while processing prop ${propName} from options API: ${String(error)}`);
+              }
               return {
                 name: propName,
                 type: 'Unknown',
@@ -159,13 +187,21 @@ export function generatePropsItems(component: Component): PropItem[] {
           });
         }
       } catch (error) {
-        console.warn(`Error processing component with options API props: ${error.message}`);
+        if (error instanceof Error) {
+          console.warn(`Error processing component with options API props: ${error.message}`);
+        } else {
+          console.warn(`An unknown error occurred while processing component with options API props: ${String(error)}`);
+        }
       }
     }
 
     return extractedProps;
   } catch (error) {
-    console.warn(`Could not analyze component props: ${error.message}`);
+    if (error instanceof Error) {
+      console.warn(`Could not analyze component props: ${error.message}`);
+    } else {
+      console.warn(`An unknown error occurred while analyzing component props: ${String(error)}`);
+    }
     return [];
   }
 }

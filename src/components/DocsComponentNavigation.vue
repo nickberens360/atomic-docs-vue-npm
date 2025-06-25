@@ -4,8 +4,8 @@
     :class="bgColor"
   >
     <template
-      v-for="(item, key) in finalStructure"
-      :key="key"
+      v-for="item in finalStructure"
+      :key="item.relativePath"
     >
       <DocsRecursiveNavItem
         :nav-items="item"
@@ -40,22 +40,14 @@ const componentsDirName = componentDocPlugin?.componentsDirName;
 
 
 const directoryStructure = computed<Record<string, NavigationItem>>(() => {
-  // Guard against undefined modules or directory names which can happen in production builds
-  if (!componentModules || !componentsDirName) {
-    return {};
-  }
-
   return Object.keys(componentModules).reduce<Record<string, NavigationItem>>((accumulator, filePath) => {
-    // Add a guard to ensure filePath is a string and contains the directory name before splitting
-    if (typeof filePath !== 'string' || !filePath.includes(componentsDirName)) {
+    // Guard against paths that don't include the components directory name
+    if (!filePath.includes(componentsDirName)) {
       return accumulator;
     }
 
     // Safely split the path and default to an empty string if the result is unexpected
     const relativePath = filePath.split(`${componentsDirName}/`)[1] || '';
-    if (!relativePath) {
-      return accumulator;
-    }
 
     // --- START: CORRECTED Logic ---
     const examplesDirName = componentDocPlugin.examplesDirName;

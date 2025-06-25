@@ -35,9 +35,9 @@ function createDocsAppMountPoint(): HTMLElement {
 
 const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
   install(app: App, options: ComponentDocOptions = {
-    componentModules: undefined,
+    componentModules: {},
     componentsDirName: "",
-    exampleModules: undefined,
+    exampleModules: {},
     examplesDirName: ""
   }) {
     try {
@@ -52,10 +52,22 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
       if (!enableDocs) {
         return;
       }
-      if (!componentModules) throw new Error('componentModules is required');
-      if (!exampleModules) throw new Error('exampleModules is required');
-      if (!componentsDirName) throw new Error('componentsDirName is required');
-      if (!examplesDirName) throw new Error('examplesDirName is required');
+      if (!componentModules) {
+        console.error('Component docs plugin failed to initialize: componentModules is required');
+        return;
+      }
+      if (!exampleModules) {
+        console.error('Component docs plugin failed to initialize: exampleModules is required');
+        return;
+      }
+      if (!componentsDirName) {
+        console.error('Component docs plugin failed to initialize: componentsDirName is required');
+        return;
+      }
+      if (!examplesDirName) {
+        console.error('Component docs plugin failed to initialize: examplesDirName is required');
+        return;
+      }
 
       const plugin: ComponentDocPlugin = {
         convertPathToExampleName,
@@ -132,11 +144,14 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
       };
 
 
-      app.config.globalProperties.$router.beforeEach((to, from, next) => {
+      app.config.globalProperties.$router.beforeEach((to, _from, next) => {
         const isDocsRoute = to.path.startsWith('/atomic-docs');
         toggleDocs(isDocsRoute);
         if (isDocsRoute && docsRouter.currentRoute.value.fullPath !== to.fullPath) {
-          docsRouter.push(to.fullPath);
+          docsRouter.push(to.fullPath).catch(() => {
+            // It's good practice to handle potential navigation failures.
+            // In this case, we can safely ignore them.
+          });
         }
         next();
       });

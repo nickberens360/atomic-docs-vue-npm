@@ -61,7 +61,7 @@ interface Props {
   mobileBreakpoint?: string;
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   hideDefaultFooter: false,
   mobileBreakpoint: 'sm'
 });

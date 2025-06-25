@@ -46,7 +46,7 @@
 
 <script setup lang="ts">
 import { ref, computed, inject, provide, watch, onUnmounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { useRoute } from 'vue-router';
 import DocsAppBar from '../components/DocsAppBar.vue';
 import DocsAppNavigationDrawer from '../components/DocsAppNavigationDrawer.vue';
 import DocsRow from '../components/DocsRow.vue';
@@ -60,17 +60,7 @@ import '../styles';
 // Import README content
 import readmeContent from '../../README.md?raw';
 
-// Import the ComponentItem interface from the types used in ComponentNavigation
-interface ComponentItem {
-  type: 'component';
-  label: string;
-  relativePath: string;
-  exampleComponent: string;
-}
-
-const router = useRouter();
 const route = useRoute();
-const filterText = ref<string>('');
 // Inject the componentDocPlugin
 const componentDocPlugin = inject<ComponentDocPlugin | undefined>('componentDocPlugin');
 
@@ -156,14 +146,6 @@ const isComponentDocsRoute = computed(() => {
 const themeClass = computed(() => {
   return isDark.value ? 'atomic-docs-app-theme--dark' : 'atomic-docs-app-theme--light';
 });
-
-function handleNavClick(arg: ComponentItem): void {
-  router.push({
-    name: 'componentDoc' as any,
-    params: { componentName: arg.exampleComponent },
-    query: { relativePath: arg.relativePath }
-  });
-}
 </script>
 
 <style>

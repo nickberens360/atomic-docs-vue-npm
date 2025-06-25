@@ -13,7 +13,7 @@
     </div>
     <div class="atomic-docs-tabs__content">
       <div
-        v-for="(tab, index) in tabs"
+        v-for="(_, index) in tabs"
         :key="index"
         class="atomic-docs-tabs__tab-content"
         :class="{ 'atomic-docs-tabs__tab-content--active': activeTab === index }"
