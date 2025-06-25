@@ -156,14 +156,6 @@ const isComponentDocsRoute = computed(() => {
 const themeClass = computed(() => {
   return isDark.value ? 'atomic-docs-app-theme--dark' : 'atomic-docs-app-theme--light';
 });
-
-function handleNavClick(arg: ComponentItem): void {
-  router.push({
-    name: 'componentDoc' as any,
-    params: { componentName: arg.exampleComponent },
-    query: { relativePath: arg.relativePath }
-  });
-}
 </script>
 
 <style>
