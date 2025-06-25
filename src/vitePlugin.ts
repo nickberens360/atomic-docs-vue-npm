@@ -1,13 +1,11 @@
 // src/plugins/component-documentation/src/vitePlugin.ts
-import type { Plugin } from 'vite';
-
-export function atomicDocsVitePlugin(options = { forceConfig: false }): Plugin {
+export function atomicDocsVitePlugin(options = { forceConfig: false }) {
   return {
     name: 'atomic-docs-vite-plugin',
-    config(config) {
+    config(config: any) {
       // Ensure optimizeDeps exists
       config.optimizeDeps = config.optimizeDeps || {};
-      
+
       // If optimizeDeps is disabled and we're not forcing configuration
       if (config.optimizeDeps.disabled === true && !options.forceConfig) {
         // Respect user's choice, but log a warning
@@ -19,18 +17,18 @@ export function atomicDocsVitePlugin(options = { forceConfig: false }): Plugin {
         );
         return config;
       }
-      
+
       // Set exclude to include 'vue' if it doesn't already
       config.optimizeDeps.exclude = config.optimizeDeps.exclude || [];
       if (Array.isArray(config.optimizeDeps.exclude) && !config.optimizeDeps.exclude.includes('vue')) {
         config.optimizeDeps.exclude.push('vue');
       }
-      
+
       // Only remove disabled if we're forcing config or it wasn't explicitly set
       if (options.forceConfig && config.optimizeDeps.disabled === true) {
         config.optimizeDeps.disabled = false;
       }
-      
+
       return config;
     }
   };

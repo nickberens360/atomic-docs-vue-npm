@@ -54,7 +54,7 @@ if (exampleModules && examplesDirName) {
   const importComponentPromises = Object.entries(exampleModules)
     .map(async ([path, moduleImport]) => {
       // Ensure path is a string and contains the directory name before splitting
-      if (typeof path !== 'string' || !path.includes(examplesDirName)) {
+      if (!path.includes(examplesDirName)) {
         return null;
       }
       const relativePath = path.split(`${examplesDirName}/`).slice(1).join('');
@@ -75,7 +75,7 @@ const props = defineProps<Props>();
 
 const componentName = computed<string>(() => {
   // Add guard for relativePath
-  if (!props.relativePath || typeof props.relativePath !== 'string') return '';
+  if (!props.relativePath) return '';
   return props.relativePath.split('/').pop()?.replace('.vue', '') || '';
 });
 

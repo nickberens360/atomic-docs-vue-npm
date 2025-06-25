@@ -97,7 +97,6 @@ import { inject, computed, onUnmounted, ref } from 'vue';
 import { ComponentDocPlugin } from '../types';
 import { useExtractedColors } from '../utils/colorExtractor';
 import DocsCopyToClipboard from './DocsCopyToClipboard.vue';
-import DocsIcon from './DocsIcon.vue';
 
 // Inject the component doc plugin
 const componentDocPlugin = inject<ComponentDocPlugin>('componentDocPlugin');
@@ -192,8 +191,6 @@ const filteredExtractedColors = computed(() => {
 </script>
 
 <style scoped lang="scss">
-.atomic-docs-colors {
-}
 
 .atomic-docs-colors-title {
   font-size: var(--atomic-docs-font-size-xl, 24px);
@@ -277,7 +274,7 @@ const filteredExtractedColors = computed(() => {
 }
 
 .atomic-docs-color-value {
-  font-family: var(--atomic-docs-font-family-mono, monospace);
+  font-family: var(--atomic-docs-font-family-mono, monospace), sans-serif;
   font-size: var(--atomic-docs-font-size-sm, 14px);
   color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
 }

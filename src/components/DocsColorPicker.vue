@@ -71,7 +71,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { ref, onMounted, onUnmounted, watch, reactive } from 'vue';
 
 interface Props {
   modelValue: string;
@@ -98,7 +98,7 @@ const hueTrack = ref<HTMLElement | null>(null);
 const alphaTrack = ref<HTMLElement | null>(null);
 
 // Pointer positions
-const saturationPointerPosition = ref({ x: 100, y: 0 });
+const saturationPointerPosition = reactive({ x: 100, y: 0 });
 const huePosition = ref(0);
 const alphaPosition = ref(100);
 
@@ -129,7 +129,7 @@ function hexToHsv(hex: string): { h: number, s: number, v: number, a: number } {
   const min = Math.min(r, g, b);
   const delta = max - min;
 
-  let h = 0;
+  let h;
   const s = max === 0 ? 0 : delta / max;
   const v = max;
 
@@ -155,7 +155,7 @@ function hsvToHex(h: number, s: number, v: number, a: number = 1): string {
   const x = c * (1 - Math.abs((h / 60) % 2 - 1));
   const m = v - c;
 
-  let r = 0, g = 0, b = 0;
+  let r, g, b;
 
   if (h >= 0 && h < 60) {
     r = c; g = x; b = 0;
@@ -197,7 +197,7 @@ function getRgbaColor(h: number, s: number, v: number, a: number): string {
   const x = c * (1 - Math.abs((h / 60) % 2 - 1));
   const m = v - c;
 
-  let r = 0, g = 0, b = 0;
+  let r, g, b;
 
   if (h >= 0 && h < 60) {
     r = c; g = x; b = 0;
@@ -287,10 +287,8 @@ function updateFromHex(hex: string) {
   currentAlpha.value = a;
 
   // Update positions
-  saturationPointerPosition.value = {
-    x: s * 100,
-    y: (1 - v) * 100
-  };
+  saturationPointerPosition.x = s * 100;
+  saturationPointerPosition.y = (1 - v) * 100;
 
   huePosition.value = (h / 360) * 100;
   alphaPosition.value = a * 100;
@@ -329,7 +327,8 @@ function handleSaturationDrag(event: MouseEvent | Touch) {
   y = Math.max(0, Math.min(100, y));
 
   // Update pointer position
-  saturationPointerPosition.value = { x, y };
+  saturationPointerPosition.x = x;
+  saturationPointerPosition.y = y;
 
   // Update saturation and value
   currentSaturation.value = x / 100;
@@ -563,14 +562,14 @@ onUnmounted(() => {
   height: 100%;
   border-radius: 6px;
   background: linear-gradient(
-    to right,
-    #f00 0%,
-    #ff0 17%,
-    #0f0 33%,
-    #0ff 50%,
-    #00f 67%,
-    #f0f 83%,
-    #f00 100%
+      to right,
+      #f00 0%,
+      #ff0 17%,
+      #0f0 33%,
+      #0ff 50%,
+      #00f 67%,
+      #f0f 83%,
+      #f00 100%
   );
   cursor: pointer;
 }
@@ -599,9 +598,9 @@ onUnmounted(() => {
   height: 100%;
   border-radius: 6px;
   background-image: linear-gradient(45deg, #ccc 25%, transparent 25%),
-    linear-gradient(-45deg, #ccc 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #ccc 75%),
-    linear-gradient(-45deg, transparent 75%, #ccc 75%);
+  linear-gradient(-45deg, #ccc 25%, transparent 25%),
+  linear-gradient(45deg, transparent 75%, #ccc 75%),
+  linear-gradient(-45deg, transparent 75%, #ccc 75%);
   background-size: 8px 8px;
   background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
   cursor: pointer;
