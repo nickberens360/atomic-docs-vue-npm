@@ -9,7 +9,7 @@
     >
       <DocsRecursiveNavItem
         :nav-items="item"
-        @nav-click="handleNavClick"
+        :force-expand="forceExpandAll" @nav-click="handleNavClick"
       />
     </template>
   </div>
@@ -25,12 +25,14 @@ interface Props {
   filterText?: string;
   onNavClick?: ((arg: ComponentItem) => void) | null;
   bgColor?: string;
+  forceExpandAll?: boolean; // New prop for forced expansion from parent
 }
 
 const props = withDefaults(defineProps<Props>(), {
   filterText: '',
   onNavClick: null,
-  bgColor: 'background'
+  bgColor: 'background',
+  forceExpandAll: false // Default to false
 });
 
 const componentDocPlugin = inject('componentDocPlugin') as ComponentDocPlugin;

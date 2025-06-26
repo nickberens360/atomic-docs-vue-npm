@@ -6,7 +6,7 @@
       class="atomic-docs-accordion__section"
       :class="{
         'atomic-docs-accordion__section--below-active': isSectionBelowActive(index),
-        'atomic-docs-accordion__section--active': activeSection === index
+        'atomic-docs-accordion__section--active': modelValue === index // Use modelValue
       }"
     >
       <button
@@ -14,14 +14,12 @@
         @click="toggleSection(index)"
       >
         <span class="atomic-docs-accordion__icon">
-          {{ activeSection === index ? '−' : '+' }}
-        </span>
+          {{ modelValue === index ? '−' : '+' }} </span>
         <span class="atomic-docs-accordion__title">{{ section.title }}</span>
       </button>
       <div
         class="atomic-docs-accordion__content"
-        :class="{ 'atomic-docs-accordion__content--active': activeSection === index }"
-      >
+        :class="{ 'atomic-docs-accordion__content--active': modelValue === index }" >
         <slot :name="`section-${index}`" />
       </div>
     </div>
@@ -36,22 +34,23 @@ interface Section {
 
 interface Props {
   sections: Section[];
-  defaultSection?: number | null;
+  modelValue?: number | null; // Changed to modelValue
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  defaultSection: null
+  modelValue: null
 });
 
-const activeSection = ref<number | null>(props.defaultSection);
+const emit = defineEmits(['update:modelValue']); // Emit update:modelValue
+
 const slots = useSlots();
 
 // Method to toggle a section
 const toggleSection = (index: number) => {
-  if (activeSection.value === index) {
-    activeSection.value = null; // Close if already open
+  if (props.modelValue === index) {
+    emit('update:modelValue', null); // Close if already open
   } else {
-    activeSection.value = index; // Open the clicked section
+    emit('update:modelValue', index); // Open the clicked section
   }
 };
 
@@ -62,20 +61,20 @@ const hasSlotContent = computed(() => {
 
 // Check if a section is below the active section
 const isSectionBelowActive = (index: number) => {
-  return activeSection.value !== null && index > activeSection.value;
+  return props.modelValue !== null && index > props.modelValue;
 };
 
 // No longer automatically opening the first section by default
 onMounted(() => {
-  // If a specific default section is provided, use it
-  if (activeSection.value !== null) {
+  // If a specific default section is provided via modelValue, use it
+  if (props.modelValue !== null) {
     // Validate that the section exists and has content
-    if (activeSection.value < props.sections.length &&
-        hasSlotContent.value[activeSection.value]) {
+    if (props.modelValue < props.sections.length &&
+      hasSlotContent.value[props.modelValue]) {
       // Keep the specified default section
     } else {
       // Invalid default section, reset to null (all closed)
-      activeSection.value = null;
+      emit('update:modelValue', null);
     }
   }
 });

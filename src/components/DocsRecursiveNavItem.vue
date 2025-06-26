@@ -5,7 +5,10 @@
   >
     <div
       class="atomic-docs-recursive-list-header"
-      :class="{ 'atomic-docs-recursive-list-header-active': expanded }"
+      :class="{
+        'atomic-docs-recursive-list-header-active': expanded,
+        'atomic-docs-recursive-list-header--no-documented-files': directoryHasNoDocumentedFiles
+      }"
       @click="toggleExpanded($event)"
     >
       <span class="atomic-docs-icon atomic-docs-folder-icon">
@@ -25,7 +28,7 @@
           <DocsRecursiveNavItem
             v-if="child.type === 'directory'"
             :nav-items="child"
-            @nav-click="emit('nav-click', $event)"
+            :force-expand="forceExpand" @nav-click="emit('nav-click', $event)"
           />
 
           <div
@@ -75,13 +78,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-// import DocsRecursiveNavItem from './DocsRecursiveNavItem.vue';
-import { NavItem } from '../types';
+import { computed, ref, watch } from 'vue'; // Import watch
+import { NavItem, ComponentItem, DirectoryItem } from '../types';
 
 // Define props
 interface Props {
   navItems: NavItem;
+  forceExpand?: boolean; // New prop for forced expansion
 }
 
 const props = defineProps<Props>();
@@ -93,6 +96,26 @@ const emit = defineEmits<{
 
 // State
 const expanded = ref(false);
+
+// Watch for changes in forceExpand prop to update local expanded state
+watch(() => props.forceExpand, (newValue) => {
+  if (newValue) {
+    expanded.value = true; // Force expand when true
+  } else {
+    // Only collapse if it was forced open and now it's not,
+    // otherwise, let user control manual collapse.
+    // Or, if you want it to collapse completely when filter is empty, use:
+    // expanded.value = false;
+    // For this use case, we want it to close only if the filter is removed and it was forced open by the filter.
+    // If the user manually expanded it, it should remain open until they close it.
+    // A simpler approach for the filter: if filterText is empty, all should collapse back to default state.
+    if (!newValue && props.navItems.type === 'directory') {
+      // Only collapse if it's a directory and forceExpand becomes false
+      expanded.value = false;
+    }
+  }
+}, { immediate: true }); // Run immediately on component mount to respect initial forceExpand value
+
 
 // Methods
 const toggleExpanded = (event: Event) => {
@@ -108,6 +131,38 @@ const sortedChildren = computed<NavItem[]>(() => {
     if (a.type !== 'directory' && b.type === 'directory') return 1;
     return a.label.localeCompare(b.label);
   })
+});
+
+/**
+ * Helper function that recursively checks if any component within the given item
+ * (or its subdirectories) is documented.
+ */
+const checkDocumentedDescendants = (item: NavItem): boolean => {
+  if (item.type === 'component') {
+    return item.isDocumented === true;
+  }
+
+  // If it's a directory, recursively check its children
+  if (item.type === 'directory' && item.children) {
+    for (const key in item.children) {
+      const child = item.children[key];
+      if (checkDocumentedDescendants(child)) {
+        return true; // Found a documented component
+      }
+    }
+  }
+  return false; // No documented components found
+};
+
+/**
+ * Computed property to determine if the current directory navItem has no documented files
+ * within itself or its subdirectories.
+ */
+const directoryHasNoDocumentedFiles = computed(() => {
+  // This computed property will only be true for directories.
+  // It returns true if the current navItem is a directory AND
+  // the recursive check finds NO documented descendants.
+  return props.navItems.type === 'directory' && !checkDocumentedDescendants(props.navItems);
 });
 </script>
 
@@ -136,6 +191,13 @@ $tree-line-thickness: 1px;
   font-size: var(--atomic-docs-font-size-sm, 14px);
   &:hover {
     background-color: var(--atomic-docs-hover-color, rgba(0, 0, 0, 0.04));
+  }
+
+  // New style for directories with no documented files
+  &--no-documented-files {
+    opacity: 0.7; // Example: make it slightly faded
+    font-style: italic; // Example: make text italic
+    color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6)); // Example: change color
   }
 }
 

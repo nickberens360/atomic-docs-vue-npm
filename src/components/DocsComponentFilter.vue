@@ -52,6 +52,7 @@
           <DocsComponentNavigation
             :filter-text="filterText"
             :on-nav-click="handleNavClick"
+            :force-expand-all="Boolean(filterText)"
             bg-color="surface"
           />
         </div>
