@@ -3,13 +3,11 @@ import type { RouteLocationNormalized } from 'vue-router';
 
 // Define interface for route parameters
 interface ComponentDocRouteParams {
-  componentName: string;
+  componentName?: string; // Make optional as it might be missing on initial /atomic-docs/ route
 }
 
 const routes: RouteRecordRaw[] = [
   {
-    // This new route handles the root path '/' to prevent initialization warnings.
-    // It renders nothing and has no effect on your application.
     path: '/',
     name: 'docsRoot',
     component: { render: () => null },
@@ -19,8 +17,15 @@ const routes: RouteRecordRaw[] = [
     name: 'componentDocs',
     component: () => import('./views/DocsHomeView.vue'),
     children: [
+      // Add a redirect for the base /atomic-docs path to the component index,
+      // or to a default component if you have one.
+      // This ensures a valid route is always active under /atomic-docs if no specific component is chosen.
       {
-        path: ':componentName',
+        path: '', // Matches /atomic-docs exactly
+        redirect: { name: 'componentIndex' } // Redirect to DocsComponentIndex view
+      },
+      {
+        path: ':componentName', // This is where the componentName parameter is expected
         name: 'componentDoc',
         component: () => import('./views/DocsComponentDetails.vue'),
         props: (route: RouteLocationNormalized) => ({
@@ -38,6 +43,12 @@ const routes: RouteRecordRaw[] = [
         name: 'typography',
         component: () => import('./views/DocsTypography.vue')
       },
+      // Define a component index route for the base /atomic-docs path
+      {
+        path: 'index', // Explicitly define an index route
+        name: 'componentIndex',
+        component: () => import('./views/DocsComponentIndex.vue') // Or a new `DocsComponentListing` view
+      }
     ]
   }
 ];
