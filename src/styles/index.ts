@@ -1,12 +1,13 @@
 /**
  * Styles index file
- * 
+ *
  * This file exports all styles for the documentation plugin.
  * Import this file in the plugin's main entry point to apply the base styles.
  */
 
 // Import base styles
 import './docs-base.scss';
+import './prism-custom-theme.scss';
 
 // Export a function to apply the atomic-docs class to the root element
 export function applyAtomicDocsStyles(rootElement: HTMLElement): void {

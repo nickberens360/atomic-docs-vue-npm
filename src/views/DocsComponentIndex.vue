@@ -45,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, inject, provide, watch, onUnmounted } from 'vue';
+import { ref, computed, inject, provide, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import DocsAppBar from '../components/DocsAppBar.vue';
 import DocsAppNavigationDrawer from '../components/DocsAppNavigationDrawer.vue';
@@ -75,60 +75,16 @@ provide('isDark', isDark);
 const isRailOpen = ref(false);
 const isNavDrawerOpen = ref(true);
 
-// Reactive reference to the currently active Prism theme stylesheet link element
-const activePrismThemeStylesheet = ref<HTMLLinkElement | null>(null);
-
-// Watch for changes in isDark to dynamically load/unload Prism themes
-watch(isDark, async (newValue) => {
-  // Save theme preference to localStorage
-  localStorage.setItem('theme', newValue ? 'dark' : 'light');
-
-  try {
-    // Dynamically import the correct theme stylesheet URL
-    const themeUrl = newValue
-      ? (await import('prismjs/themes/prism-okaidia.css?url')).default
-      : (await import('prismjs/themes/prism-solarizedlight.css?url')).default;
-
-    // Create new link element
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = themeUrl;
-
-    // Wait for new theme to load before removing old one to prevent flash
-    link.onload = () => {
-      if (activePrismThemeStylesheet.value) {
-        document.head.removeChild(activePrismThemeStylesheet.value);
-      }
-      activePrismThemeStylesheet.value = link;
-
-      // Re-highlight all code blocks after theme change
-      setTimeout(() => {
-        Prism.highlightAll();
-      }, 50);
-    };
-
-    link.onerror = () => {
-      console.error('Failed to load Prism theme stylesheet');
-    };
-
-    document.head.appendChild(link);
-  } catch (error) {
-    console.error('Failed to load Prism theme:', error);
-  }
-}, { immediate: true }); // Run immediately on component mount
-
-// On component unmount, remove the active stylesheet to clean up
-onUnmounted(() => {
-  if (activePrismThemeStylesheet.value) {
-    document.head.removeChild(activePrismThemeStylesheet.value);
-    activePrismThemeStylesheet.value = null;
-  }
-});
-
 // Function to toggle theme
 function toggleTheme(value: boolean) {
   isDark.value = value;
-  // The theme class will be automatically applied through the computed property
+  // Save theme preference to localStorage
+  localStorage.setItem('theme', value ? 'dark' : 'light');
+  // Re-highlight all code blocks after theme change
+  // This will pick up the CSS variables from the theme classes
+  setTimeout(() => {
+    Prism.highlightAll();
+  }, 50);
 }
 
 // Function to toggle drawer
@@ -146,6 +102,15 @@ const isComponentDocsRoute = computed(() => {
 const themeClass = computed(() => {
   return isDark.value ? 'atomic-docs-app-theme--dark' : 'atomic-docs-app-theme--light';
 });
+
+// Initial highlighting on mount and when theme changes to ensure styles are applied
+// This replaces the previous dynamic stylesheet loading logic.
+watch(isDark, () => {
+  // Trigger re-highlighting when theme changes to ensure Prism applies styles correctly
+  setTimeout(() => {
+    Prism.highlightAll();
+  }, 50);
+}, { immediate: true }); // Run immediately on component mount
 </script>
 
 <style>
