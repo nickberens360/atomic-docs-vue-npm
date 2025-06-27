@@ -1,12 +1,11 @@
 // nickberens360/atomic-docs-vue-npm/atomic-docs-vue-npm-consumer-app-id/src/index.ts
-// ... (rest of the file remains the same)
 
 import { App, Plugin, Component, createApp } from 'vue';
 import ExampleComponent from './components/DocsExampleComponent.vue';
 import DocsComponentIndex from './views/DocsComponentIndex.vue';
 import { ComponentDocPlugin, ComponentDocOptions } from './types';
 import routesConfig from './routes';
-import { createRouter, createWebHistory } from 'vue-router'; // Import createWebHistory
+import { createRouter, createWebHistory } from 'vue-router';
 import './styles';
 
 export function convertPathToExampleName(path: string): string {
@@ -84,7 +83,7 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
 
       const docsApp = createApp(DocsComponentIndex);
       const docsRouter = createRouter({
-        history: options.history || createWebHistory('/atomic-docs'), // <--- CHANGED THIS LINE
+        history: options.history || createWebHistory('/atomic-docs'), // <--- CRITICAL CHANGE
         routes: routesConfig
       });
 

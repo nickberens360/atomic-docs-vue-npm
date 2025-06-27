@@ -45,8 +45,7 @@
         <template #[`section-1`]>
           <div class="atomic-docs-nav-item">
             <router-link
-              to="/atomic-docs/colors"
-              class="atomic-docs-nav-link"
+              to="/colors" class="atomic-docs-nav-link"
               active-class="atomic-docs-nav-link--active"
             >
               <span class="atomic-docs-icon atomic-docs-file-icon">🎨</span>
@@ -58,8 +57,7 @@
         <template #[`section-2`]>
           <div class="atomic-docs-nav-item">
             <router-link
-              to="/atomic-docs/typography"
-              class="atomic-docs-nav-link"
+              to="/typography" class="atomic-docs-nav-link"
               active-class="atomic-docs-nav-link--active"
             >
               <span class="atomic-docs-icon atomic-docs-file-icon">🔤</span>
@@ -77,11 +75,9 @@ import { ref, watch } from 'vue';
 import DocsComponentNavigation from "./DocsComponentNavigation.vue";
 import DocsAccordion from "./DocsAccordion.vue";
 
-// Define refs
 const filterText = ref('');
-const activeComponentsSection = ref<number | null>(0); // Initialize Components section as open
+const activeComponentsSection = ref<number | null>(0);
 
-// Define props
 const props = defineProps<{
   isRailOpen: boolean;
   isNavDrawerOpen: boolean;
@@ -89,17 +85,14 @@ const props = defineProps<{
 
 const isExpanded = ref(false);
 
-// Watch filterText to automatically open/close the Components accordion section
 watch(filterText, (newValue) => {
   if (newValue.length > 0) {
-    activeComponentsSection.value = 0; // Open Components section if filterText is not empty
+    activeComponentsSection.value = 0;
   } else {
-    activeComponentsSection.value = null; // Close Components section if filterText is empty
+    activeComponentsSection.value = null;
   }
-});
+}, { immediate: true });
 
-
-// Handle expand-on-hover functionality
 const handleMouseEnter = () => {
   if (props.isRailOpen) {
     isExpanded.value = true;
@@ -112,7 +105,6 @@ const handleMouseLeave = () => {
   }
 };
 
-// Watch for changes to the rail state
 watch(() => props.isRailOpen, (newValue) => {
   if (!newValue) {
     isExpanded.value = false;
@@ -141,15 +133,12 @@ watch(() => props.isRailOpen, (newValue) => {
   overflow-y: auto;
   z-index: 100;
 
-  // Closed state
   transform: translateX(-100%);
 
-  // Open state
   &--open {
     transform: translateX(0);
   }
 
-  // Rail state (collapsed)
   &--rail {
     width: var(--atomic-docs-drawer-rail-width);
     overflow: hidden;
@@ -160,7 +149,6 @@ watch(() => props.isRailOpen, (newValue) => {
     }
   }
 
-  // Expanded state (on hover when in rail mode)
   &--rail.atomic-docs-navigation-drawer--expanded {
     width: var(--atomic-docs-drawer-width);
 
@@ -219,8 +207,8 @@ watch(() => props.isRailOpen, (newValue) => {
   max-width: 85%;
   margin: 0 auto;
   background-color: var(--atomic-docs-background-color, white);
-  border-radius: var(--atomic-docs-border-radius-sm, 4px);
   border: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.23));
+  border-radius: var(--atomic-docs-border-radius-sm, 4px);
 }
 
 .atomic-docs-input-wrapper {

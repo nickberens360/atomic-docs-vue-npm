@@ -1,8 +1,7 @@
-// src/routes.ts (within your atomic-docs plugin source)
+// nickberens360/atomic-docs-vue-npm/atomic-docs-vue-npm-consumer-app-id/src/routes.ts
 import { RouteRecordRaw } from 'vue-router';
 import type { RouteLocationNormalized } from 'vue-router';
 
-// Define interface for route parameters
 interface ComponentDocRouteParams {
   componentName: string;
 }
@@ -14,12 +13,13 @@ const routes: RouteRecordRaw[] = [
     component: { render: () => null },
   },
   {
-    path: '/atomic-docs',
+    // CHANGED: This path should now be '/' because createWebHistory('/atomic-docs') handles the prefix
+    path: '/', // <--- CRITICAL CHANGE: Was '/atomic-docs'
     name: 'componentDocs',
-    component: () => import('./views/DocsHomeView.vue'), // This is correct
+    component: () => import('./views/DocsHomeView.vue'),
     children: [
       {
-        path: ':componentName',
+        path: ':componentName', // This will now resolve to /atomic-docs/:componentName
         name: 'componentDoc',
         component: () => import('./views/DocsComponentDetails.vue'),
         props: (route: RouteLocationNormalized) => ({
@@ -28,12 +28,12 @@ const routes: RouteRecordRaw[] = [
         })
       },
       {
-        path: 'colors',
+        path: 'colors', // This will now resolve to /atomic-docs/colors
         name: 'colors',
         component: () => import('./views/DocsColorsView.vue')
       },
       {
-        path: 'typography',
+        path: 'typography', // This will now resolve to /atomic-docs/typography
         name: 'typography',
         component: () => import('./views/DocsTypography.vue')
       },
