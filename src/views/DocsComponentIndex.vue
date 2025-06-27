@@ -75,8 +75,7 @@ provide('isDark', isDark);
 const isRailOpen = ref(false);
 const isNavDrawerOpen = ref(true);
 
-// Reactive reference to the currently active Prism theme stylesheet link element
-const activePrismThemeStylesheet = ref<HTMLLinkElement | null>(null);
+// No longer need to track the stylesheet element as we're importing CSS directly
 
 // Watch for changes in isDark to dynamically load/unload Prism themes
 watch(isDark, async (newValue) => {
@@ -84,46 +83,21 @@ watch(isDark, async (newValue) => {
   localStorage.setItem('theme', newValue ? 'dark' : 'light');
 
   try {
-    // Dynamically import the correct theme stylesheet URL
-    const themeUrl = newValue
-      ? (await import('prismjs/themes/prism-okaidia.css?url')).default
-      : (await import('prismjs/themes/prism-solarizedlight.css?url')).default;
+    // Import the CSS directly instead of as a URL
+    if (newValue) {
+      await import('prismjs/themes/prism-okaidia.css');
+    } else {
+      await import('prismjs/themes/prism-solarizedlight.css');
+    }
 
-    // Create new link element
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = themeUrl;
-
-    // Wait for new theme to load before removing old one to prevent flash
-    link.onload = () => {
-      if (activePrismThemeStylesheet.value) {
-        document.head.removeChild(activePrismThemeStylesheet.value);
-      }
-      activePrismThemeStylesheet.value = link;
-
-      // Re-highlight all code blocks after theme change
-      setTimeout(() => {
-        Prism.highlightAll();
-      }, 50);
-    };
-
-    link.onerror = () => {
-      console.error('Failed to load Prism theme stylesheet');
-    };
-
-    document.head.appendChild(link);
+    // Re-highlight all code blocks after theme change
+    setTimeout(() => {
+      Prism.highlightAll();
+    }, 50);
   } catch (error) {
     console.error('Failed to load Prism theme:', error);
   }
 }, { immediate: true }); // Run immediately on component mount
-
-// On component unmount, remove the active stylesheet to clean up
-onUnmounted(() => {
-  if (activePrismThemeStylesheet.value) {
-    document.head.removeChild(activePrismThemeStylesheet.value);
-    activePrismThemeStylesheet.value = null;
-  }
-});
 
 // Function to toggle theme
 function toggleTheme(value: boolean) {
