@@ -55,6 +55,9 @@ import DocsMain from '../components/DocsMain.vue';
 import DocsMarkdown from '../components/DocsMarkdown.vue';
 import { ComponentDocPlugin } from '../types';
 import Prism from 'prismjs';
+// Import Prism themes directly
+import 'prismjs/themes/prism-okaidia.css';
+import 'prismjs/themes/prism-solarizedlight.css';
 // Import base styles
 import '../styles';
 // Import README content
@@ -75,54 +78,29 @@ provide('isDark', isDark);
 const isRailOpen = ref(false);
 const isNavDrawerOpen = ref(true);
 
-// Reactive reference to the currently active Prism theme stylesheet link element
-const activePrismThemeStylesheet = ref<HTMLLinkElement | null>(null);
-
-// Watch for changes in isDark to dynamically load/unload Prism themes
-watch(isDark, async (newValue) => {
+// Watch for changes in isDark to toggle theme classes
+watch(isDark, (newValue) => {
   // Save theme preference to localStorage
   localStorage.setItem('theme', newValue ? 'dark' : 'light');
 
-  try {
-    // Dynamically import the correct theme stylesheet URL
-    const themeUrl = newValue
-      ? (await import('prismjs/themes/prism-okaidia.css?url')).default
-      : (await import('prismjs/themes/prism-solarizedlight.css?url')).default;
-
-    // Create new link element
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = themeUrl;
-
-    // Wait for new theme to load before removing old one to prevent flash
-    link.onload = () => {
-      if (activePrismThemeStylesheet.value) {
-        document.head.removeChild(activePrismThemeStylesheet.value);
-      }
-      activePrismThemeStylesheet.value = link;
-
-      // Re-highlight all code blocks after theme change
-      setTimeout(() => {
-        Prism.highlightAll();
-      }, 50);
-    };
-
-    link.onerror = () => {
-      console.error('Failed to load Prism theme stylesheet');
-    };
-
-    document.head.appendChild(link);
-  } catch (error) {
-    console.error('Failed to load Prism theme:', error);
+  // Apply theme by toggling a class on the document body
+  if (newValue) {
+    document.body.classList.add('prism-dark-theme');
+    document.body.classList.remove('prism-light-theme');
+  } else {
+    document.body.classList.add('prism-light-theme');
+    document.body.classList.remove('prism-dark-theme');
   }
+
+  // Re-highlight all code blocks after theme change
+  setTimeout(() => {
+    Prism.highlightAll();
+  }, 50);
 }, { immediate: true }); // Run immediately on component mount
 
-// On component unmount, remove the active stylesheet to clean up
+// Clean up on unmount
 onUnmounted(() => {
-  if (activePrismThemeStylesheet.value) {
-    document.head.removeChild(activePrismThemeStylesheet.value);
-    activePrismThemeStylesheet.value = null;
-  }
+  document.body.classList.remove('prism-dark-theme', 'prism-light-theme');
 });
 
 // Function to toggle theme
@@ -154,6 +132,27 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
+}
+
+/* Prism theme control */
+:root {
+  --prism-dark-theme: 'prism-okaidia';
+  --prism-light-theme: 'prism-solarizedlight';
+}
+
+/* Hide both themes by default */
+:root .prism-okaidia-theme,
+:root .prism-solarizedlight-theme {
+  display: none;
+}
+
+/* Show the appropriate theme based on body class */
+body.prism-dark-theme :root .prism-okaidia-theme {
+  display: block;
+}
+
+body.prism-light-theme :root .prism-solarizedlight-theme {
+  display: block;
 }
 </style>
 
