@@ -1,5 +1,6 @@
 <template>
   <div>
+    {{isDocsEnabled}} dff
     <div
       v-if="isDocsEnabled"
       class="atomic-docs"
