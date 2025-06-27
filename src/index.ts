@@ -7,7 +7,7 @@ import { ComponentDocPlugin, ComponentDocOptions } from './types';
 import routesConfig from './routes';
 import { createRouter, createWebHistory } from 'vue-router';
 import './styles';
-
+console.log('Component documentation plugin initialized');
 export function convertPathToExampleName(path: string): string {
   if (!path) return '';
   try {

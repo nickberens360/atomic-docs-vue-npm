@@ -28,7 +28,7 @@
           <div class="details-list">
             <div v-for="(value, key) in rule.styles" :key="key" class="detail-item">
               <span>{{ key }}:</span>
-              <code>{{ value }}</code>
+              <code class="atomic-docs-type-value">{{ value }}</code>
             </div>
           </div>
         </div>
@@ -122,14 +122,50 @@ const fuzzyMatch = (text: string, pattern: string): boolean => {
   return patternIdx === lowerPattern.length && maxConsecutive >= 2;
 };
 
-// Filter utility classes based on search term
+// Filter and sort utility classes based on search term and size
 const filteredUtilityClasses = computed(() => {
-  if (!searchTerm.value) {
-    return typographyData.value.utilityClasses;
+  // First filter the utility classes based on search term
+  let filtered = typographyData.value.utilityClasses;
+  if (searchTerm.value) {
+    filtered = filtered.filter(rule =>
+      fuzzyMatch(rule.selector, searchTerm.value)
+    );
   }
-  return typographyData.value.utilityClasses.filter(rule =>
-    fuzzyMatch(rule.selector, searchTerm.value)
-  );
+
+  // Then sort by size (largest to smallest)
+  return filtered.sort((a, b) => {
+    console.log('Sorting utility classes by size:', a, b);
+    // Helper function to extract numeric value from CSS value
+    const extractNumericValue = (rule) => {
+      // Look for font-size first
+      if (rule.styles['font-size']) {
+        const value = rule.styles['font-size'];
+        // Extract numeric part from values like '16px', '1.5rem', etc.
+        const numericValue = parseFloat(value);
+
+        // Convert to px for consistent comparison
+        if (value.includes('rem')) {
+          return numericValue * 16; // Assuming 1rem = 16px
+        } else if (value.includes('em')) {
+          return numericValue * 16; // Simplified, actual em depends on parent
+        } else {
+          return numericValue;
+        }
+      }
+
+      // If no font-size, try other size-related properties
+      const sizeProps = ['line-height', 'letter-spacing', 'margin', 'padding'];
+      for (const prop of sizeProps) {
+        if (rule.styles[prop]) {
+          return parseFloat(rule.styles[prop]);
+        }
+      }
+
+      return 0; // Default if no size property found
+    };
+
+    return extractNumericValue(b) - extractNumericValue(a); // Descending order
+  });
 });
 
 // Sort and filter element tags
