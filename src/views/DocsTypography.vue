@@ -163,6 +163,7 @@ const filteredUtilityClasses = computed(() => {
 
       return 0; // Default if no size property found
     };
+    console.log('Extracted sizes:', extractNumericValue(a), extractNumericValue(b));
 
     return extractNumericValue(b) - extractNumericValue(a); // Descending order
   });
