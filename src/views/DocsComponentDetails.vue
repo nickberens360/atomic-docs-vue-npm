@@ -80,8 +80,10 @@ const componentName = computed<string>(() => {
 });
 
 const currentComponent = computed<ComponentType>(() => {
-  if (exampleComponents[props.componentName]) {
-    return exampleComponents[props.componentName].default;
+  // CHANGED: Use componentDocPlugin.convertPathToExampleName with relativePath for lookup
+  const internalExampleComponentName = componentDocPlugin?.convertPathToExampleName(props.relativePath);
+  if (internalExampleComponentName && exampleComponents[internalExampleComponentName]) {
+    return exampleComponents[internalExampleComponentName].default;
   } else {
     return DocsComponentNotDocumented;
   }

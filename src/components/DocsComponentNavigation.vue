@@ -123,7 +123,7 @@ function handleNavClick(arg: NavItem): void {
   if (arg.relativePath && arg.exampleComponent) {
     router.push({
       name: 'componentDoc' as any,
-      params: { componentName: arg.exampleComponent },
+      params: { componentName: arg.label.replace('.vue', '') }, // CHANGED: Use the clean label for the URL parameter
       query: { relativePath: arg.relativePath }
     });
   }
