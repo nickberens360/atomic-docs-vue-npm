@@ -113,7 +113,7 @@ const componentRef = ref<HTMLElement | null>(null);
 function handleNavClick(arg: ComponentItem): void {
   router.push({
     name: 'componentDoc' as any,
-    params: { componentName: arg.exampleComponent },
+    params: { componentName: encodeURIComponent(arg.exampleComponent) }, // Explicitly encode componentName
     query: { relativePath: arg.relativePath }
   });
   // Only close the menu if persistOpen is false AND closeOnClick is true

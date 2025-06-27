@@ -2,7 +2,7 @@
   <div class="component-details">
     <div class="component-header">
       <h2 class="component-title">
-        {{ componentName }}
+        {{ decodedComponentNameForDisplay }}
       </h2>
       <span
         v-if="props.relativePath"
@@ -15,7 +15,6 @@
       <Component
         :is="currentComponent"
       />
-      <!--        :relative-path="props.relativePath"-->
       <template #fallback>
         Loading...
       </template>
@@ -39,7 +38,7 @@ interface ExampleComponent {
 // Define the interface for the props
 interface Props {
   relativePath: string;
-  componentName: string;
+  componentName: string; // This prop will now receive the URL-encoded exampleComponent name
 }
 const componentDocPlugin = inject('componentDocPlugin') as ComponentDocPlugin;
 const exampleComponents: Record<string, ExampleComponent> = {};
@@ -73,15 +72,17 @@ if (exampleModules && examplesDirName) {
 
 const props = defineProps<Props>();
 
-const componentName = computed<string>(() => {
-  // Add guard for relativePath
-  if (!props.relativePath) return '';
-  return props.relativePath.split('/').pop()?.replace('.vue', '') || '';
+// Computed property to decode componentName for display purposes
+const decodedComponentNameForDisplay = computed<string>(() => {
+  // Decode the componentName prop, which comes URL-encoded from the route parameter
+  return decodeURIComponent(props.componentName);
 });
 
 const currentComponent = computed<ComponentType>(() => {
-  if (exampleComponents[props.componentName]) {
-    return exampleComponents[props.componentName].default;
+  // Decode props.componentName before using it as a key for exampleComponents lookup
+  const decodedName = decodeURIComponent(props.componentName);
+  if (exampleComponents[decodedName]) {
+    return exampleComponents[decodedName].default;
   } else {
     return DocsComponentNotDocumented;
   }
