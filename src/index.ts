@@ -79,6 +79,8 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
         options
       };
 
+      app.provide('componentDocPlugin', plugin);
+
       const docsApp = createApp(DocsComponentIndex);
       const docsRouter = createRouter({
         history: options.history || createWebHistory(),
@@ -121,11 +123,22 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
 
       let mainAppContainer: HTMLElement | null = null;
 
+
+      console.log('options.mainAppID', options.mainAppID);
+
       const toggleDocs = (show: boolean) => {
         const docsElement = document.getElementById('atomic-docs-app');
 
         if (!mainAppContainer) {
-          mainAppContainer = app._container as HTMLElement;
+          // First try to find the container by ID if mainAppID is provided
+          if (options.mainAppID) {
+            mainAppContainer = document.getElementById(options.mainAppID);
+          }
+
+          // Fall back to the current method if mainAppID is not provided or element not found
+          if (!mainAppContainer) {
+            mainAppContainer = app._container as HTMLElement;
+          }
         }
 
         if (docsElement) {
