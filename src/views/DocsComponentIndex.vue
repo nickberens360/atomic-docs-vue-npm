@@ -130,8 +130,8 @@ html, body {
   width: 100%;
   background-color: var(--atomic-docs-surface-color, white);
   border-radius: var(--atomic-docs-border-radius-sm, 4px);
-  height: 100vh;
-  overflow: auto;
+  //height: 100vh;
+  //overflow: auto;
 }
 
 @keyframes bounce-right {
