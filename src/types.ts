@@ -57,6 +57,7 @@ export interface ComponentDocOptions {
   plugins?: Plugin[]; // <-- MODIFIED: Changed from 'vuetify' to a generic 'plugins' array
   globalComponents?: Record<string, Component>; // Components to register globally in the docs app
   autoRegisterComponents?: boolean; // Auto-register all components from the main app
+  mainAppID?: string; // ID of the main application container element
 }
 
 // Plugin interface
