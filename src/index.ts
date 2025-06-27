@@ -79,7 +79,10 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
         options
       };
 
-      const docsApp = createApp(DocsComponentIndex);
+      // MODIFIED: Pass plugin as a prop to DocsComponentIndex
+      const docsApp = createApp(DocsComponentIndex, {
+        componentDocPlugin: plugin
+      });
       const docsRouter = createRouter({
         history: options.history || createWebHistory(),
         routes: routesConfig
@@ -111,7 +114,7 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
         }
       }
 
-      docsApp.provide('componentDocPlugin', plugin);
+      // REMOVED: docsApp.provide('componentDocPlugin', plugin); // This line is no longer needed here
       docsApp.use(docsRouter);
       docsApp.component('ExampleComponentUsage', ExampleComponent as Component);
 
