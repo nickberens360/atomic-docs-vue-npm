@@ -79,6 +79,8 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
         options
       };
 
+      app.provide('componentDocPlugin', plugin);
+
       const docsApp = createApp(DocsComponentIndex);
       const docsRouter = createRouter({
         history: options.history || createWebHistory(),
