@@ -1,4 +1,4 @@
-// src/routes.ts
+// src/routes.ts (within your atomic-docs plugin source)
 import { RouteRecordRaw } from 'vue-router';
 import type { RouteLocationNormalized } from 'vue-router';
 
@@ -9,8 +9,6 @@ interface ComponentDocRouteParams {
 
 const routes: RouteRecordRaw[] = [
   {
-    // This new route handles the root path '/' to prevent initialization warnings.
-    // It renders nothing and has no effect on your application.
     path: '/',
     name: 'docsRoot',
     component: { render: () => null },
@@ -18,7 +16,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/atomic-docs',
     name: 'componentDocs',
-    component: () => import('./views/DocsHomeView.vue'), // Correctly uses DocsHomeView.vue
+    component: () => import('./views/DocsHomeView.vue'), // This is correct
     children: [
       {
         path: ':componentName',
