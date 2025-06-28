@@ -28,7 +28,7 @@
           <div class="details-list">
             <div v-for="(value, key) in rule.styles" :key="key" class="detail-item">
               <span>{{ key }}:</span>
-              <code>{{ value }}</code>
+              <code class="atomic-docs-type-value">{{ value }}</code>
             </div>
           </div>
         </div>
