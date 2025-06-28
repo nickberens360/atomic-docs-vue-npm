@@ -278,6 +278,7 @@ watch(typographyData, (newData) => {
 .atomic-docs-element-preview {
   margin: 0 0 16px 0;
   padding: 0;
+  display: unset;
 }
 
 .atomic-docs-details-list {
