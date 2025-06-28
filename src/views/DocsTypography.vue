@@ -51,6 +51,7 @@
               <DocsCopyToClipboard
                 :text="rule.selector.substring(1)"
                 title="Copy class name"
+                aria-label="Copy class name"
                 :show-text="false"
                 button-text="Copy class"
               />
