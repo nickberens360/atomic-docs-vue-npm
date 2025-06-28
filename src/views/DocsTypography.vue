@@ -26,7 +26,9 @@
         <div v-for="(rules, prefix) in groupedUtilityClasses" :key="prefix" class="atomic-docs-typography-group">
           <h4 class="atomic-docs-group-title">{{ prefix }}</h4>
           <div v-for="rule in rules" :key="rule.selector" class="atomic-docs-typography-example">
-            <p :class="rule.selector.substring(1)" class="atomic-docs-element-preview">{{ rule.selector }}</p>
+            <p :class="rule.selector.substring(1)" class="atomic-docs-element-preview">
+              {{ rule.selector.substring(1) }}
+            </p>
             <div class="atomic-docs-details-list">
               <div v-for="(value, key) in rule.styles" :key="key" class="atomic-docs-detail-item">
                 <span class="atomic-docs-type-key">{{ key }}:</span>
@@ -75,6 +77,11 @@ const isLoading = ref(true);
 // Search term
 const searchTerm = ref('');
 
+// Normalize search term: remove leading '.' if present
+const normalizedSearchTerm = computed(() => {
+  return searchTerm.value.startsWith('.') ? searchTerm.value.slice(1) : searchTerm.value;
+});
+
 // Fuzzy search function
 const fuzzyMatch = (text: string, pattern: string): boolean => {
   if (!pattern) return true;
@@ -114,10 +121,11 @@ const fuzzyMatch = (text: string, pattern: string): boolean => {
 
 // Filtered utility classes
 const filteredUtilityClasses = computed(() => {
-  if (!searchTerm.value) return typographyData.value.utilityClasses;
-  return typographyData.value.utilityClasses.filter(rule =>
-    fuzzyMatch(rule.selector, searchTerm.value)
-  );
+  if (!normalizedSearchTerm.value) return typographyData.value.utilityClasses;
+  return typographyData.value.utilityClasses.filter(rule => {
+    const selector = rule.selector.startsWith('.') ? rule.selector.slice(1) : rule.selector;
+    return fuzzyMatch(selector, normalizedSearchTerm.value);
+  });
 });
 
 // Group filtered utility classes by shared prefix and sort each group by largest font-size first
@@ -181,17 +189,17 @@ const sortedElementTags = computed(() => {
 
 // Filtered element tags
 const filteredElementTags = computed(() => {
-  if (!searchTerm.value) return sortedElementTags.value;
-  return sortedElementTags.value.filter(tag => fuzzyMatch(tag, searchTerm.value));
+  if (!normalizedSearchTerm.value) return sortedElementTags.value;
+  return sortedElementTags.value.filter(tag => fuzzyMatch(tag, normalizedSearchTerm.value));
 });
 
 // Filtered variables
 const filteredVariables = computed(() => {
-  if (!searchTerm.value) return typographyData.value.variables;
+  if (!normalizedSearchTerm.value) return typographyData.value.variables;
 
   const result: Record<string, string> = {};
   Object.entries(typographyData.value.variables).forEach(([key, value]) => {
-    if (fuzzyMatch(key, searchTerm.value)) result[key] = value;
+    if (fuzzyMatch(key, normalizedSearchTerm.value)) result[key] = value;
   });
   return result;
 });
@@ -278,7 +286,6 @@ watch(typographyData, (newData) => {
 .atomic-docs-element-preview {
   margin: 0 0 16px 0;
   padding: 0;
-  display: unset;
 }
 
 .atomic-docs-details-list {
