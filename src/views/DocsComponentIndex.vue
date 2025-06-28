@@ -131,7 +131,7 @@ html, body {
   background-color: var(--atomic-docs-surface-color, white);
   border-radius: var(--atomic-docs-border-radius-sm, 4px);
   height: 100vh;
-  overflow: auto;
+  overflow: hidden;
 }
 
 @keyframes bounce-right {
