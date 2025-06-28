@@ -8,18 +8,22 @@ import routesConfig from './routes';
 import { createRouter, createWebHistory } from 'vue-router';
 import './styles';
 
+// Centralized constants
+const DOCS_MOUNT_ID = 'atomic-docs-app';
+const DOCS_ROUTE_PREFIX = '/atomic-docs';
+
 export function convertPathToExampleName(path: string): string {
   if (!path) return '';
   try {
     return 'Example' + path.replace(/ /g, '-')
       .replace(/\.vue/g, '')
       .split('/')
-      .map((part) => {
-        return part.split('-')
-          .map((word) => `${word.charAt(0).toUpperCase()}${word.slice(1)}`)
-          .join('')
-          .trim();
-      }).join('')
+      .map((part) => part
+        .split('-')
+        .map((word) => `${word.charAt(0).toUpperCase()}${word.slice(1)}`)
+        .join('')
+        .trim()
+      ).join('')
       .trim();
   } catch {
     return 'ExampleComponent';
@@ -27,10 +31,18 @@ export function convertPathToExampleName(path: string): string {
 }
 
 function createDocsAppMountPoint(): HTMLElement {
+  let existing = document.getElementById(DOCS_MOUNT_ID);
+  if (existing) return existing;
   const mountPoint = document.createElement('div');
-  mountPoint.id = 'atomic-docs-app';
+  mountPoint.id = DOCS_MOUNT_ID;
   document.body.appendChild(mountPoint);
   return mountPoint;
+}
+
+function toggleElementDisplay(el: HTMLElement | null, show: boolean) {
+  if (el) {
+    el.style.display = show ? '' : 'none';
+  }
 }
 
 const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
@@ -41,31 +53,25 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
     examplesDirName: ""
   }) {
     try {
-      const componentModules = options?.componentModules;
-      const componentsDirName = options?.componentsDirName;
-      const exampleModules = options?.exampleModules;
-      const examplesDirName = options?.examplesDirName;
-      const rawComponentSourceModules = options?.rawComponentSourceModules;
-      const plugins = options?.plugins;
-      const enableDocs = options?.enableDocs;
+      const {
+        componentModules,
+        componentsDirName,
+        exampleModules,
+        examplesDirName,
+        rawComponentSourceModules,
+        plugins,
+        enableDocs,
+        mainAppID,
+        globalComponents,
+        autoRegisterComponents,
+        history: customHistory,
+      } = options;
 
-      if (!enableDocs) {
-        return;
-      }
-      if (!componentModules) {
-        console.error('Component docs plugin failed to initialize: componentModules is required');
-        return;
-      }
-      if (!exampleModules) {
-        console.error('Component docs plugin failed to initialize: exampleModules is required');
-        return;
-      }
-      if (!componentsDirName) {
-        console.error('Component docs plugin failed to initialize: componentsDirName is required');
-        return;
-      }
-      if (!examplesDirName) {
-        console.error('Component docs plugin failed to initialize: examplesDirName is required');
+      if (!enableDocs) return;
+
+      // Validate required options
+      if (!componentModules || !exampleModules || !componentsDirName || !examplesDirName) {
+        console.error('Component docs plugin initialization failed: Missing required options.');
         return;
       }
 
@@ -79,38 +85,36 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
         options
       };
 
+      // Provide plugin to main app intentionally
       app.provide('componentDocPlugin', plugin);
 
+      // Initialize docs app
       const docsApp = createApp(DocsComponentIndex);
       const docsRouter = createRouter({
-        history: options.history || createWebHistory(),
+        history: customHistory || createWebHistory(),
         routes: routesConfig
       });
 
-      if (plugins && Array.isArray(plugins)) {
-        plugins.forEach(plugin => {
-          docsApp.use(plugin);
-        });
+      if (plugins?.length) {
+        plugins.forEach(p => docsApp.use(p));
       }
 
-      if (options.globalComponents) {
-        Object.entries(options.globalComponents).forEach(([name, component]) => {
+      if (globalComponents) {
+        Object.entries(globalComponents).forEach(([name, component]) => {
           docsApp.component(name, component);
         });
       }
 
-      if (options.autoRegisterComponents) {
-        const mainAppComponents = app._context.components;
-        if (mainAppComponents) {
-          Object.entries(mainAppComponents).forEach(([name, component]) => {
-            if (
-              !['RouterLink', 'RouterView', 'ExampleComponentUsage'].includes(name) &&
-              (!docsApp._context.components || !docsApp._context.components[name])
-            ) {
-              docsApp.component(name, component);
-            }
-          });
-        }
+      if (autoRegisterComponents) {
+        const mainAppComponents = app._context?.components;
+        Object.entries(mainAppComponents || {}).forEach(([name, component]) => {
+          if (
+            !['RouterLink', 'RouterView', 'ExampleComponentUsage'].includes(name) &&
+            !docsApp._context.components[name]
+          ) {
+            docsApp.component(name, component);
+          }
+        });
       }
 
       docsApp.provide('componentDocPlugin', plugin);
@@ -120,57 +124,81 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
       const mountPoint = createDocsAppMountPoint();
       docsApp.mount(mountPoint);
 
-
       let mainAppContainer: HTMLElement | null = null;
 
-
-      console.log('options.mainAppID', options.mainAppID);
-
       const toggleDocs = (show: boolean) => {
-        const docsElement = document.getElementById('atomic-docs-app');
+        const docsElement = document.getElementById(DOCS_MOUNT_ID);
 
         if (!mainAppContainer) {
-          // First try to find the container by ID if mainAppID is provided
-          if (options.mainAppID) {
-            mainAppContainer = document.getElementById(options.mainAppID);
+          // 1️⃣ If mainAppID is provided, try to find it
+          if (mainAppID) {
+            mainAppContainer = document.getElementById(mainAppID);
+            if (!mainAppContainer) {
+              console.error(
+                `[ComponentDocsPlugin] mainAppID "${mainAppID}" was provided but no matching element was found in the DOM.`
+              );
+              return; // Exit early if explicit mainAppID fails
+            }
           }
+          // 2️⃣ If mainAppID is NOT provided, try multiple fallback strategies
+          else {
+            // Strategy 1: Try app._container
+            const rootEl = app._container as HTMLElement;
+            if (rootEl && rootEl.nodeType === Node.ELEMENT_NODE) {
+              console.warn(
+                '[ComponentDocsPlugin] mainAppID not provided; falling back to root component container. Consider specifying mainAppID in options for reliable behavior.'
+              );
+              mainAppContainer = rootEl;
+            }
+            // Strategy 2: Try common Vue app container IDs
+            else {
+              const commonIds = ['app', '#app', 'main', 'root'];
+              for (const id of commonIds) {
+                const element = document.getElementById(id.replace('#', ''));
+                if (element) {
+                  console.warn(
+                    `[ComponentDocsPlugin] mainAppID not provided and app._container unavailable; falling back to element with id "${id}". Consider specifying mainAppID in options for reliable behavior.`
+                  );
+                  mainAppContainer = element;
+                  break;
+                }
+              }
+            }
 
-          // Fall back to the current method if mainAppID is not provided or element not found
-          if (!mainAppContainer) {
-            mainAppContainer = app._container as HTMLElement;
+            // If all strategies failed
+            if (!mainAppContainer) {
+              console.error(
+                '[ComponentDocsPlugin] Could not determine main app container. app._container is:',
+                app._container,
+                'Available elements with common IDs:',
+                ['app', 'main', 'root'].map(id => document.getElementById(id)).filter(Boolean),
+                'Please provide mainAppID in plugin options to enable toggling visibility.'
+              );
+              return;
+            }
           }
         }
 
-        if (docsElement) {
-          docsElement.style.display = show ? 'block' : 'none';
-        }
-
-        if (mainAppContainer) {
-          if (show) {
-            // When showing docs, hide the main app
-            mainAppContainer.style.display = 'none';
-          } else {
-            // When hiding docs, always ensure the main app is visible
-            mainAppContainer.style.display = ''; // Use empty string to reset to default display value
-          }
-        }
+        toggleElementDisplay(docsElement, show);
+        toggleElementDisplay(mainAppContainer, !show);
       };
 
+      const router = app.config.globalProperties?.$router;
 
-      app.config.globalProperties.$router.beforeEach((to, _from, next) => {
-        const isDocsRoute = to.path.startsWith('/atomic-docs');
-        toggleDocs(isDocsRoute);
-        if (isDocsRoute && docsRouter.currentRoute.value.fullPath !== to.fullPath) {
-          docsRouter.push(to.fullPath).catch(() => {
-            // It's good practice to handle potential navigation failures.
-            // In this case, we can safely ignore them.
-          });
-        }
-        next();
-      });
+      if (router?.beforeEach) {
+        router.beforeEach((to, _from, next) => {
+          const isDocsRoute = to.path.startsWith(DOCS_ROUTE_PREFIX);
+          toggleDocs(isDocsRoute);
+          if (isDocsRoute && docsRouter.currentRoute.value.fullPath !== to.fullPath) {
+            docsRouter.push(to.fullPath).catch(() => {});
+          }
+          next();
+        });
+      } else {
+        console.warn('Component docs plugin: Vue Router not found in main app. Skipping route sync.');
+      }
 
       toggleDocs(false);
-
 
     } catch (error) {
       console.error('Component docs plugin failed to initialize:', error);
