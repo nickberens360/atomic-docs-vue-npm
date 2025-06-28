@@ -51,12 +51,13 @@ export interface ComponentDocOptions {
     name: string;
     color: string;
   }>;
-  autoExtractColors?: boolean; // Whether to automatically extract colors from the DOM when no colors are provided
+  autoExtractColors?: boolean;
   componentFont?: string;
   history?: RouterHistory;
-  plugins?: Plugin[]; // <-- MODIFIED: Changed from 'vuetify' to a generic 'plugins' array
-  globalComponents?: Record<string, Component>; // Components to register globally in the docs app
-  autoRegisterComponents?: boolean; // Auto-register all components from the main app
+  plugins?: Plugin[];
+  globalComponents?: Record<string, Component>;
+  autoRegisterComponents?: boolean;
+  mainAppID?: string; // Add this line - ID of the main application container
 }
 
 // Plugin interface
