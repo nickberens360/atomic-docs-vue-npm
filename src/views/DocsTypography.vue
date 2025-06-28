@@ -26,9 +26,12 @@
         <div v-for="(rules, prefix) in groupedUtilityClasses" :key="prefix" class="atomic-docs-typography-group">
           <h4 class="atomic-docs-group-title">{{ prefix }}</h4>
           <div v-for="rule in rules" :key="rule.selector" class="atomic-docs-typography-example">
-            <p :class="rule.selector.substring(1)" class="atomic-docs-element-preview">
-              {{ rule.selector.substring(1) }}
-            </p>
+            <div class="atomic-docs-example-header">
+              <p :class="rule.selector.substring(1)" class="atomic-docs-element-preview">
+                {{ rule.selector.substring(1) }}
+              </p>
+              <DocsCopyToClipboard :text="rule.selector.substring(1)" title="Copy class name" />
+            </div>
             <div class="atomic-docs-details-list">
               <div v-for="(value, key) in rule.styles" :key="key" class="atomic-docs-detail-item">
                 <span class="atomic-docs-type-key">{{ key }}:</span>
@@ -43,7 +46,10 @@
         <h3 class="atomic-docs-section-title">Base Element Styles</h3>
         <p class="atomic-docs-section-subtitle">Default styles applied to common HTML tags.</p>
         <div v-for="tag in filteredElementTags" :key="tag" class="atomic-docs-typography-example">
-          <component :is="tag" class="atomic-docs-element-preview">{{ tag.charAt(0).toUpperCase() + tag.slice(1) }} Default Style</component>
+          <div class="atomic-docs-example-header">
+            <component :is="tag" class="atomic-docs-element-preview">{{ tag.charAt(0).toUpperCase() + tag.slice(1) }} Default Style</component>
+            <DocsCopyToClipboard :text="tag" title="Copy element tag" />
+          </div>
           <div class="atomic-docs-details-list">
             <div v-for="(value, key) in typographyData.elementStyles[tag]" :key="key" class="atomic-docs-detail-item">
               <span class="atomic-docs-type-key">{{ key }}:</span>
@@ -70,6 +76,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { useExtractedTypography } from '../utils/typographyExtractor';
+import DocsCopyToClipboard from '../components/DocsCopyToClipboard.vue';
 
 const { extractedTypography: typographyData } = useExtractedTypography();
 const isLoading = ref(true);
@@ -283,10 +290,17 @@ watch(typographyData, (newData) => {
   overflow-x: auto;
 }
 
+.atomic-docs-example-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
 .atomic-docs-element-preview {
   position: unset;
   display: unset;
-  margin: 0 0 16px 0;
+  margin: 0;
   padding: 0;
 }
 
