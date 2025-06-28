@@ -33,39 +33,6 @@ function createDocsAppMountPoint(): HTMLElement {
   return mountPoint;
 }
 
-// Define a list of all internal component names from your plugin
-// This list is crucial for the autoRegisterComponents feature to prevent recursion.
-// Ensure this list is exhaustive. Add any other components if they are internal to atomic-docs.
-const internalDocsComponents = [
-  'RouterLink', // Typically provided by Vue Router
-  'RouterView', // Typically provided by Vue Router
-  'ExampleComponentUsage',
-  'DocsAppBar',
-  'DocsAppNavigationDrawer',
-  'DocsAccordion',
-  'DocsComponentNavigation',
-  'DocsRecursiveNavItem',
-  'DocsComponentNotDocumented',
-  'DocsMain',
-  'DocsMarkdown',
-  'DocsRow',
-  'DocsCol',
-  'DocsDataTable',
-  'DocsTabs',
-  'DocsSourceCode',
-  'DocsComponentIsolation',
-  'DocsCopyToClipboard',
-  'DocsTextField',
-  'DocsSlider',
-  'DocsMenu',
-  'DocsChip',
-  'DocsColors',
-  'DocsColorPicker',
-  'DocsIcon',
-  // Add any other Vue component names that are part of your atomic-docs plugin
-];
-
-
 const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
   install(app: App, options: ComponentDocOptions = {
     componentModules: {},
@@ -136,9 +103,10 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
         const mainAppComponents = app._context.components;
         if (mainAppComponents) {
           Object.entries(mainAppComponents).forEach(([name, component]) => {
-            // Filter out components that are part of the atomic-docs plugin itself
-            if (!internalDocsComponents.includes(name) &&
-              (!docsApp._context.components || !docsApp._context.components[name])) {
+            if (
+              !['RouterLink', 'RouterView', 'ExampleComponentUsage'].includes(name) &&
+              (!docsApp._context.components || !docsApp._context.components[name])
+            ) {
               docsApp.component(name, component);
             }
           });
@@ -188,22 +156,7 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
         }
       };
 
-      // --- MODIFICATION START ---
 
-      // Get the initial path from the main app's router
-      const initialPath = app.config.globalProperties.$router.currentRoute.value.fullPath;
-      const isInitialDocsRoute = initialPath.startsWith('/atomic-docs');
-
-      // Immediately toggle visibility based on the initial route
-      toggleDocs(isInitialDocsRoute);
-
-      // If it's an initial docs route, explicitly push it to the docsRouter
-      // to ensure content renders right away on direct page load/refresh.
-      if (isInitialDocsRoute) {
-        docsRouter.push(initialPath).catch(() => { /* handle errors or log */ });
-      }
-
-      // Existing beforeEach hook for *subsequent* navigations (client-side transitions)
       app.config.globalProperties.$router.beforeEach((to, _from, next) => {
         const isDocsRoute = to.path.startsWith('/atomic-docs');
         toggleDocs(isDocsRoute);
@@ -216,7 +169,7 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
         next();
       });
 
-      // --- MODIFICATION END ---
+      toggleDocs(false);
 
 
     } catch (error) {
