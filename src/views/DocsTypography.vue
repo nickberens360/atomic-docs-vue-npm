@@ -14,11 +14,9 @@
         class="atomic-docs-typography-search-input"
       />
     </div>
-
     <div v-if="isLoading" class="atomic-docs-loading-message">
       <p>Analyzing stylesheets...</p>
     </div>
-
     <div v-else class="atomic-docs-typography-sections">
       <section v-if="Object.keys(groupedUtilityClasses).length" class="atomic-docs-typography-section">
         <h3 class="atomic-docs-section-title">Utility Classes</h3>
@@ -30,7 +28,16 @@
               <p :class="rule.selector.substring(1)" class="atomic-docs-element-preview">
                 {{ rule.selector.substring(1) }}
               </p>
-              <DocsCopyToClipboard :text="rule.selector.substring(1)" title="Copy class name" />
+              <DocsCopyToClipboard
+                :text="rule.selector.substring(1)"
+                title="Copy class name"
+                show-text
+                button-text="Copy class"
+              >
+                <template #text>
+                  copy
+                </template>
+              </DocsCopyToClipboard>
             </div>
             <div class="atomic-docs-details-list">
               <div v-for="(value, key) in rule.styles" :key="key" class="atomic-docs-detail-item">
@@ -293,7 +300,7 @@ watch(typographyData, (newData) => {
 .atomic-docs-example-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 16px;
 }
 
