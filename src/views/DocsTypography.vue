@@ -22,7 +22,7 @@
     <div v-else class="typography-sections">
       <section v-if="Object.keys(groupedUtilityClasses).length" class="typography-section">
         <h3 class="section-title">Utility Classes</h3>
-        <p class="section-subtitle">Classes grouped by shared prefixes.</p>
+        <p class="section-subtitle">Classes grouped by shared prefixes, sorted by font size.</p>
         <div v-for="(rules, prefix) in groupedUtilityClasses" :key="prefix" class="typography-group">
           <h4 class="group-title">{{ prefix }}</h4>
           <div v-for="rule in rules" :key="rule.selector" class="typography-example">
@@ -120,7 +120,7 @@ const filteredUtilityClasses = computed(() => {
   );
 });
 
-// Group filtered utility classes by shared prefix
+// Group filtered utility classes by shared prefix and sort each group by largest font-size first
 const groupedUtilityClasses = computed(() => {
   const groups: Record<string, typeof typographyData.value.utilityClasses> = {};
   const filtered = filteredUtilityClasses.value;
@@ -134,8 +134,40 @@ const groupedUtilityClasses = computed(() => {
     groups[prefix].push(rule);
   });
 
+  for (const prefix in groups) {
+    groups[prefix].sort((a, b) => {
+      const sizeA = extractFontSizePx(a.styles['font-size']);
+      const sizeB = extractFontSizePx(b.styles['font-size']);
+      return sizeB - sizeA; // largest first
+    });
+  }
+
   return groups;
 });
+
+/**
+ * Converts a CSS font-size string to a pixel number (approximation).
+ * Supports px, rem, em (assuming 16px base), fallback 0.
+ */
+function extractFontSizePx(fontSize?: string): number {
+  if (!fontSize) return 0;
+
+  const match = fontSize.match(/^([\d.]+)(px|rem|em)?$/);
+  if (!match) return 0;
+
+  const value = parseFloat(match[1]);
+  const unit = match[2] || 'px';
+
+  switch (unit) {
+    case 'px':
+      return value;
+    case 'rem':
+    case 'em':
+      return value * 16;
+    default:
+      return 0;
+  }
+}
 
 // Sorted element tags
 const sortedElementTags = computed(() => {
