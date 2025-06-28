@@ -1,34 +1,34 @@
 <template>
-  <div class="typography-view">
-    <h2 class="typography-title">Typography System Test</h2>
-    <p class="typography-description">
+  <div class="atomic-docs-typography-view">
+    <h2 class="atomic-docs-typography-title">Typography System Test</h2>
+    <p class="atomic-docs-typography-description">
       The following styles are dynamically extracted by parsing your application's loaded stylesheets.
     </p>
 
     <!-- Search input -->
-    <div class="typography-search">
+    <div class="atomic-docs-typography-search">
       <input
         type="text"
         v-model="searchTerm"
         placeholder="Search by class name..."
-        class="typography-search-input"
+        class="atomic-docs-typography-search-input"
       />
     </div>
 
-    <div v-if="isLoading" class="loading-message">
+    <div v-if="isLoading" class="atomic-docs-loading-message">
       <p>Analyzing stylesheets...</p>
     </div>
 
-    <div v-else class="typography-sections">
-      <section v-if="Object.keys(groupedUtilityClasses).length" class="typography-section">
-        <h3 class="section-title">Utility Classes</h3>
-        <p class="section-subtitle">Classes grouped by shared prefixes, sorted by font size.</p>
-        <div v-for="(rules, prefix) in groupedUtilityClasses" :key="prefix" class="typography-group">
-          <h4 class="group-title">{{ prefix }}</h4>
-          <div v-for="rule in rules" :key="rule.selector" class="typography-example">
-            <p :class="rule.selector.substring(1)" class="element-preview">{{ rule.selector }}</p>
-            <div class="details-list">
-              <div v-for="(value, key) in rule.styles" :key="key" class="detail-item">
+    <div v-else class="atomic-docs-typography-sections">
+      <section v-if="Object.keys(groupedUtilityClasses).length" class="atomic-docs-typography-section">
+        <h3 class="atomic-docs-section-title">Utility Classes</h3>
+        <p class="atomic-docs-section-subtitle">Classes grouped by shared prefixes, sorted by font size.</p>
+        <div v-for="(rules, prefix) in groupedUtilityClasses" :key="prefix" class="atomic-docs-typography-group">
+          <h4 class="atomic-docs-group-title">{{ prefix }}</h4>
+          <div v-for="rule in rules" :key="rule.selector" class="atomic-docs-typography-example">
+            <p :class="rule.selector.substring(1)" class="atomic-docs-element-preview">{{ rule.selector }}</p>
+            <div class="atomic-docs-details-list">
+              <div v-for="(value, key) in rule.styles" :key="key" class="atomic-docs-detail-item">
                 <span class="atomic-docs-type-key">{{ key }}:</span>
                 <code class="atomic-docs-type-value">{{ value }}</code>
               </div>
@@ -37,13 +37,13 @@
         </div>
       </section>
 
-      <section v-if="filteredElementTags.length" class="typography-section">
-        <h3 class="section-title">Base Element Styles</h3>
-        <p class="section-subtitle">Default styles applied to common HTML tags.</p>
-        <div v-for="tag in filteredElementTags" :key="tag" class="typography-example">
-          <component :is="tag" class="element-preview">{{ tag.charAt(0).toUpperCase() + tag.slice(1) }} Default Style</component>
-          <div class="details-list">
-            <div v-for="(value, key) in typographyData.elementStyles[tag]" :key="key" class="detail-item">
+      <section v-if="filteredElementTags.length" class="atomic-docs-typography-section">
+        <h3 class="atomic-docs-section-title">Base Element Styles</h3>
+        <p class="atomic-docs-section-subtitle">Default styles applied to common HTML tags.</p>
+        <div v-for="tag in filteredElementTags" :key="tag" class="atomic-docs-typography-example">
+          <component :is="tag" class="atomic-docs-element-preview">{{ tag.charAt(0).toUpperCase() + tag.slice(1) }} Default Style</component>
+          <div class="atomic-docs-details-list">
+            <div v-for="(value, key) in typographyData.elementStyles[tag]" :key="key" class="atomic-docs-detail-item">
               <span class="atomic-docs-type-key">{{ key }}:</span>
               <code class="atomic-docs-type-value">{{ value }}</code>
             </div>
@@ -51,11 +51,11 @@
         </div>
       </section>
 
-      <section v-if="Object.keys(filteredVariables).length" class="typography-section">
-        <h3 class="section-title">CSS Variables</h3>
-        <p class="section-subtitle">Typography-related custom properties found in your stylesheets.</p>
-        <div class="variables-table">
-          <div v-for="(value, key) in filteredVariables" :key="key" class="variable-row">
+      <section v-if="Object.keys(filteredVariables).length" class="atomic-docs-typography-section">
+        <h3 class="atomic-docs-section-title">CSS Variables</h3>
+        <p class="atomic-docs-section-subtitle">Typography-related custom properties found in your stylesheets.</p>
+        <div class="atomic-docs-variables-table">
+          <div v-for="(value, key) in filteredVariables" :key="key" class="atomic-docs-variable-row">
             <span class="atomic-docs-type-key">{{ key }}:</span>
             <code class="atomic-docs-type-value">{{ value }}</code>
           </div>
@@ -138,7 +138,7 @@ const groupedUtilityClasses = computed(() => {
     groups[prefix].sort((a, b) => {
       const sizeA = extractFontSizePx(a.styles['font-size']);
       const sizeB = extractFontSizePx(b.styles['font-size']);
-      return sizeB - sizeA; // largest first
+      return sizeB - sizeA;
     });
   }
 
@@ -205,11 +205,11 @@ watch(typographyData, (newData) => {
 </script>
 
 <style scoped lang="scss">
-.typography-view {
+.atomic-docs-typography-view {
   width: 100%;
 }
 
-.typography-title {
+.atomic-docs-typography-title {
   font-size: var(--atomic-docs-font-size-xl, 24px);
   font-weight: 500;
   margin-bottom: var(--atomic-docs-spacing-md, 16px);
@@ -217,16 +217,16 @@ watch(typographyData, (newData) => {
   border-bottom: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.12));
 }
 
-.typography-description, .section-subtitle {
+.atomic-docs-typography-description, .atomic-docs-section-subtitle {
   margin-bottom: var(--atomic-docs-spacing-lg, 24px);
   color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
 }
 
-.typography-search {
+.atomic-docs-typography-search {
   margin-bottom: var(--atomic-docs-spacing-lg, 24px);
 }
 
-.typography-search-input {
+.atomic-docs-typography-search-input {
   width: 100%;
   padding: 8px 12px;
   border: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.12));
@@ -239,35 +239,35 @@ watch(typographyData, (newData) => {
   }
 }
 
-.section-subtitle {
+.atomic-docs-section-subtitle {
   margin-top: -16px;
   font-size: 14px;
 }
 
-.typography-sections {
+.atomic-docs-typography-sections {
   display: flex;
   flex-direction: column;
   gap: 48px;
 }
 
-.section-title {
+.atomic-docs-section-title {
   font-size: var(--atomic-docs-font-size-lg, 20px);
   font-weight: 500;
   margin-bottom: var(--atomic-docs-spacing-md, 16px);
 }
 
-.typography-group {
+.atomic-docs-typography-group {
   margin-bottom: var(--atomic-docs-spacing-lg, 24px);
 }
 
-.group-title {
+.atomic-docs-group-title {
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 8px;
   color: var(--atomic-docs-primary-color, #1976d2);
 }
 
-.typography-example {
+.atomic-docs-typography-example {
   padding: 16px;
   border: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.12));
   border-radius: 4px;
@@ -275,18 +275,18 @@ watch(typographyData, (newData) => {
   overflow-x: auto;
 }
 
-.element-preview {
+.atomic-docs-element-preview {
   margin: 0 0 16px 0;
   padding: 0;
 }
 
-.details-list {
+.atomic-docs-details-list {
   background-color: var(--atomic-docs-surface-color, #f5f5f5);
   padding: 12px;
   border-radius: 4px;
 }
 
-.detail-item {
+.atomic-docs-detail-item {
   display: flex;
   justify-content: space-between;
   font-size: 14px;
@@ -297,13 +297,13 @@ watch(typographyData, (newData) => {
   }
 }
 
-.variables-table {
+.atomic-docs-variables-table {
   border: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.12));
   border-radius: 4px;
   overflow: hidden;
 }
 
-.variable-row {
+.atomic-docs-variable-row {
   display: flex;
   justify-content: space-between;
   padding: 12px;
@@ -313,7 +313,7 @@ watch(typographyData, (newData) => {
   }
 }
 
-.variable-name {
+.atomic-docs-variable-name {
   color: var(--atomic-docs-primary-color, #1976d2);
 }
 
@@ -324,7 +324,7 @@ code {
   padding: 0;
 }
 
-.loading-message {
+.atomic-docs-loading-message {
   padding: var(--atomic-docs-spacing-lg, 24px);
   text-align: center;
   color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));
