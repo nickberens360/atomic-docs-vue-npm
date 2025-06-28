@@ -19,32 +19,24 @@
 import { ref } from 'vue';
 import DocsIcon from './DocsIcon.vue';
 
-const props = defineProps({
+interface Props {
   /** Text to copy to clipboard */
-  text: {
-    type: String,
-    required: true
-  },
+  text: string;
   /** Button tooltip text */
-  title: {
-    type: String,
-    default: ''
-  },
+  title?: string;
   /** Text to display on the button */
-  buttonText: {
-    type: String,
-    default: 'Copy'
-  },
+  buttonText?: string;
   /** Whether to show text next to the icon */
-  showText: {
-    type: Boolean,
-    default: false
-  },
+  showText?: boolean;
   /** Duration in ms to show the copied state */
-  copiedDuration: {
-    type: Number,
-    default: 2000
-  }
+  copiedDuration?: number;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  title: '',
+  buttonText: 'Copy',
+  showText: true,
+  copiedDuration: 2000,
 });
 
 const copied = ref(false);
@@ -67,10 +59,11 @@ const copyToClipboard = async () => {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  background: transparent;
+  //background: transparent;
+  background-color: var(--atomic-docs-surface-color, #fff);
   border: none;
   cursor: pointer;
-  padding: 4px;
+  padding: 4px 8px;
   border-radius: var(--atomic-docs-border-radius-sm, 4px);
   transition: opacity 0.2s, background-color 0.2s;
   color: var(--atomic-docs-text-secondary, rgba(0, 0, 0, 0.6));

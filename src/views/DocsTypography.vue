@@ -14,33 +14,53 @@
         class="atomic-docs-typography-search-input"
       />
     </div>
-    <div v-if="isLoading" class="atomic-docs-loading-message">
+    <div
+      v-if="isLoading"
+      class="atomic-docs-loading-message"
+    >
       <p>Analyzing stylesheets...</p>
     </div>
-    <div v-else class="atomic-docs-typography-sections">
-      <section v-if="Object.keys(groupedUtilityClasses).length" class="atomic-docs-typography-section">
+    <div
+      v-else
+      class="atomic-docs-typography-sections"
+    >
+      <section
+        v-if="Object.keys(groupedUtilityClasses).length"
+        class="atomic-docs-typography-section"
+      >
         <h3 class="atomic-docs-section-title">Utility Classes</h3>
         <p class="atomic-docs-section-subtitle">Classes grouped by shared prefixes, sorted by font size.</p>
-        <div v-for="(rules, prefix) in groupedUtilityClasses" :key="prefix" class="atomic-docs-typography-group">
+        <div
+          v-for="(rules, prefix) in groupedUtilityClasses"
+          :key="prefix"
+          class="atomic-docs-typography-group"
+        >
           <h4 class="atomic-docs-group-title">{{ prefix }}</h4>
-          <div v-for="rule in rules" :key="rule.selector" class="atomic-docs-typography-example">
+          <div
+            v-for="rule in rules"
+            :key="rule.selector"
+            class="atomic-docs-typography-example"
+          >
             <div class="atomic-docs-example-header">
-              <p :class="rule.selector.substring(1)" class="atomic-docs-element-preview">
+              <p
+                :class="rule.selector.substring(1)"
+                class="atomic-docs-element-preview"
+              >
                 {{ rule.selector.substring(1) }}
               </p>
               <DocsCopyToClipboard
                 :text="rule.selector.substring(1)"
                 title="Copy class name"
-                show-text
+                :show-text="false"
                 button-text="Copy class"
-              >
-                <template #text>
-                  copy
-                </template>
-              </DocsCopyToClipboard>
+              />
             </div>
             <div class="atomic-docs-details-list">
-              <div v-for="(value, key) in rule.styles" :key="key" class="atomic-docs-detail-item">
+              <div
+                v-for="(value, key) in rule.styles"
+                :key="key"
+                class="atomic-docs-detail-item"
+              >
                 <span class="atomic-docs-type-key">{{ key }}:</span>
                 <code class="atomic-docs-type-value">{{ value }}</code>
               </div>
@@ -49,16 +69,42 @@
         </div>
       </section>
 
-      <section v-if="filteredElementTags.length" class="atomic-docs-typography-section">
+      <section
+        v-if="filteredElementTags.length"
+        class="atomic-docs-typography-section"
+      >
         <h3 class="atomic-docs-section-title">Base Element Styles</h3>
         <p class="atomic-docs-section-subtitle">Default styles applied to common HTML tags.</p>
-        <div v-for="tag in filteredElementTags" :key="tag" class="atomic-docs-typography-example">
+        <div
+          v-for="tag in filteredElementTags"
+          :key="tag"
+          class="atomic-docs-typography-example"
+        >
           <div class="atomic-docs-example-header">
-            <component :is="tag" class="atomic-docs-element-preview">{{ tag.charAt(0).toUpperCase() + tag.slice(1) }} Default Style</component>
-            <DocsCopyToClipboard :text="tag" title="Copy element tag" />
+            <component
+              v-if="tag !== 'body'"
+              :is="tag"
+              class="atomic-docs-element-preview"
+            >
+              {{ tag.charAt(0).toUpperCase() + tag.slice(1) }} Default Style
+            </component>
+            <div
+              v-else
+              class="atomic-docs-element-preview"
+            >
+              body Default Style
+            </div>
+            <DocsCopyToClipboard
+              :text="tag"
+              title="Copy element tag"
+            />
           </div>
           <div class="atomic-docs-details-list">
-            <div v-for="(value, key) in typographyData.elementStyles[tag]" :key="key" class="atomic-docs-detail-item">
+            <div
+              v-for="(value, key) in typographyData.elementStyles[tag]"
+              :key="key"
+              class="atomic-docs-detail-item"
+            >
               <span class="atomic-docs-type-key">{{ key }}:</span>
               <code class="atomic-docs-type-value">{{ value }}</code>
             </div>
@@ -66,11 +112,18 @@
         </div>
       </section>
 
-      <section v-if="Object.keys(filteredVariables).length" class="atomic-docs-typography-section">
+      <section
+        v-if="Object.keys(filteredVariables).length"
+        class="atomic-docs-typography-section"
+      >
         <h3 class="atomic-docs-section-title">CSS Variables</h3>
         <p class="atomic-docs-section-subtitle">Typography-related custom properties found in your stylesheets.</p>
         <div class="atomic-docs-variables-table">
-          <div v-for="(value, key) in filteredVariables" :key="key" class="atomic-docs-variable-row">
+          <div
+            v-for="(value, key) in filteredVariables"
+            :key="key"
+            class="atomic-docs-variable-row"
+          >
             <span class="atomic-docs-type-key">{{ key }}:</span>
             <code class="atomic-docs-type-value">{{ value }}</code>
           </div>
@@ -80,12 +133,15 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { computed, ref, watch } from 'vue';
-import { useExtractedTypography } from '../utils/typographyExtractor';
+<script
+  setup
+  lang="ts"
+>
+import {computed, ref, watch} from 'vue';
+import {useExtractedTypography} from '../utils/typographyExtractor';
 import DocsCopyToClipboard from '../components/DocsCopyToClipboard.vue';
 
-const { extractedTypography: typographyData } = useExtractedTypography();
+const {extractedTypography: typographyData} = useExtractedTypography();
 const isLoading = ref(true);
 
 // Search term
@@ -223,10 +279,13 @@ watch(typographyData, (newData) => {
   if (newData.utilityClasses.length || Object.keys(newData.variables).length || Object.keys(newData.elementStyles).length) {
     isLoading.value = false;
   }
-}, { immediate: true, deep: true });
+}, {immediate: true, deep: true});
 </script>
 
-<style scoped lang="scss">
+<style
+  scoped
+  lang="scss"
+>
 .atomic-docs-typography-view {
   width: 100%;
 }
@@ -322,6 +381,7 @@ watch(typographyData, (newData) => {
   justify-content: space-between;
   font-size: 14px;
   padding: 4px 0;
+
   span {
     margin-right: 16px;
     color: var(--atomic-docs-text-secondary);
@@ -339,6 +399,7 @@ watch(typographyData, (newData) => {
   justify-content: space-between;
   padding: 12px;
   border-bottom: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.12));
+
   &:last-child {
     border-bottom: none;
   }
