@@ -5,7 +5,7 @@
       The following styles are dynamically extracted by parsing your application's loaded stylesheets.
     </p>
 
-    <!-- Add search input -->
+    <!-- Search input -->
     <div class="typography-search">
       <input
         type="text"
@@ -20,15 +20,18 @@
     </div>
 
     <div v-else class="typography-sections">
-      <section v-if="filteredUtilityClasses.length" class="typography-section">
+      <section v-if="Object.keys(groupedUtilityClasses).length" class="typography-section">
         <h3 class="section-title">Utility Classes</h3>
-        <p class="section-subtitle">Classes that apply specific typography styles.</p>
-        <div v-for="rule in filteredUtilityClasses" :key="rule.selector" class="typography-example">
-          <p :class="rule.selector.substring(1)" class="element-preview">{{ rule.selector }}</p>
-          <div class="details-list">
-            <div v-for="(value, key) in rule.styles" :key="key" class="detail-item">
-              <span>{{ key }}:</span>
-              <code class="atomic-docs-type-value">{{ value }}</code>
+        <p class="section-subtitle">Classes grouped by shared prefixes.</p>
+        <div v-for="(rules, prefix) in groupedUtilityClasses" :key="prefix" class="typography-group">
+          <h4 class="group-title">{{ prefix }}</h4>
+          <div v-for="rule in rules" :key="rule.selector" class="typography-example">
+            <p :class="rule.selector.substring(1)" class="element-preview">{{ rule.selector }}</p>
+            <div class="details-list">
+              <div v-for="(value, key) in rule.styles" :key="key" class="detail-item">
+                <span class="atomic-docs-type-key">{{ key }}:</span>
+                <code class="atomic-docs-type-value">{{ value }}</code>
+              </div>
             </div>
           </div>
         </div>
@@ -41,8 +44,8 @@
           <component :is="tag" class="element-preview">{{ tag.charAt(0).toUpperCase() + tag.slice(1) }} Default Style</component>
           <div class="details-list">
             <div v-for="(value, key) in typographyData.elementStyles[tag]" :key="key" class="detail-item">
-              <span>{{ key }}:</span>
-              <code>{{ value }}</code>
+              <span class="atomic-docs-type-key">{{ key }}:</span>
+              <code class="atomic-docs-type-value">{{ value }}</code>
             </div>
           </div>
         </div>
@@ -52,9 +55,9 @@
         <h3 class="section-title">CSS Variables</h3>
         <p class="section-subtitle">Typography-related custom properties found in your stylesheets.</p>
         <div class="variables-table">
-          <div v-for="(value, name) in filteredVariables" :key="name" class="variable-row">
-            <code class="variable-name">{{ name }}</code>
-            <code class="variable-value">{{ value }}</code>
+          <div v-for="(value, key) in filteredVariables" :key="key" class="variable-row">
+            <span class="atomic-docs-type-key">{{ key }}:</span>
+            <code class="atomic-docs-type-value">{{ value }}</code>
           </div>
         </div>
       </section>
@@ -69,39 +72,27 @@ import { useExtractedTypography } from '../utils/typographyExtractor';
 const { extractedTypography: typographyData } = useExtractedTypography();
 const isLoading = ref(true);
 
-// Add search functionality
+// Search term
 const searchTerm = ref('');
 
-// Fuzzy search function (similar to DocsColors)
+// Fuzzy search function
 const fuzzyMatch = (text: string, pattern: string): boolean => {
   if (!pattern) return true;
 
   const lowerText = text.toLowerCase();
   const lowerPattern = pattern.toLowerCase();
 
-  // For short search terms (1-2 chars), require word boundary matches
   if (lowerPattern.length <= 2) {
-    // Check if pattern is at the start of the text
-    if (lowerText.startsWith(lowerPattern)) {
-      return true;
-    }
-
-    // Check if pattern appears after a delimiter
+    if (lowerText.startsWith(lowerPattern)) return true;
     const delimiterPattern = new RegExp(`[-_\\s]${lowerPattern}`, 'i');
     return delimiterPattern.test(lowerText);
   }
 
-  // For longer terms, prioritize word boundaries
   const words = lowerText.split(/[-_\s]/);
-
-  // Check if pattern starts at the beginning of any word
   for (const word of words) {
-    if (word.startsWith(lowerPattern)) {
-      return true;
-    }
+    if (word.startsWith(lowerPattern)) return true;
   }
 
-  // Fall back to standard fuzzy search with consecutive character bonus
   let patternIdx = 0;
   let textIdx = 0;
   let consecutiveMatches = 0;
@@ -118,23 +109,36 @@ const fuzzyMatch = (text: string, pattern: string): boolean => {
     textIdx++;
   }
 
-  // Require at least 2 consecutive matches for longer patterns
   return patternIdx === lowerPattern.length && maxConsecutive >= 2;
 };
 
-// Filter utility classes based on search term
+// Filtered utility classes
 const filteredUtilityClasses = computed(() => {
-  if (!searchTerm.value) {
-    return typographyData.value.utilityClasses;
-  }
+  if (!searchTerm.value) return typographyData.value.utilityClasses;
   return typographyData.value.utilityClasses.filter(rule =>
     fuzzyMatch(rule.selector, searchTerm.value)
   );
 });
 
-// Sort and filter element tags
+// Group filtered utility classes by shared prefix
+const groupedUtilityClasses = computed(() => {
+  const groups: Record<string, typeof typographyData.value.utilityClasses> = {};
+  const filtered = filteredUtilityClasses.value;
+
+  filtered.forEach((rule) => {
+    const className = rule.selector.startsWith('.') ? rule.selector.slice(1) : rule.selector;
+    const match = className.match(/^([^-_]+[-_]?)/);
+    const prefix = match ? match[1] : 'other';
+
+    if (!groups[prefix]) groups[prefix] = [];
+    groups[prefix].push(rule);
+  });
+
+  return groups;
+});
+
+// Sorted element tags
 const sortedElementTags = computed(() => {
-  // Sort h1-h6 tags numerically, then others alphabetically
   return Object.keys(typographyData.value.elementStyles || {}).sort((a, b) => {
     if (a.startsWith('h') && b.startsWith('h')) return parseInt(a.slice(1)) - parseInt(b.slice(1));
     if (a === 'body') return -1;
@@ -143,30 +147,24 @@ const sortedElementTags = computed(() => {
   });
 });
 
+// Filtered element tags
 const filteredElementTags = computed(() => {
-  if (!searchTerm.value) {
-    return sortedElementTags.value;
-  }
-  return sortedElementTags.value.filter(tag =>
-    fuzzyMatch(tag, searchTerm.value)
-  );
+  if (!searchTerm.value) return sortedElementTags.value;
+  return sortedElementTags.value.filter(tag => fuzzyMatch(tag, searchTerm.value));
 });
 
-// Filter variables based on search term
+// Filtered variables
 const filteredVariables = computed(() => {
-  if (!searchTerm.value) {
-    return typographyData.value.variables;
-  }
+  if (!searchTerm.value) return typographyData.value.variables;
 
   const result: Record<string, string> = {};
   Object.entries(typographyData.value.variables).forEach(([key, value]) => {
-    if (fuzzyMatch(key, searchTerm.value)) {
-      result[key] = value;
-    }
+    if (fuzzyMatch(key, searchTerm.value)) result[key] = value;
   });
   return result;
 });
 
+// Loading state watcher
 watch(typographyData, (newData) => {
   if (newData.utilityClasses.length || Object.keys(newData.variables).length || Object.keys(newData.elementStyles).length) {
     isLoading.value = false;
@@ -226,6 +224,17 @@ watch(typographyData, (newData) => {
   margin-bottom: var(--atomic-docs-spacing-md, 16px);
 }
 
+.typography-group {
+  margin-bottom: var(--atomic-docs-spacing-lg, 24px);
+}
+
+.group-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--atomic-docs-primary-color, #1976d2);
+}
+
 .typography-example {
   padding: 16px;
   border: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.12));
@@ -233,6 +242,7 @@ watch(typographyData, (newData) => {
   margin-bottom: 8px;
   overflow-x: auto;
 }
+
 .element-preview {
   margin: 0 0 16px 0;
   padding: 0;
@@ -270,15 +280,18 @@ watch(typographyData, (newData) => {
     border-bottom: none;
   }
 }
+
 .variable-name {
   color: var(--atomic-docs-primary-color, #1976d2);
 }
+
 code {
   font-family: var(--atomic-docs-font-family-mono, monospace), sans-serif;
   font-size: 13px;
   background-color: transparent;
   padding: 0;
 }
+
 .loading-message {
   padding: var(--atomic-docs-spacing-lg, 24px);
   text-align: center;
