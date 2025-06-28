@@ -122,7 +122,6 @@ export function generatePropsItems(component: Component): PropItem[] {
         if (typeof component.setup === 'function') {
           // Try to extract props from component.props (might be available in some cases)
           if (component.props) {
-            console.log('Component has props property:', component.props);
             extractedProps = Object.entries(component.props).map(([propName, prop]: [string, any]) => {
               try {
                 return {
