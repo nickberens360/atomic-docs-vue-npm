@@ -1,6 +1,5 @@
 // src/types.ts
 
-// Add this import at the top of the file
 import type { RouterHistory } from 'vue-router';
 import type { Plugin, Component } from 'vue';
 
@@ -9,7 +8,7 @@ export interface ComponentItem {
   label: string;
   relativePath: string;
   exampleComponent: string;
-  isDocumented?: boolean; // <-- ADDED
+  isDocumented?: boolean;
 }
 
 export interface DirectoryItem {
@@ -21,13 +20,12 @@ export interface DirectoryItem {
 
 export type NavigationItem = ComponentItem | DirectoryItem;
 
-// Nav item interfaces used in recursive components
 export interface ComponentNavItem {
   type: 'component';
   label: string;
   relativePath?: string;
   exampleComponent?: string;
-  isDocumented?: boolean; // <-- ADDED
+  isDocumented?: boolean;
 }
 
 export interface DirectoryNavItem {
@@ -39,7 +37,17 @@ export interface DirectoryNavItem {
 
 export type NavItem = ComponentNavItem | DirectoryNavItem;
 
-// Configuration options interface
+/**
+ * Defines a named color option for use in the component documentation system.
+ */
+export interface DocColor {
+  name: string;
+  color: string;
+}
+
+/**
+ * Configuration options for the component docs plugin.
+ */
 export interface ComponentDocOptions {
   enableDocs?: boolean;
   componentModules: Record<string, () => Promise<any>>;
@@ -47,19 +55,23 @@ export interface ComponentDocOptions {
   componentsDirName: string;
   examplesDirName: string;
   rawComponentSourceModules?: Record<string, () => Promise<string>>;
-  colors?: Array<{
-    name: string;
-    color: string;
-  }>;
-  autoExtractColors?: boolean; // Whether to automatically extract colors from the DOM when no colors are provided
+  colors?: DocColor[];
+  autoExtractColors?: boolean;
   componentFont?: string;
   history?: RouterHistory;
-  plugins?: Plugin[]; // <-- MODIFIED: Changed from 'vuetify' to a generic 'plugins' array
-  globalComponents?: Record<string, Component>; // Components to register globally in the docs app
-  autoRegisterComponents?: boolean; // Auto-register all components from the main app
+  plugins?: Plugin[];
+  globalComponents?: Record<string, Component>;
+  autoRegisterComponents?: boolean;
+  /**
+   * ID of the main application's root HTML element.
+   * Used by the plugin to hide/show the main app when toggling docs.
+   */
+  mainAppID?: string;
 }
 
-// Plugin interface
+/**
+ * Plugin interface that provides utilities and configuration for docs integration.
+ */
 export interface ComponentDocPlugin {
   convertPathToExampleName: (path: string) => string;
   componentModules: Record<string, () => Promise<any>>;
@@ -67,5 +79,5 @@ export interface ComponentDocPlugin {
   componentsDirName: string;
   examplesDirName: string;
   rawComponentSourceModules?: Record<string, () => Promise<string>>;
-  options?: ComponentDocOptions;
+  options: ComponentDocOptions;
 }
