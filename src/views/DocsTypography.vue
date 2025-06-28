@@ -284,6 +284,8 @@ watch(typographyData, (newData) => {
 }
 
 .atomic-docs-element-preview {
+  position: unset;
+  display: unset;
   margin: 0 0 16px 0;
   padding: 0;
 }
