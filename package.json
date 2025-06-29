@@ -17,7 +17,8 @@
     "LICENSE",
     "src/routes.ts",
     "src/types.ts",
-    "src/components"
+    "src/components",
+    "src/scripts/generate-docs-manifest.js"
   ],
   "scripts": {
     "dev": "vite",
@@ -35,7 +36,8 @@
     "release:major": "npm version major && npm publish",
     "release:next": "npm version prepatch --preid=next && npm publish --tag next",
     "release:alpha": "npm version prerelease --preid=alpha && npm publish --tag alpha",
-    "postrelease": "git push && git push --tags"
+    "postrelease": "git push && git push --tags",
+    "generate-docs-manifest": "node src/scripts/generate-docs-manifest.js"
   },
   "peerDependencies": {
     "vue": "^3.2.0",
@@ -47,6 +49,7 @@
     }
   },
   "dependencies": {
+    "glob": "^11.0.3",
     "markdown-it": "^14.1.0",
     "prismjs": "^1.30.0"
   },

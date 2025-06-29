@@ -7,8 +7,10 @@ export interface ComponentItem {
   type: 'component';
   label: string;
   relativePath: string;
-  exampleComponent: string;
+  exampleComponent?: string;
   isDocumented?: boolean;
+  importer?: () => Promise<any>;
+  rawImporter?: () => Promise<any>;
 }
 
 export interface DirectoryItem {
@@ -36,6 +38,13 @@ export interface DirectoryNavItem {
 }
 
 export type NavItem = ComponentNavItem | DirectoryNavItem;
+
+export interface ExampleItem {
+  type: 'example';
+  label: string;
+  relativePath: string;
+  importer: () => Promise<any>;
+}
 
 /**
  * Defines a named color option for use in the component documentation system.
