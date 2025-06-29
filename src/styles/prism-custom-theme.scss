@@ -1,659 +1,140 @@
-// Custom Prism.js Light & Dark Themes for Vue SFC
-// Enhanced with better Vue-specific syntax highlighting
+/* src/styles/prism-custom-theme.scss */
 
-.atomic-docs.atomic-docs-app-theme--light {
-  // Light Theme Variables
-  --prism-bg: #fafafa;
-  --prism-text: #383a42;
-  --prism-comment: #a0a1a7;
-  --prism-keyword: #a626a4;
-  --prism-string: #50a14f;
-  --prism-number: #986801;
-  --prism-function: #4078f2;
-  --prism-operator: #383a42;
-  --prism-punctuation: #383a42;
-  --prism-property: #e45649;
-  --prism-class: #c18401;
-  --prism-variable: #e45649;
-  --prism-regex: #50a14f;
-  --prism-important: #e45649;
-  --prism-bold: #383a42;
-  --prism-italic: #383a42;
-  --prism-selection: #e5e5e6;
-  --prism-line-highlight: #f0f0f1;
-  --prism-line-numbers: #9d9d9f;
-  --prism-scrollbar: #d1d5da;
-  --prism-scrollbar-track: #f6f8fa;
-
-  // Vue-specific colors
-  --prism-vue-template: #a626a4;
-  --prism-vue-component: #c18401;
-  --prism-vue-directive: #a626a4;
-  --prism-vue-interpolation: #986801;
-  --prism-html-tag: #4078f2;
-  --prism-html-attr: #e45649;
-
-  code[class*="language-"],
+// Common Prism styles
+.atomic-docs {
   pre[class*="language-"] {
-    color: var(--prism-text);
-    background: none;
-    text-shadow: none;
-    font-family: 'Fira Code', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
-    font-size: 14px;
-    line-height: 1.5;
-    direction: ltr;
-    text-align: left;
-    white-space: pre;
-    word-spacing: normal;
-    word-break: normal;
-    word-wrap: normal;
-    tab-size: 4;
-    hyphens: none;
-  }
-
-  pre[class*="language-"] {
-    padding: 1.5rem;
-    margin: 0.5rem 0;
+    padding: 1em;
+    margin: .5em 0;
     overflow: auto;
-    border-radius: 8px;
-    background: var(--prism-bg);
-    border: 1px solid #e1e4e8;
-
-    &::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: var(--prism-scrollbar-track);
-      border-radius: 4px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: var(--prism-scrollbar);
-      border-radius: 4px;
-
-      &:hover {
-        background: #bbb;
-      }
-    }
   }
-
   :not(pre) > code[class*="language-"],
   pre[class*="language-"] {
-    background: var(--prism-bg);
-  }
-
-  :not(pre) > code[class*="language-"] {
-    padding: 0.2em 0.4em;
-    border-radius: 4px;
-    white-space: normal;
-    border: 1px solid #e1e4e8;
-  }
-
-  // General Token Styles
-  .token {
-    &.comment,
-    &.prolog,
-    &.doctype,
-    &.cdata {
-      color: var(--prism-comment);
-      font-style: italic;
-    }
-
-    &.punctuation {
-      color: var(--prism-punctuation);
-    }
-
-    &.namespace {
-      opacity: 0.7;
-    }
-
-    &.property,
-    &.boolean,
-    &.constant,
-    &.symbol,
-    &.deleted {
-      color: var(--prism-property);
-    }
-
-    &.selector,
-    &.string,
-    &.char,
-    &.builtin,
-    &.inserted {
-      color: var(--prism-string);
-    }
-
-    &.operator,
-    &.entity,
-    &.url {
-      color: var(--prism-operator);
-    }
-
-    &.atrule,
-    &.attr-value,
-    &.keyword {
-      color: var(--prism-keyword);
-      font-weight: 600;
-    }
-
-    &.function,
-    &.class-name {
-      color: var(--prism-function);
-      font-weight: 500;
-    }
-
-    &.regex,
-    &.important,
-    &.variable {
-      color: var(--prism-variable);
-    }
-
-    &.number {
-      color: var(--prism-number);
-    }
-
-    &.important,
-    &.bold {
-      font-weight: bold;
-      color: var(--prism-important);
-    }
-
-    &.italic {
-      font-style: italic;
-    }
-
-    &.entity {
-      cursor: help;
-    }
-
-    // Base tag styling - default for regular HTML tags
-    &.tag {
-      color: var(--prism-html-tag);
-      font-weight: 500;
-    }
-  }
-
-  // Vue-specific enhanced token styles
-  .token {
-    // Template section tags (template, script, style)
-    &.template-tag {
-      &.markup,
-      .tag {
-        color: var(--prism-vue-template) !important;
-        font-weight: 700;
-      }
-      .punctuation {
-        color: var(--prism-vue-template) !important;
-        font-weight: 700;
-      }
-    }
-
-    // Component tags (custom Vue components)
-    &.component-tag {
-      .pattern,
-      .tag {
-        color: var(--prism-vue-component) !important;
-        font-weight: 600;
-      }
-      .punctuation {
-        color: var(--prism-vue-component) !important;
-      }
-    }
-
-    // Script section with language specification
-    &.script-tag {
-      &.javascript,
-      &.typescript {
-        color: var(--prism-vue-template) !important;
-        font-weight: 700;
-      }
-      .punctuation {
-        color: var(--prism-vue-template) !important;
-      }
-    }
-
-    // Vue directives (v-if, v-model, etc.)
-    &.directive {
-      color: var(--prism-vue-directive) !important;
-      font-weight: 600;
-      font-style: italic;
-    }
-
-    // Enhanced attribute name handling
-    &.attr-name {
-      color: var(--prism-html-attr);
-
-      // Vue directive shorthands and full directives
-      &[class*="v-"],
-      &[data-v-directive],
-      &.directive {
-        color: var(--prism-vue-directive) !important;
-        font-weight: 600;
-        font-style: italic;
-      }
-    }
-
-    // Attribute values with enhanced Vue support
-    &.attr-value {
-      color: var(--prism-string);
-
-      .punctuation {
-        color: var(--prism-punctuation);
-      }
-    }
-
-    // Vue interpolation ({{ }})
-    &.interpolation {
-      color: var(--prism-vue-interpolation);
-
-      .interpolation-punctuation,
-      .punctuation {
-        color: var(--prism-vue-interpolation);
-        font-weight: 600;
-      }
-
-      // Nested tokens within interpolation
-      .token {
-        &.string { color: var(--prism-string); }
-        &.number { color: var(--prism-number); }
-        &.boolean { color: var(--prism-property); }
-        &.operator { color: var(--prism-operator); }
-        &.function { color: var(--prism-function); }
-        &.property { color: var(--prism-property); }
-        &.keyword { color: var(--prism-keyword); }
-        &.variable { color: var(--prism-variable); }
-        &.punctuation { color: var(--prism-punctuation); }
-      }
-    }
-
-    // JavaScript/TypeScript within script tags
-    &.language-javascript,
-    &.language-typescript {
-      .token {
-        &.keyword { color: var(--prism-keyword); }
-        &.function { color: var(--prism-function); }
-        &.variable { color: var(--prism-variable); }
-        &.string { color: var(--prism-string); }
-        &.number { color: var(--prism-number); }
-        &.operator { color: var(--prism-operator); }
-        &.punctuation { color: var(--prism-punctuation); }
-        &.comment { color: var(--prism-comment); }
-        &.class-name { color: var(--prism-class); }
-        &.property { color: var(--prism-property); }
-        &.boolean { color: var(--prism-property); }
-      }
-    }
-  }
-
-  // Enhanced selector specificity for Vue patterns
-  .language-vue {
-    // Template tags with higher specificity
-    .token.template-tag.markup {
-      color: var(--prism-vue-template) !important;
-      font-weight: 700;
-    }
-
-    // Component patterns with higher specificity
-    .token.component-tag .token.pattern {
-      color: var(--prism-vue-component) !important;
-      font-weight: 600;
-    }
-
-    // Script tags with language attributes
-    .token.script-tag.javascript {
-      color: var(--prism-vue-template) !important;
-      font-weight: 700;
-    }
-
-    // Directive keywords with enhanced styling
-    .token.directive.keyword {
-      color: var(--prism-vue-directive) !important;
-      font-weight: 600;
-      font-style: italic;
-    }
-  }
-
-  // Line highlighting
-  .line-highlight {
-    background: var(--prism-line-highlight);
-    background: linear-gradient(to right, var(--prism-line-highlight) 70%, transparent);
-  }
-
-  // Line numbers
-  .line-numbers {
-    .line-numbers-rows {
-      border-right: 1px solid #e1e4e8;
-
-      > span {
-        color: var(--prism-line-numbers);
-
-        &:before {
-          color: var(--prism-line-numbers);
-        }
-      }
-    }
+    background: #f5f2f0; // Default light background
   }
 }
 
-.atomic-docs.atomic-docs-app-theme--dark {
-  // Dark Theme Variables
-  --prism-bg: #1e1e1e;
-  --prism-text: #d4d4d4;
-  --prism-comment: #6a9955;
-  --prism-keyword: #569cd6;
-  --prism-string: #ce9178;
-  --prism-number: #b5cea8;
-  --prism-function: #dcdcaa;
-  --prism-operator: #d4d4d4;
-  --prism-punctuation: #d4d4d4;
-  --prism-property: #9cdcfe;
-  --prism-class: #4ec9b0;
-  --prism-variable: #9cdcfe;
-  --prism-regex: #d16969;
-  --prism-important: #f44747;
-  --prism-bold: #d4d4d4;
-  --prism-italic: #d4d4d4;
-  --prism-selection: #264f78;
-  --prism-line-highlight: #2d2d30;
-  --prism-line-numbers: #858585;
-  --prism-scrollbar: #424242;
-  --prism-scrollbar-track: #1e1e1e;
-
-  // Vue-specific dark colors
-  --prism-vue-template: #569cd6;
-  --prism-vue-component: #4ec9b0;
-  --prism-vue-directive: #c586c0;
-  --prism-vue-interpolation: #ffd700;
-  --prism-html-tag: #569cd6;
-  --prism-html-attr: #9cdcfe;
-
-  code[class*="language-"],
-  pre[class*="language-"] {
-    color: var(--prism-text);
-    background: none;
-    text-shadow: none;
-    font-family: 'Fira Code', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
-    font-size: 14px;
-    line-height: 1.5;
-    direction: ltr;
-    text-align: left;
-    white-space: pre;
-    word-spacing: normal;
-    word-break: normal;
-    word-wrap: normal;
-    tab-size: 4;
-    hyphens: none;
+// Mixin for shared token styles
+@mixin prism-token-styles {
+  .token.namespace {
+    opacity: .7;
   }
-
-  pre[class*="language-"] {
-    padding: 1.5rem;
-    margin: 0.5rem 0;
-    overflow: auto;
-    border-radius: 8px;
-    background: var(--prism-bg);
-    border: 1px solid #3c3c3c;
-
-    &::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: var(--prism-scrollbar-track);
-      border-radius: 4px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: var(--prism-scrollbar);
-      border-radius: 4px;
-
-      &:hover {
-        background: #555;
-      }
-    }
+  .token.important,
+  .token.bold {
+    font-weight: bold;
   }
+  .token.italic {
+    font-style: italic;
+  }
+  .token.entity {
+    cursor: help;
+  }
+}
 
+// Light Theme Styles for Prism
+.atomic-docs.atomic-docs-app-theme--light {
   :not(pre) > code[class*="language-"],
   pre[class*="language-"] {
-    background: var(--prism-bg);
+    background: var(--atomic-docs-surface-color); // Use light surface color
+    color: var(--atomic-docs-text-primary);
   }
 
-  :not(pre) > code[class*="language-"] {
-    padding: 0.2em 0.4em;
-    border-radius: 4px;
-    white-space: normal;
-    border: 1px solid #3c3c3c;
+  // Apply shared token styles
+  @include prism-token-styles;
+
+  // Light theme specific highlighting
+  .token.comment,
+  .token.prolog,
+  .token.doctype,
+  .token.cdata {
+    color: slategray;
+  }
+  .token.punctuation {
+    color: #999;
+  }
+  .token.property,
+  .token.tag,
+  .token.boolean,
+  .token.number,
+  .token.constant,
+  .token.symbol,
+  .token.deleted {
+    color: #905;
+  }
+  .token.selector,
+  .token.attr-name,
+  .token.string,
+  .token.char,
+  .token.builtin,
+  .token.inserted {
+    color: #690;
+  }
+  .token.operator,
+  .token.entity,
+  .token.url,
+  .language-css .token.string,
+  .style .token.string {
+    color: #9a6e3a;
+    background: hsla(0, 0%, 100%, .5);
+  }
+  .token.atrule,
+  .token.keyword,
+  .token.attr-value,
+  .token.regex,
+  .token.important {
+    color: #07a;
+  }
+}
+
+// Dark Theme Styles for Prism
+.atomic-docs.atomic-docs-app-theme--dark {
+  :not(pre) > code[class*="language-"],
+  pre[class*="language-"] {
+    background: var(--atomic-docs-surface-color); // Use dark surface color
+    color: var(--atomic-docs-text-primary);
   }
 
-  // General Token Styles (same structure as light theme)
-  .token {
-    &.comment,
-    &.prolog,
-    &.doctype,
-    &.cdata {
-      color: var(--prism-comment);
-      font-style: italic;
-    }
+  // Apply shared token styles
+  @include prism-token-styles;
 
-    &.punctuation {
-      color: var(--prism-punctuation);
-    }
-
-    &.namespace {
-      opacity: 0.7;
-    }
-
-    &.property,
-    &.boolean,
-    &.constant,
-    &.symbol,
-    &.deleted {
-      color: var(--prism-property);
-    }
-
-    &.selector,
-    &.string,
-    &.char,
-    &.builtin,
-    &.inserted {
-      color: var(--prism-string);
-    }
-
-    &.operator,
-    &.entity,
-    &.url {
-      color: var(--prism-operator);
-    }
-
-    &.atrule,
-    &.attr-value,
-    &.keyword {
-      color: var(--prism-keyword);
-      font-weight: 600;
-    }
-
-    &.function,
-    &.class-name {
-      color: var(--prism-function);
-      font-weight: 500;
-    }
-
-    &.regex,
-    &.important,
-    &.variable {
-      color: var(--prism-variable);
-    }
-
-    &.number {
-      color: var(--prism-number);
-    }
-
-    &.important,
-    &.bold {
-      font-weight: bold;
-      color: var(--prism-important);
-    }
-
-    &.italic {
-      font-style: italic;
-    }
-
-    &.entity {
-      cursor: help;
-    }
-
-    &.tag {
-      color: var(--prism-html-tag);
-      font-weight: 500;
-    }
+  // Dark theme specific highlighting
+  .token.comment,
+  .token.prolog,
+  .token.doctype,
+  .token.cdata {
+    color: #5C6370; // Darker comment
   }
-
-  // Vue-specific enhanced token styles (same structure as light theme)
-  .token {
-    &.template-tag {
-      &.markup,
-      .tag {
-        color: var(--prism-vue-template) !important;
-        font-weight: 700;
-      }
-      .punctuation {
-        color: var(--prism-vue-template) !important;
-        font-weight: 700;
-      }
-    }
-
-    &.component-tag {
-      .pattern,
-      .tag {
-        color: var(--prism-vue-component) !important;
-        font-weight: 600;
-      }
-      .punctuation {
-        color: var(--prism-vue-component) !important;
-      }
-    }
-
-    &.script-tag {
-      &.javascript,
-      &.typescript {
-        color: var(--prism-vue-template) !important;
-        font-weight: 700;
-      }
-      .punctuation {
-        color: var(--prism-vue-template) !important;
-      }
-    }
-
-    &.directive {
-      color: var(--prism-vue-directive) !important;
-      font-weight: 600;
-      font-style: italic;
-    }
-
-    &.attr-name {
-      color: var(--prism-html-attr);
-
-      &[class*="v-"],
-      &[data-v-directive],
-      &.directive {
-        color: var(--prism-vue-directive) !important;
-        font-weight: 600;
-        font-style: italic;
-      }
-    }
-
-    &.attr-value {
-      color: var(--prism-string);
-
-      .punctuation {
-        color: var(--prism-punctuation);
-      }
-    }
-
-    &.interpolation {
-      color: var(--prism-vue-interpolation);
-
-      .interpolation-punctuation,
-      .punctuation {
-        color: var(--prism-vue-interpolation);
-        font-weight: 600;
-      }
-
-      .token {
-        &.string { color: var(--prism-string); }
-        &.number { color: var(--prism-number); }
-        &.boolean { color: var(--prism-property); }
-        &.operator { color: var(--prism-operator); }
-        &.function { color: var(--prism-function); }
-        &.property { color: var(--prism-property); }
-        &.keyword { color: var(--prism-keyword); }
-        &.variable { color: var(--prism-variable); }
-        &.punctuation { color: var(--prism-punctuation); }
-      }
-    }
-
-    &.language-javascript,
-    &.language-typescript {
-      .token {
-        &.keyword { color: var(--prism-keyword); }
-        &.function { color: var(--prism-function); }
-        &.variable { color: var(--prism-variable); }
-        &.string { color: var(--prism-string); }
-        &.number { color: var(--prism-number); }
-        &.operator { color: var(--prism-operator); }
-        &.punctuation { color: var(--prism-punctuation); }
-        &.comment { color: var(--prism-comment); }
-        &.class-name { color: var(--prism-class); }
-        &.property { color: var(--prism-property); }
-        &.boolean { color: var(--prism-property); }
-      }
-    }
+  .token.punctuation {
+    color: #ABB2BF; // Light grey punctuation
   }
-
-  // Enhanced selector specificity for Vue patterns
-  .language-vue {
-    .token.template-tag.markup {
-      color: var(--prism-vue-template) !important;
-      font-weight: 700;
-    }
-
-    .token.component-tag .token.pattern {
-      color: var(--prism-vue-component) !important;
-      font-weight: 600;
-    }
-
-    .token.script-tag.javascript {
-      color: var(--prism-vue-template) !important;
-      font-weight: 700;
-    }
-
-    .token.directive.keyword {
-      color: var(--prism-vue-directive) !important;
-      font-weight: 600;
-      font-style: italic;
-    }
+  .token.property,
+  .token.tag,
+  .token.boolean,
+  .token.number,
+  .token.constant,
+  .token.symbol,
+  .token.deleted {
+    color: #D19A66; // Orange/brown for numbers, booleans etc.
   }
-
-  // Line highlighting
-  .line-highlight {
-    background: var(--prism-line-highlight);
-    background: linear-gradient(to right, var(--prism-line-highlight) 70%, transparent);
+  .token.selector,
+  .token.attr-name,
+  .token.string,
+  .token.char,
+  .token.builtin,
+  .token.inserted {
+    color: #98C379; // Green for strings
   }
-
-  // Line numbers
-  .line-numbers {
-    .line-numbers-rows {
-      border-right: 1px solid #3c3c3c;
-
-      > span {
-        color: var(--prism-line-numbers);
-
-        &:before {
-          color: var(--prism-line-numbers);
-        }
-      }
-    }
+  .token.operator,
+  .token.entity,
+  .token.url,
+  .language-css .token.string,
+  .style .token.string {
+    color: #E06C75; // Red for operators
+  }
+  .token.atrule,
+  .token.keyword,
+  .token.attr-value,
+  .token.regex,
+  .token.important {
+    color: #C678DD; // Purple for keywords
   }
 }
