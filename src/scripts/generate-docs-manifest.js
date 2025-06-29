@@ -1,8 +1,8 @@
 // scripts/generate-docs-manifest.js
 /**
  * @typedef {import('vue').Component} Component
- * @typedef {import('vue-atomic-docs/dist/types').ComponentItem} ComponentItem
- * @typedef {import('vue-atomic-docs/dist/types').ExampleItem} ExampleItem
+ * @typedef {import('../types').ComponentItem} ComponentItem
+ * @typedef {import('../types').ExampleItem} ExampleItem
  *
  * @type {Object}
  * @property {string} lib - ES2015 or later to support Promises
@@ -23,13 +23,21 @@ function parseArgs() {
   return args;
 }
 
+// Available arguments:
+// --output: Path to output the docs-manifest.ts file (default: src/docs-manifest.ts in the current working directory)
+// --componentsDir: Path to the components directory (default: src/components)
+// --examplesDir: Path to the examples directory (default: src/component-examples)
+// --pluginComponentsBaseName: Base name for components in the plugin (default: components)
+// --pluginExamplesBaseName: Base name for examples in the plugin (default: component-examples)
+
 const args = parseArgs();
 
 // Default values:
 // 1. projectRoot: Defaults to the current working directory (where npm run is executed)
 //    This is the most reliable way to find the actual project root when the script
 //    is located deep in node_modules.
-const projectRoot = args.root ? path.resolve(process.cwd(), args.root) : process.cwd();
+// Always use process.cwd() to ensure we're working with the consuming app's directory
+const projectRoot = process.cwd();
 
 // These are the *file system paths* to the directories, relative to projectRoot.
 // These should match where your component and example files physically reside.
@@ -43,7 +51,9 @@ const pluginExamplesBaseName = args.pluginExamplesBaseName || 'component-example
 
 
 // manifestOutputPath: Defaults to 'src/docs-manifest.ts' within the projectRoot.
-const manifestOutputPath = args.output ? path.resolve(process.cwd(), args.output) : path.resolve(projectRoot, 'src', 'docs-manifest.ts');
+// When running from within the vue-atomic-docs package, we want to output to the consuming app's directory
+// process.cwd() is the current working directory (where npm run is executed)
+const manifestOutputPath = args.output ? path.resolve(process.cwd(), args.output) : path.resolve(process.cwd(), 'src', 'docs-manifest.ts');
 
 // Ensure the output directory exists
 const outputDir = path.dirname(manifestOutputPath);
@@ -133,7 +143,25 @@ async function generateDocsManifest() {
 import type { ComponentItem, ExampleItem } from 'vue-atomic-docs/src/types'; // Reference types from the installed package
 
 ${componentsContent}
-${exampleComponentsContent}`;
+${exampleComponentsContent}
+
+// Pre-computed module mappings for direct use with the plugin
+export const componentModules: Record<string, () => Promise<any>> = components.reduce((acc, comp) => {
+  acc[comp.relativePath] = comp.importer;
+  return acc;
+}, {});
+
+export const rawComponentSourceModules: Record<string, () => Promise<string>> = components.reduce((acc, comp) => {
+  if (comp.rawImporter) {
+    acc[comp.relativePath] = comp.rawImporter;
+  }
+  return acc;
+}, {});
+
+export const exampleModules: Record<string, () => Promise<any>> = exampleComponents.reduce((acc, example) => {
+  acc[example.relativePath] = example.importer;
+  return acc;
+}, {});`;
 
   fs.writeFileSync(manifestOutputPath, manifestContent);
   console.log(`✅ Docs manifest generated successfully at ${manifestOutputPath}`);
