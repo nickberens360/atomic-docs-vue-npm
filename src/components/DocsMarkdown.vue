@@ -24,6 +24,8 @@ import 'prismjs/components/prism-typescript';
 import 'prismjs/components/prism-bash';
 import 'prismjs/components/prism-json';
 import 'prismjs/components/prism-markdown';
+// Import Vue language support
+import '../utils/prism-vue.js';
 
 // Create a custom markdown-it-prism plugin
 const markdownItPrism = (md: MarkdownIt) => {

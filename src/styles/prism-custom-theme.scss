@@ -1,6 +1,6 @@
 /* src/styles/prism-custom-theme.scss */
 
-// Common Prism styles (can be outside theme blocks if they apply to both)
+// Common Prism styles
 .atomic-docs {
   pre[class*="language-"] {
     padding: 1em;
@@ -13,6 +13,23 @@
   }
 }
 
+// Mixin for shared token styles
+@mixin prism-token-styles {
+  .token.namespace {
+    opacity: .7;
+  }
+  .token.important,
+  .token.bold {
+    font-weight: bold;
+  }
+  .token.italic {
+    font-style: italic;
+  }
+  .token.entity {
+    cursor: help;
+  }
+}
+
 // Light Theme Styles for Prism
 .atomic-docs.atomic-docs-app-theme--light {
   :not(pre) > code[class*="language-"],
@@ -21,7 +38,10 @@
     color: var(--atomic-docs-text-primary);
   }
 
-  // Example: Basic highlighting for light theme
+  // Apply shared token styles
+  @include prism-token-styles;
+
+  // Light theme specific highlighting
   .token.comment,
   .token.prolog,
   .token.doctype,
@@ -30,9 +50,6 @@
   }
   .token.punctuation {
     color: #999;
-  }
-  .token.namespace {
-    opacity: .7;
   }
   .token.property,
   .token.tag,
@@ -66,16 +83,6 @@
   .token.important {
     color: #07a;
   }
-  .token.important,
-  .token.bold {
-    font-weight: bold;
-  }
-  .token.italic {
-    font-style: italic;
-  }
-  .token.entity {
-    cursor: help;
-  }
 }
 
 // Dark Theme Styles for Prism
@@ -86,7 +93,10 @@
     color: var(--atomic-docs-text-primary);
   }
 
-  // Example: Basic highlighting for dark theme
+  // Apply shared token styles
+  @include prism-token-styles;
+
+  // Dark theme specific highlighting
   .token.comment,
   .token.prolog,
   .token.doctype,
@@ -95,9 +105,6 @@
   }
   .token.punctuation {
     color: #ABB2BF; // Light grey punctuation
-  }
-  .token.namespace {
-    opacity: .7;
   }
   .token.property,
   .token.tag,
@@ -129,15 +136,5 @@
   .token.regex,
   .token.important {
     color: #C678DD; // Purple for keywords
-  }
-  .token.important,
-  .token.bold {
-    font-weight: bold;
-  }
-  .token.italic {
-    font-style: italic;
-  }
-  .token.entity {
-    cursor: help;
   }
 }
