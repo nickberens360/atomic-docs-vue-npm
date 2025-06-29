@@ -23,8 +23,9 @@ Prism.languages.vue = {
   },
   // Vue component tags
   'component-tag': {
-    pattern: /<[A-Z]\w*(?:\s+[^>]*)?>/,
-    inside: Prism.languages.markup.tag
+    pattern: /<[A-Z]\w*(?:\s+[^>]*)?>|<\/[A-Z]\w*>/,
+    greedy: true,
+    inside: Prism.languages.markup.tag.inside
   },
   // Vue interpolation
   'interpolation': {
