@@ -19,7 +19,6 @@
       <DocsTabs :tabs="tabsExample">
         <template #[`tab-0`]>
           <div class="tab-content">
-            <!-- Universal Search Input for Tables -->
             <div class="atomic-docs-table-search">
               <DocsTextField
                 v-model="searchTerm"
@@ -306,7 +305,9 @@ onMounted(async () => {
 
       if (rawSourcePath) {
         try {
-          const rawSource = await componentDocPlugin.rawComponentSourceModules[rawSourcePath]();
+          const rawSourceModule = await componentDocPlugin.rawComponentSourceModules[rawSourcePath]();
+          // Access the 'default' property as the raw source is now exported as default
+          const rawSource = rawSourceModule.default; // <<-- MODIFIED LINE
 
           // Use the imported extractor functions directly
           templateSource.value = extractTemplateContent(rawSource);

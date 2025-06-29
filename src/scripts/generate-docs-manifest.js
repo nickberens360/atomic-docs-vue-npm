@@ -1,8 +1,8 @@
 // scripts/generate-docs-manifest.js
 /**
  * @typedef {import('vue').Component} Component
- * @typedef {import('./types').ComponentItem} ComponentItem
- * @typedef {import('./types').ExampleItem} ExampleItem
+ * @typedef {import('vue-atomic-docs/dist/types').ComponentItem} ComponentItem
+ * @typedef {import('vue-atomic-docs/dist/types').ExampleItem} ExampleItem
  *
  * @type {Object}
  * @property {string} lib - ES2015 or later to support Promises
@@ -29,12 +29,20 @@ const args = parseArgs();
 // 1. projectRoot: Defaults to the current working directory (where npm run is executed)
 //    This is the most reliable way to find the actual project root when the script
 //    is located deep in node_modules.
-// 2. componentsDirName/examplesDirName: These are relative to projectRoot.
-// 3. manifestOutputPath: Defaults to 'src/docs-manifest.ts' within the projectRoot.
-
 const projectRoot = args.root ? path.resolve(process.cwd(), args.root) : process.cwd();
-const componentsDirName = args.componentsDir || 'src/components'; // Common Vue component path, relative to projectRoot
-const examplesDirName = args.examplesDir || 'src/component-examples'; // Common Vue example path, relative to projectRoot
+
+// These are the *file system paths* to the directories, relative to projectRoot.
+// These should match where your component and example files physically reside.
+const filesystemComponentsDir = args.componentsDir || 'src/components';
+const filesystemExamplesDir = args.examplesDir || 'src/component-examples';
+
+// These are the *base names* expected by the `vue-atomic-docs` plugin for relative paths.
+// They should match the `componentsDirName` and `examplesDirName` options passed to the plugin in `plugins/index.ts`.
+const pluginComponentsBaseName = args.pluginComponentsBaseName || 'components';
+const pluginExamplesBaseName = args.pluginExamplesBaseName || 'component-examples';
+
+
+// manifestOutputPath: Defaults to 'src/docs-manifest.ts' within the projectRoot.
 const manifestOutputPath = args.output ? path.resolve(process.cwd(), args.output) : path.resolve(projectRoot, 'src', 'docs-manifest.ts');
 
 // Ensure the output directory exists
@@ -45,8 +53,10 @@ if (!fs.existsSync(outputDir)) {
 
 console.log(`--- Generating Docs Manifest for Vue App ---`);
 console.log(`Project Root: ${projectRoot}`);
-console.log(`Components Directory (relative to root): ${componentsDirName}`);
-console.log(`Examples Directory (relative to root): ${examplesDirName}`);
+console.log(`Filesystem Components Directory: ${filesystemComponentsDir}`);
+console.log(`Filesystem Examples Directory: ${filesystemExamplesDir}`);
+console.log(`Plugin Expected Components Base Name: ${pluginComponentsBaseName}`);
+console.log(`Plugin Expected Examples Base Name: ${pluginExamplesBaseName}`);
 console.log(`Manifest Output Path: ${manifestOutputPath}`);
 console.log(`------------------------------------------`);
 
@@ -56,62 +66,77 @@ async function generateDocsManifest() {
   const allExampleComponents = [];
 
   // --- Process Components ---
-  // The glob patterns are constructed using projectRoot and the relative component directory name
-  const componentGlobPattern = path.join(projectRoot, componentsDirName, '**', '*.vue').replace(/\\/g, '/');
+  const componentGlobPattern = path.join(projectRoot, filesystemComponentsDir, '**', '*.vue').replace(/\\/g, '/');
   const componentFiles = await glob(componentGlobPattern);
 
   for (const filePath of componentFiles) {
-    // relativePathInDir: e.g., 'buttons/MyButton.vue' (relative to 'src/components')
-    const relativePathInDir = path.relative(path.join(projectRoot, componentsDirName), filePath);
+    const relativePathInDir = path.relative(path.join(projectRoot, filesystemComponentsDir), filePath);
     const label = path.basename(filePath, '.vue');
-
-    // Construct import path relative to the *generated manifest file itself*
-    // This allows bundlers to resolve the import correctly from the manifest's location.
     const importPathRelativeToManifest = `./${path.relative(path.dirname(manifestOutputPath), filePath).replace(/\\/g, '/')}`;
 
+    // Store as an object with string values for properties that will be stringified,
+    // and raw function strings for importer/rawImporter.
     allComponents.push({
       type: 'component',
       label: label,
-      relativePath: relativePathInDir.replace(/\\/g, '/'), // Unix-like paths for consistency
+      relativePath: path.join(pluginComponentsBaseName, relativePathInDir).replace(/\\/g, '/'),
       importer: `() => import('${importPathRelativeToManifest}')`,
-      rawImporter: `() => import('${importPathRelativeToManifest}?raw')`, // For raw source code
+      rawImporter: `() => import('${importPathRelativeToManifest}?raw')`,
     });
   }
 
   // --- Process Example Components ---
-  const exampleGlobPattern = path.join(projectRoot, examplesDirName, '**', '*.vue').replace(/\\/g, '/');
+  const exampleGlobPattern = path.join(projectRoot, filesystemExamplesDir, '**', '*.vue').replace(/\\/g, '/');
   const exampleFiles = await glob(exampleGlobPattern);
 
   for (const filePath of exampleFiles) {
-    // relativePathInDir: e.g., 'buttons/MyButton.vue' (relative to 'src/component-examples')
-    const relativePathInDir = path.relative(path.join(projectRoot, examplesDirName), filePath);
+    const relativePathInDir = path.relative(path.join(projectRoot, filesystemExamplesDir), filePath);
     const label = path.basename(filePath, '.vue');
-
-    // Construct import path relative to the *generated manifest file itself*
     const importPathRelativeToManifest = `./${path.relative(path.dirname(manifestOutputPath), filePath).replace(/\\/g, '/')}`;
 
     allExampleComponents.push({
       type: 'example',
       label: label,
-      relativePath: relativePathInDir.replace(/\\/g, '/'), // Unix-like paths for consistency
+      relativePath: path.join(pluginExamplesBaseName, relativePathInDir).replace(/\\/g, '/'),
       importer: `() => import('${importPathRelativeToManifest}')`,
     });
   }
 
-  // Generate the TypeScript file content
+  // Manually construct the manifest content to avoid double stringification
+  let componentsContent = 'export const components: ComponentItem[] = [\n';
+  allComponents.forEach((comp, index) => {
+    componentsContent += `  {\n`;
+    componentsContent += `    "type": "${comp.type}",\n`;
+    componentsContent += `    "label": "${comp.label}",\n`;
+    componentsContent += `    "relativePath": "${comp.relativePath}",\n`;
+    componentsContent += `    "importer": ${comp.importer},\n`; // Directly embed function string
+    componentsContent += `    "rawImporter": ${comp.rawImporter}\n`; // Directly embed function string
+    componentsContent += `  }${index < allComponents.length - 1 ? ',' : ''}\n`;
+  });
+  componentsContent += `];\n\n`;
+
+  let exampleComponentsContent = 'export const exampleComponents: ExampleItem[] = [\n';
+  allExampleComponents.forEach((example, index) => {
+    exampleComponentsContent += `  {\n`;
+    exampleComponentsContent += `    "type": "${example.type}",\n`;
+    exampleComponentsContent += `    "label": "${example.label}",\n`;
+    exampleComponentsContent += `    "relativePath": "${example.relativePath}",\n`;
+    exampleComponentsContent += `    "importer": ${example.importer}\n`; // Directly embed function string
+    exampleComponentsContent += `  }${index < allExampleComponents.length - 1 ? ',' : ''}\n`;
+  });
+  exampleComponentsContent += `];\n`;
+
   const manifestContent = `
 // This file is auto-generated by scripts/generate-docs-manifest.js
 // Do not edit this file directly.
 
-import type { ComponentItem, ExampleItem } from 'vue-atomic-docs/dist/types'; // Reference types from the installed package
+import type { ComponentItem, ExampleItem } from 'vue-atomic-docs/src/types'; // Reference types from the installed package
 
-export const components: ComponentItem[] = ${JSON.stringify(allComponents, null, 2).replace(/"importer": "(.+?)"/g, '"importer": $1').replace(/"rawImporter": "(.+?)"/g, '"rawImporter": $1')};
-
-export const exampleComponents: ExampleItem[] = ${JSON.stringify(allExampleComponents, null, 2).replace(/"importer": "(.+?)"/g, '"importer": $1')};
-`;
+${componentsContent}
+${exampleComponentsContent}`;
 
   fs.writeFileSync(manifestOutputPath, manifestContent);
-  console.log(`✅ Docs manifest generated successfully.`);
+  console.log(`✅ Docs manifest generated successfully at ${manifestOutputPath}`);
 }
 
 generateDocsManifest().catch(console.error);
