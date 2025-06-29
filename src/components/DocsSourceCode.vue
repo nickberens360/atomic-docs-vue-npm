@@ -19,6 +19,8 @@
 import { computed, inject, ref } from 'vue'; // Removed watch, onUnmounted
 // Import Prism.js
 import Prism from 'prismjs';
+// Import Vue language support
+import '../utils/prism-vue.js';
 // Removed 'initPrismTheme' import as it's no longer used
 
 const props = defineProps({
@@ -29,7 +31,7 @@ const props = defineProps({
   language: {
     type: String,
     default: 'markup',
-    validator: (value) => ['markup', 'javascript', 'css'].includes(value)
+    validator: (value) => ['markup', 'javascript', 'css', 'vue'].includes(value)
   }
 });
 

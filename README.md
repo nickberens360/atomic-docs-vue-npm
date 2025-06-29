@@ -2,8 +2,6 @@
 
 A Vue 3 plugin for building beautiful, interactive documentation sites for your component libraries – with zero config.
 
----
-
 ## Features
 
 - ⚡ **Automatic Prop & Type Tables**
@@ -15,8 +13,6 @@ A Vue 3 plugin for building beautiful, interactive documentation sites for your 
 - 🧩 **Style Isolation**
 - 🚦 **Zero-Config Routing**
 - 🛡️ **Vite Build Helper Plugin**
-
----
 
 ## Quick Start
 
@@ -93,22 +89,106 @@ export default defineConfig({
 
 For each component (`/components/MyButton.vue`), create an example file (`/component-examples/MyButton.vue`):
 
-```vue
+```markup
 <template>
-  <ExampleComponentUsage :component="MyButton" description="Standard button">
-    <template #default>
-      <MyButton @click="onClick">Click Me!</MyButton>
-    </template>
-    <!-- Optionally: override generated docs tables -->
-    <template #props>
-      <p>This will replace the props table.</p>
+  <ExampleComponentUsage
+    :event-items="eventItems"
+    :slot-items="slotItems"
+    expand-props-table
+    description="A simple box component."
+  >
+    <div class="box-demo-container">
+      <BoxDemo
+        :height="`${height}px`"
+        :width="`${width}px`"
+        :bg-color="bgColor"
+        :border-radius="`${borderRadius}px`"
+        @click="handleClick"
+      />
+    </div>
+    <template #[`item.actions`]="{item}">
+      <!-- Use whatever controls you want to change the box properties. 
+           I've included a few built-in components for convenience. -->
+      <DocsSlider
+        v-if="item.name === 'width'"
+        v-model="width"
+        label="width"
+        thumb-label
+        max="600"
+        hide-details
+      />
+      <DocsSlider
+        v-if="item.name === 'height'"
+        v-model="height"
+        thumb-label
+        label="height"
+        max="600"
+        hide-details
+      />
+      <DocsMenu
+        v-if="item.name === 'bgColor'"
+        :close-on-content-click="false"
+      >
+        <template #activator="{ props }">
+          <DocsChip
+            v-bind="props"
+            :color="bgColor"
+            variant="flat"
+            :rounded="false"
+            size="large"
+            label
+            width="100%"
+            class="color-chip"
+          >
+            Color
+          </DocsChip>
+        </template>
+        <DocsColorPicker
+          v-model="bgColor"
+          label="bgColor"
+        />
+      </DocsMenu>
+      <DocsSlider
+        v-if="item.name === 'borderRadius'"
+        v-model="borderRadius"
+        thumb-label
+        label="borderRadius"
+        max="100"
+        hide-details
+      />
     </template>
   </ExampleComponentUsage>
 </template>
 
 <script setup lang="ts">
-import MyButton from '../components/MyButton.vue';
-function onClick() { alert('Button clicked!'); }
+import { ref } from 'vue';
+import BoxDemo from '@/components/base/BoxDemo.vue';
+import { DocsSlider, DocsMenu, DocsChip, DocsColorPicker } from 'vue-atomic-docs';
+
+const height = ref(150);
+const width = ref(150);
+const bgColor = ref('#6dabe8');
+const borderRadius = ref(8);
+
+const eventItems = [
+  {
+    event: 'box-clicked',
+    payload: 'void',
+    description: 'Emitted when the box is clicked.',
+  },
+];
+
+const slotItems = [
+  {
+    name: 'default',
+    content: 'null',
+    description: 'Slot for custom content.',
+  },
+];
+
+const handleClick = () => {
+  alert('Box clicked');
+};
 </script>
 ```
 
@@ -139,9 +219,9 @@ All docs UI styles are namespaced under `.atomic-docs`. Easily theme the docs by
 
 ```css
 .atomic-docs {
-  --atomic-docs-primary-color: #ff5722;
-  --atomic-docs-background-color: #f8f8f8;
-  --atomic-docs-font-family: 'Your Custom Font', sans-serif;
+    --atomic-docs-primary-color: #ff5722;
+    --atomic-docs-background-color: #f8f8f8;
+    --atomic-docs-font-family: 'Your Custom Font', sans-serif;
 }
 ```
 
