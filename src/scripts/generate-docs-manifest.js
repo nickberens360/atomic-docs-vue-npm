@@ -79,9 +79,11 @@ const pluginExamplesBaseName = args.pluginExamplesBaseName || 'component-example
 
 
 // manifestOutputPath: Defaults to 'src/atomic-docs-manifest.ts' within the projectRoot.
-// When running from within the vue-atomic-docs package, we want to output to the consuming app's directory
-// process.cwd() is the current working directory (where npm run is executed)
-const manifestOutputPath = args.output ? path.resolve(process.cwd(), args.output) : path.resolve(process.cwd(), 'src', 'atomic-docs-manifest.ts');
+// When running from within the vue-atomic-docs package, we want to output to the plugin's src directory
+// __dirname is the directory of the current script
+const manifestOutputPath = args.output
+  ? path.resolve(process.cwd(), args.output)
+  : path.resolve(__dirname, '../../src', 'atomic-docs-manifest.ts');
 
 // Ensure the output directory exists
 const outputDir = path.dirname(manifestOutputPath);

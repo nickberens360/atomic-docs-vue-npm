@@ -8,6 +8,29 @@ import routesConfig from './routes';
 import { createRouter, createWebHistory } from 'vue-router';
 import './styles';
 
+// Import the manifest data
+import { components, exampleComponents, componentModules, rawComponentSourceModules, exampleModules } from './atomic-docs-manifest';
+
+// Import the config file
+let configOptions = {};
+try {
+  // First try to import as ES module
+  import('../atomic-docs.config.js')
+    .then(config => {
+      configOptions = config.default || config;
+    })
+    .catch(() => {
+      // If ES module import fails, try CommonJS require
+      try {
+        configOptions = require('../atomic-docs.config.js');
+      } catch (e) {
+        console.warn('Could not load atomic-docs.config.js', e);
+      }
+    });
+} catch (e) {
+  console.warn('Could not load atomic-docs.config.js', e);
+}
+
 // Centralized constants
 const DOCS_MOUNT_ID = 'atomic-docs-app';
 const DOCS_ROUTE_PREFIX = '/atomic-docs';
@@ -46,13 +69,28 @@ function toggleElementDisplay(el: HTMLElement | null, show: boolean) {
 }
 
 const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
-  install(app: App, options: ComponentDocOptions = {
-    componentModules: {},
-    componentsDirName: "",
-    exampleModules: {},
-    examplesDirName: ""
-  }) {
+  install(app: App, options: ComponentDocOptions = {}) {
     try {
+      // Merge provided options with config file options and manifest data
+      const mergedOptions: ComponentDocOptions = {
+        // Default values
+        componentModules: {},
+        componentsDirName: "components",
+        exampleModules: {},
+        examplesDirName: "component-examples",
+
+        // Values from config file
+        ...configOptions,
+
+        // Values from manifest
+        componentModules: componentModules || {},
+        exampleModules: exampleModules || {},
+        rawComponentSourceModules: rawComponentSourceModules || {},
+
+        // User-provided options (highest priority)
+        ...options
+      };
+
       const {
         componentModules,
         componentsDirName,
@@ -65,7 +103,7 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
         globalComponents,
         autoRegisterComponents,
         history: customHistory,
-      } = options;
+      } = mergedOptions;
 
       if (!enableDocs) return;
 
