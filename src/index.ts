@@ -17,25 +17,19 @@ import {
   exampleModules as importedExampleModules
 } from './atomic-docs-manifest';
 
-// Import the config file
-let configOptions = {};
-try {
-  // First try to import as ES module
-  import('../atomic-docs.config.js')
-    .then(config => {
-      configOptions = config.default || config;
-    })
-    .catch(() => {
-      // If ES module import fails, try CommonJS require
-      try {
-        configOptions = require('../atomic-docs.config.js');
-      } catch (e) {
-        console.warn('Could not load atomic-docs.config.js', e);
-      }
-    });
-} catch (e) {
-  console.warn('Could not load atomic-docs.config.js', e);
-}
+// Import the runtime config
+import { runtimeConfig } from './runtime-config';
+
+// Default config options with runtime config
+const configOptions = {
+  // Default values
+  componentsDirName: "components",
+  examplesDirName: "component-examples",
+  // other defaults...
+
+  // Override with imported config
+  ...runtimeConfig
+};
 
 // Centralized constants
 const DOCS_MOUNT_ID = 'atomic-docs-app';

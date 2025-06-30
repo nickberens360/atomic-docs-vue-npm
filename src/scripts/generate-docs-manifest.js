@@ -195,6 +195,15 @@ export const exampleModules: Record<string, () => Promise<any>> = exampleCompone
 
   fs.writeFileSync(manifestOutputPath, manifestContent);
   console.log(`✅ Docs manifest generated successfully at ${manifestOutputPath}`);
+
+  // Generate runtime config file
+  const runtimeConfigPath = path.resolve(outputDir, 'runtime-config.js');
+  const runtimeConfigContent = `
+// This file is auto-generated - do not edit
+export const runtimeConfig = ${JSON.stringify(fileConfig, null, 2)};
+`;
+  fs.writeFileSync(runtimeConfigPath, runtimeConfigContent);
+  console.log(`✅ Runtime config generated successfully at ${runtimeConfigPath}`);
 }
 
 generateDocsManifest().catch(console.error);
