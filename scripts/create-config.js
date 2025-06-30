@@ -1,7 +1,8 @@
 // scripts/create-config.js
 /**
  * This script creates a default atomic-docs.config.js file in the root of the consuming app
- * if it doesn't already exist.
+ * if it doesn't already exist. It also adds the generate-docs-manifest script to the consuming
+ * app's package.json if it doesn't already exist.
  */
 const fs = require('fs');
 const path = require('path');
@@ -50,4 +51,35 @@ if (fs.existsSync(configPath)) {
   } catch (error) {
     console.error(`❌ Error creating config file: ${error.message}`);
   }
+}
+
+// Add the generate-docs-manifest script to the consuming app's package.json
+const packageJsonPath = path.join(appRoot, 'package.json');
+
+if (fs.existsSync(packageJsonPath)) {
+  try {
+    // Read the package.json file
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+
+    // Check if the scripts section exists
+    if (!packageJson.scripts) {
+      packageJson.scripts = {};
+    }
+
+    // Check if the generate-docs-manifest script already exists
+    if (!packageJson.scripts['generate-docs-manifest']) {
+      // Add the script
+      packageJson.scripts['generate-docs-manifest'] = 'node ./node_modules/vue-atomic-docs/src/scripts/generate-docs-manifest.js';
+
+      // Write the updated package.json back to disk
+      fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+      console.log(`✅ Added generate-docs-manifest script to package.json`);
+    } else {
+      console.log(`generate-docs-manifest script already exists in package.json`);
+    }
+  } catch (error) {
+    console.error(`❌ Error updating package.json: ${error.message}`);
+  }
+} else {
+  console.error(`❌ package.json not found at ${packageJsonPath}`);
 }
