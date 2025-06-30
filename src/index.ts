@@ -10,8 +10,8 @@ import './styles';
 
 // Eagerly import the manifest file from the consuming app, if it exists.
 const manifestModules = import.meta.glob('/src/atomic-docs-manifest.{js,ts,json}', { eager: true });
-const manifestModule = Object.values(manifestModules)[0] as { default: { globalComponents?: Record<string, Component> } } | undefined;
-console.debug('Manifest module:', manifestModule);
+// const manifestModule = Object.values(manifestModules)[0] as { default: { globalComponents?: Record<string, Component> } } | undefined;
+console.debug('Manifest module:', manifestModules);
 // if (manifestModule?.default?.globalComponents) {
 //   Object.entries(manifestModule.default.globalComponents).forEach(([name, component]) => {
 //     docsApp.component(name, component);
