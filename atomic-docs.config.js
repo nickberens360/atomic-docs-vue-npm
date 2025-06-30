@@ -3,18 +3,50 @@
 // You can modify this file to customize your documentation setup
 
 module.exports = {
+  // === Manifest Generator Options ===
+
   // Path to output the atomic-docs-manifest.ts file
   output: 'src/atomic-docs-manifest.ts',
-  
+
   // Path to the components directory
   componentsDir: 'src/components',
-  
+
   // Path to the examples directory
   examplesDir: 'src/component-examples',
-  
+
   // Base name for components in the plugin
   pluginComponentsBaseName: 'components',
-  
+
   // Base name for examples in the plugin
-  pluginExamplesBaseName: 'component-examples'
+  pluginExamplesBaseName: 'component-examples',
+
+  // === Vue Plugin Options ===
+
+  // Enable or disable the documentation system
+  enableDocs: true,
+
+  // ID of the main application's root HTML element
+  // Used by the plugin to hide/show the main app when toggling docs
+  mainAppID: 'app',
+
+  // Automatically register components from the main app in the docs app
+  autoRegisterComponents: true,
+
+  // Directory name for components (should match pluginComponentsBaseName)
+  componentsDirName: 'components',
+
+  // Directory name for examples (should match pluginExamplesBaseName)
+  examplesDirName: 'component-examples',
+
+  // Optional: Custom color definitions for the documentation
+  // colors: [
+  //   { name: 'Primary', color: '#3498db' },
+  //   { name: 'Secondary', color: '#2ecc71' }
+  // ],
+
+  // Optional: Automatically extract colors from CSS variables
+  // autoExtractColors: true,
+
+  // Optional: Custom font for component documentation
+  // componentFont: 'Roboto, sans-serif'
 };

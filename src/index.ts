@@ -7,20 +7,64 @@ import { ComponentDocPlugin, ComponentDocOptions } from './types';
 import routesConfig from './routes';
 import { createRouter, createWebHistory } from 'vue-router';
 import './styles';
+// Check if we're in a Node.js environment
+const isNode = typeof process !== 'undefined' &&
+  process.versions != null &&
+  process.versions.node != null;
 
-// Eagerly import the manifest file from the consuming app, if it exists.
-const manifestModules = import.meta.glob('/src/atomic-docs-manifest.{js,ts,json}', { eager: true });
-// const manifestModule = Object.values(manifestModules)[0] as { default: { globalComponents?: Record<string, Component> } } | undefined;
-console.debug('Manifest module:', manifestModules);
-// if (manifestModule?.default?.globalComponents) {
-//   Object.entries(manifestModule.default.globalComponents).forEach(([name, component]) => {
-//     docsApp.component(name, component);
-//   });
-// }
+// Conditionally import Node.js modules
+let fs: any = null;
+let path: any = null;
+if (isNode) {
+  // Only import in Node environment
+  // Using dynamic imports to prevent Vite from processing these during build
+  try {
+    fs = require('fs');
+    path = require('path');
+  } catch (e) {
+    console.warn('[ComponentDocsPlugin] Node.js modules not available:', e);
+  }
+}
 
 // Centralized constants
 const DOCS_MOUNT_ID = 'atomic-docs-app';
 const DOCS_ROUTE_PREFIX = '/atomic-docs';
+
+// Function to load config from atomic-docs.config.js if it exists
+function loadConfigFile() {
+  if (!isNode || !fs || !path) {
+    console.log('[ComponentDocsPlugin] Config file loading skipped in browser environment');
+    return {};
+  }
+
+  try {
+    // Use dynamic import to load the config file from the consuming app's directory
+    const configPath = path.join(process.cwd(), 'atomic-docs.config.js');
+    if (fs.existsSync(configPath)) {
+      console.log(`[ComponentDocsPlugin] Loading configuration from ${configPath}`);
+      const config = require(configPath);
+      const rawConfig = config.default || config;
+
+      // Map manifest generator options to plugin options
+      const mappedConfig = { ...rawConfig };
+
+      // Map componentsDir to componentsDirName if not already set
+      if (rawConfig.componentsDir && !rawConfig.componentsDirName) {
+        mappedConfig.componentsDirName = rawConfig.pluginComponentsBaseName || 'components';
+      }
+
+      // Map examplesDir to examplesDirName if not already set
+      if (rawConfig.examplesDir && !rawConfig.examplesDirName) {
+        mappedConfig.examplesDirName = rawConfig.pluginExamplesBaseName || 'component-examples';
+      }
+
+      return mappedConfig;
+    }
+  } catch (error) {
+    console.warn(`[ComponentDocsPlugin] Error loading config file: ${error.message}`);
+  }
+  return {};
+}
 
 export function convertPathToExampleName(path: string): string {
   if (!path) return '';
@@ -56,13 +100,71 @@ function toggleElementDisplay(el: HTMLElement | null, show: boolean) {
 }
 
 const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
-  install(app: App, options: ComponentDocOptions = {
+  install(app: App, userOptions: ComponentDocOptions = {
     componentModules: {},
-    componentsDirName: "",
     exampleModules: {},
+    componentsDirName: "",
     examplesDirName: ""
   }) {
     try {
+      // Load options from config file
+      const fileOptions = loadConfigFile();
+
+      // Check for conflicting options and warn if found
+      if (Object.keys(fileOptions).length > 0 && Object.keys(userOptions).length > 0) {
+        const conflictingKeys = Object.keys(fileOptions).filter(key =>
+          key in userOptions && JSON.stringify(fileOptions[key]) !== JSON.stringify(userOptions[key])
+        );
+
+        if (conflictingKeys.length > 0) {
+          console.warn(
+            `[ComponentDocsPlugin] Warning: The following options are defined both in atomic-docs.config.js and plugin options: ${conflictingKeys.join(', ')}. ` +
+            `The explicitly provided options will take precedence.`
+          );
+        }
+      }
+
+      // Try to load component and example modules from the manifest if not provided
+      let manifestModules = {};
+      try {
+        // Determine the manifest path from fileOptions or use default
+        const manifestPath = fileOptions.output || 'src/atomic-docs-manifest.ts';
+
+        if (isNode && fs && path) {
+          const manifestFullPath = path.join(process.cwd(), manifestPath);
+
+          if (fs.existsSync(manifestFullPath)) {
+            console.log(`[ComponentDocsPlugin] Attempting to load modules from manifest: ${manifestFullPath}`);
+            // Dynamic import would be ideal, but require is more reliable in this context
+            const manifest = require(manifestFullPath);
+
+            if (manifest) {
+              manifestModules = {
+                componentModules: manifest.componentModules || {},
+                exampleModules: manifest.exampleModules || {},
+                rawComponentSourceModules: manifest.rawComponentSourceModules || {}
+              };
+              console.log(`[ComponentDocsPlugin] Successfully loaded modules from manifest`);
+            }
+          }
+        } else {
+          console.log('[ComponentDocsPlugin] Manifest loading skipped in browser environment');
+        }
+      } catch (error) {
+        console.warn(`[ComponentDocsPlugin] Could not load modules from manifest: ${error.message}`);
+      }
+
+      // Merge options, with precedence: defaults < manifest < fileOptions < userOptions
+      const options = {
+        componentModules: {},
+        componentsDirName: "",
+        exampleModules: {},
+        examplesDirName: "",
+        ...manifestModules,
+        ...fileOptions,
+        ...userOptions
+      };
+
       const {
         componentModules,
         componentsDirName,
@@ -79,9 +181,28 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
 
       if (!enableDocs) return;
 
-      // Validate required options
-      if (!componentModules || !exampleModules || !componentsDirName || !examplesDirName) {
-        console.error('Component docs plugin initialization failed: Missing required options.');
+      // Validate required options with detailed feedback
+      const missingOptions = [];
+      if (!componentModules || Object.keys(componentModules).length === 0) missingOptions.push('componentModules');
+      if (!exampleModules || Object.keys(exampleModules).length === 0) missingOptions.push('exampleModules');
+      if (!componentsDirName) missingOptions.push('componentsDirName');
+      if (!examplesDirName) missingOptions.push('examplesDirName');
+
+      if (missingOptions.length > 0) {
+        console.error(`[ComponentDocsPlugin] Initialization failed: Missing required options: ${missingOptions.join(', ')}.`);
+        console.error(`[ComponentDocsPlugin] To fix this issue:
+  1. Make sure atomic-docs.config.js exists in your project root
+  2. Run the manifest generator script to create the manifest file
+  3. Or provide these options explicitly when installing the plugin
+
+  Example atomic-docs.config.js:
+  module.exports = {
+    output: 'src/atomic-docs-manifest.ts',
+    componentsDir: 'src/components',
+    examplesDir: 'src/component-examples',
+    componentsDirName: 'components',
+    examplesDirName: 'component-examples'
+  }`);
         return;
       }
 
