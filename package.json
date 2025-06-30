@@ -31,7 +31,7 @@
     "test:coverage": "vitest run --coverage",
     "test:ui": "vitest --ui",
     "prepublishOnly": "npm run build",
-    "postinstall": "node scripts/create-config.js",
+    "postinstall": "node $INIT_CWD/node_modules/vue-atomic-docs/scripts/create-config.js",
     "release": "npm run release:patch",
     "release:patch": "npm version patch && npm publish",
     "release:minor": "npm version minor && npm publish",

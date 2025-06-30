@@ -7,8 +7,9 @@ const fs = require('fs');
 const path = require('path');
 
 // Get the root directory of the consuming app
-// When running from node_modules, process.cwd() will be the root of the consuming app
-const appRoot = process.cwd();
+// INIT_CWD is set by npm and points to the directory where npm was invoked
+// Fallback to process.cwd() if INIT_CWD is not available
+const appRoot = process.env.INIT_CWD || process.cwd();
 
 console.log(`Creating config file in app root: ${appRoot}`);
 
@@ -23,16 +24,16 @@ const defaultConfigContent = `// atomic-docs.config.js
 module.exports = {
   // Path to output the atomic-docs-manifest.ts file
   output: 'src/atomic-docs-manifest.ts',
-  
+
   // Path to the components directory
   componentsDir: 'src/components',
-  
+
   // Path to the examples directory
   examplesDir: 'src/component-examples',
-  
+
   // Base name for components in the plugin
   pluginComponentsBaseName: 'components',
-  
+
   // Base name for examples in the plugin
   pluginExamplesBaseName: 'component-examples'
 };
