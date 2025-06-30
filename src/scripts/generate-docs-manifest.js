@@ -32,7 +32,9 @@ function loadConfigFile() {
       console.log(`Loading configuration from ${configPath}`);
       // Use require to load the JS config file
       const config = require(configPath);
-      return config;
+      // Handle both CommonJS and ES module exports
+      // If it's an ES module with a default export, use that
+      return config.default || config;
     } catch (error) {
       console.error(`Error loading config file: ${error.message}`);
       return {};
