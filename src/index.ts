@@ -32,6 +32,7 @@ const DOCS_ROUTE_PREFIX = '/atomic-docs';
 
 // Function to load config from atomic-docs.config.js if it exists
 function loadConfigFile() {
+  console.log('[ComponentDocsPlugin] DEBUG: Starting loadConfigFile function');
   if (!isNode || !fs || !path) {
     console.log('[ComponentDocsPlugin] Config file loading skipped in browser environment');
     return {};
@@ -40,24 +41,33 @@ function loadConfigFile() {
   try {
     // Use dynamic import to load the config file from the consuming app's directory
     const configPath = path.join(process.cwd(), 'atomic-docs.config.js');
+    console.log(`[ComponentDocsPlugin] DEBUG: Looking for config at ${configPath}`);
+
     if (fs.existsSync(configPath)) {
       console.log(`[ComponentDocsPlugin] Loading configuration from ${configPath}`);
       const config = require(configPath);
+      console.log(`[ComponentDocsPlugin] DEBUG: Raw config loaded:`, config);
+
       const rawConfig = config.default || config;
+      console.log(`[ComponentDocsPlugin] DEBUG: Processed rawConfig:`, rawConfig);
 
       // Map manifest generator options to plugin options
       const mappedConfig = { ...rawConfig };
+      console.log(`[ComponentDocsPlugin] DEBUG: Initial mappedConfig:`, mappedConfig);
 
       // Map componentsDir to componentsDirName if not already set
       if (rawConfig.componentsDir && !rawConfig.componentsDirName) {
+        console.log(`[ComponentDocsPlugin] DEBUG: Mapping componentsDir to componentsDirName using pluginComponentsBaseName:`, rawConfig.pluginComponentsBaseName);
         mappedConfig.componentsDirName = rawConfig.pluginComponentsBaseName || 'components';
       }
 
       // Map examplesDir to examplesDirName if not already set
       if (rawConfig.examplesDir && !rawConfig.examplesDirName) {
+        console.log(`[ComponentDocsPlugin] DEBUG: Mapping examplesDir to examplesDirName using pluginExamplesBaseName:`, rawConfig.pluginExamplesBaseName);
         mappedConfig.examplesDirName = rawConfig.pluginExamplesBaseName || 'component-examples';
       }
 
+      console.log(`[ComponentDocsPlugin] DEBUG: Final mappedConfig:`, mappedConfig);
       return mappedConfig;
     }
   } catch (error) {
@@ -106,9 +116,14 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
     componentsDirName: "",
     examplesDirName: ""
   }) {
+    console.log('[ComponentDocsPlugin] DEBUG: Starting plugin installation');
+    console.log('[ComponentDocsPlugin] DEBUG: User options provided:', userOptions);
+
     try {
       // Load options from config file
+      console.log('[ComponentDocsPlugin] DEBUG: Loading options from config file');
       const fileOptions = loadConfigFile();
+      console.log('[ComponentDocsPlugin] DEBUG: File options loaded:', fileOptions);
 
       // Check for conflicting options and warn if found
       if (Object.keys(fileOptions).length > 0 && Object.keys(userOptions).length > 0) {
@@ -125,36 +140,67 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
       }
 
       // Try to load component and example modules from the manifest if not provided
+      console.log('[ComponentDocsPlugin] DEBUG: Attempting to load modules from manifest');
       let manifestModules = {};
       try {
         // Determine the manifest path from fileOptions or use default
         const manifestPath = fileOptions.output || 'src/atomic-docs-manifest.ts';
+        console.log(`[ComponentDocsPlugin] DEBUG: Manifest path from config: ${manifestPath}`);
 
         if (isNode && fs && path) {
           const manifestFullPath = path.join(process.cwd(), manifestPath);
+          console.log(`[ComponentDocsPlugin] DEBUG: Full manifest path: ${manifestFullPath}`);
 
+          console.log(`[ComponentDocsPlugin] DEBUG: Checking if manifest exists at: ${manifestFullPath}`);
           if (fs.existsSync(manifestFullPath)) {
             console.log(`[ComponentDocsPlugin] Attempting to load modules from manifest: ${manifestFullPath}`);
             // Dynamic import would be ideal, but require is more reliable in this context
-            const manifest = require(manifestFullPath);
+            try {
+              console.log(`[ComponentDocsPlugin] DEBUG: Requiring manifest file`);
+              const manifest = require(manifestFullPath);
+              console.log(`[ComponentDocsPlugin] DEBUG: Manifest loaded:`, manifest);
 
-            if (manifest) {
-              manifestModules = {
-                componentModules: manifest.componentModules || {},
-                exampleModules: manifest.exampleModules || {},
-                rawComponentSourceModules: manifest.rawComponentSourceModules || {}
-              };
-              console.log(`[ComponentDocsPlugin] Successfully loaded modules from manifest`);
+              if (manifest) {
+                console.log(`[ComponentDocsPlugin] DEBUG: Extracting modules from manifest`);
+                console.log(`[ComponentDocsPlugin] DEBUG: Component modules in manifest:`, Object.keys(manifest.componentModules || {}).length);
+                console.log(`[ComponentDocsPlugin] DEBUG: Example modules in manifest:`, Object.keys(manifest.exampleModules || {}).length);
+
+                manifestModules = {
+                  componentModules: manifest.componentModules || {},
+                  exampleModules: manifest.exampleModules || {},
+                  rawComponentSourceModules: manifest.rawComponentSourceModules || {}
+                };
+                console.log(`[ComponentDocsPlugin] Successfully loaded modules from manifest`);
+              } else {
+                console.warn(`[ComponentDocsPlugin] DEBUG: Manifest file exists but content is invalid or empty`);
+              }
+            } catch (requireError) {
+              console.error(`[ComponentDocsPlugin] DEBUG: Error requiring manifest file: ${requireError.message}`);
+              throw requireError;
             }
+          } else {
+            console.warn(`[ComponentDocsPlugin] DEBUG: Manifest file does not exist at ${manifestFullPath}`);
           }
         } else {
           console.log('[ComponentDocsPlugin] Manifest loading skipped in browser environment');
         }
       } catch (error) {
         console.warn(`[ComponentDocsPlugin] Could not load modules from manifest: ${error.message}`);
+        console.error(`[ComponentDocsPlugin] DEBUG: Full error:`, error);
       }
 
       // Merge options, with precedence: defaults < manifest < fileOptions < userOptions
+      console.log('[ComponentDocsPlugin] DEBUG: Merging options from different sources');
+      console.log('[ComponentDocsPlugin] DEBUG: Default options:', {
+        componentModules: {},
+        componentsDirName: "",
+        exampleModules: {},
+        examplesDirName: ""
+      });
+      console.log('[ComponentDocsPlugin] DEBUG: Manifest modules:', manifestModules);
+      console.log('[ComponentDocsPlugin] DEBUG: File options:', fileOptions);
+      console.log('[ComponentDocsPlugin] DEBUG: User options:', userOptions);
+
       const options = {
         componentModules: {},
         componentsDirName: "",
@@ -164,6 +210,8 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
         ...fileOptions,
         ...userOptions
       };
+
+      console.log('[ComponentDocsPlugin] DEBUG: Final merged options:', options);
 
       const {
         componentModules,
@@ -179,16 +227,44 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
         history: customHistory,
       } = options;
 
-      if (!enableDocs) return;
+      console.log('[ComponentDocsPlugin] DEBUG: Destructured options:');
+      console.log('[ComponentDocsPlugin] DEBUG: componentModules:', componentModules ? Object.keys(componentModules).length : 'undefined');
+      console.log('[ComponentDocsPlugin] DEBUG: componentsDirName:', componentsDirName);
+      console.log('[ComponentDocsPlugin] DEBUG: exampleModules:', exampleModules ? Object.keys(exampleModules).length : 'undefined');
+      console.log('[ComponentDocsPlugin] DEBUG: examplesDirName:', examplesDirName);
+      console.log('[ComponentDocsPlugin] DEBUG: enableDocs:', enableDocs);
+
+      if (!enableDocs) {
+        console.log('[ComponentDocsPlugin] DEBUG: enableDocs is false, exiting installation');
+        return;
+      }
 
       // Validate required options with detailed feedback
+      console.log('[ComponentDocsPlugin] DEBUG: Validating required options');
       const missingOptions = [];
-      if (!componentModules || Object.keys(componentModules).length === 0) missingOptions.push('componentModules');
-      if (!exampleModules || Object.keys(exampleModules).length === 0) missingOptions.push('exampleModules');
-      if (!componentsDirName) missingOptions.push('componentsDirName');
-      if (!examplesDirName) missingOptions.push('examplesDirName');
+
+      if (!componentModules || Object.keys(componentModules).length === 0) {
+        console.log('[ComponentDocsPlugin] DEBUG: Missing componentModules');
+        missingOptions.push('componentModules');
+      }
+
+      if (!exampleModules || Object.keys(exampleModules).length === 0) {
+        console.log('[ComponentDocsPlugin] DEBUG: Missing exampleModules');
+        missingOptions.push('exampleModules');
+      }
+
+      if (!componentsDirName) {
+        console.log('[ComponentDocsPlugin] DEBUG: Missing componentsDirName');
+        missingOptions.push('componentsDirName');
+      }
+
+      if (!examplesDirName) {
+        console.log('[ComponentDocsPlugin] DEBUG: Missing examplesDirName');
+        missingOptions.push('examplesDirName');
+      }
 
       if (missingOptions.length > 0) {
+        console.log(`[ComponentDocsPlugin] DEBUG: Missing options detected: ${missingOptions.join(', ')}`);
         console.error(`[ComponentDocsPlugin] Initialization failed: Missing required options: ${missingOptions.join(', ')}.`);
         console.error(`[ComponentDocsPlugin] To fix this issue:
   1. Make sure atomic-docs.config.js exists in your project root
@@ -205,6 +281,8 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
   }`);
         return;
       }
+
+      console.log('[ComponentDocsPlugin] DEBUG: All required options are present, continuing initialization');
 
       const plugin: ComponentDocPlugin = {
         convertPathToExampleName,
@@ -332,7 +410,15 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
       toggleDocs(false);
 
     } catch (error) {
-      console.error('Component docs plugin failed to initialize:', error);
+      console.error('[ComponentDocsPlugin] ERROR: Plugin failed to initialize:', error);
+      console.error('[ComponentDocsPlugin] DEBUG: Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
+      console.error('[ComponentDocsPlugin] DEBUG: If the error is related to missing options, make sure your atomic-docs.config.js has the correct property names:');
+      console.error('[ComponentDocsPlugin] DEBUG: - componentsDirName (not pluginComponentsBaseName)');
+      console.error('[ComponentDocsPlugin] DEBUG: - examplesDirName (not pluginExamplesBaseName)');
     }
   }
 };
