@@ -9,7 +9,13 @@ import { createRouter, createWebHistory } from 'vue-router';
 import './styles';
 
 // Import the manifest data
-import { components, exampleComponents, componentModules, rawComponentSourceModules, exampleModules } from './atomic-docs-manifest';
+import {
+  components,
+  exampleComponents,
+  componentModules as importedComponentModules,
+  rawComponentSourceModules as importedRawComponentSourceModules,
+  exampleModules as importedExampleModules
+} from './atomic-docs-manifest';
 
 // Import the config file
 let configOptions = {};
@@ -69,26 +75,30 @@ function toggleElementDisplay(el: HTMLElement | null, show: boolean) {
 }
 
 const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
-  install(app: App, options: ComponentDocOptions = {}) {
+  install(app: App, options: Partial<ComponentDocOptions> = {}) {
     try {
-      // Merge provided options with config file options and manifest data
+      // Merge provided options with config file options
       const mergedOptions: ComponentDocOptions = {
         // Default values
-        componentModules: {},
         componentsDirName: "components",
-        exampleModules: {},
         examplesDirName: "component-examples",
+        componentModules: {},
+        exampleModules: {},
+        rawComponentSourceModules: {},
 
         // Values from config file
         ...configOptions,
 
-        // Values from manifest
-        componentModules: componentModules || {},
-        exampleModules: exampleModules || {},
-        rawComponentSourceModules: rawComponentSourceModules || {},
-
         // User-provided options (highest priority)
         ...options
+      };
+
+      // Use the imported values from the manifest
+      const finalOptions = {
+        ...mergedOptions,
+        componentModules: importedComponentModules,
+        exampleModules: importedExampleModules,
+        rawComponentSourceModules: importedRawComponentSourceModules
       };
 
       const {
@@ -103,7 +113,7 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
         globalComponents,
         autoRegisterComponents,
         history: customHistory,
-      } = mergedOptions;
+      } = finalOptions;
 
       if (!enableDocs) return;
 
@@ -120,7 +130,7 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
         examplesDirName,
         exampleModules,
         rawComponentSourceModules,
-        options
+        options: finalOptions as ComponentDocOptions
       };
 
       // Provide plugin to main app intentionally
