@@ -66,16 +66,33 @@ if (fs.existsSync(packageJsonPath)) {
       packageJson.scripts = {};
     }
 
+    // Flag to track if we need to write the package.json
+    let needsUpdate = false;
+
     // Check if the generate-docs-manifest script already exists
     if (!packageJson.scripts['generate-docs-manifest']) {
       // Add the script
       packageJson.scripts['generate-docs-manifest'] = 'node ./node_modules/vue-atomic-docs/src/scripts/generate-docs-manifest.js';
-
-      // Write the updated package.json back to disk
-      fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+      needsUpdate = true;
       console.log(`✅ Added generate-docs-manifest script to package.json`);
     } else {
       console.log(`generate-docs-manifest script already exists in package.json`);
+    }
+
+    // Check if the start-docs-server script already exists
+    if (!packageJson.scripts['start-docs-server']) {
+      // Add the script
+      packageJson.scripts['start-docs-server'] = 'node ./node_modules/vue-atomic-docs/server.js';
+      needsUpdate = true;
+      console.log(`✅ Added start-docs-server script to package.json`);
+    } else {
+      console.log(`start-docs-server script already exists in package.json`);
+    }
+
+    // Write the updated package.json back to disk if needed
+    if (needsUpdate) {
+      fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+      console.log(`✅ Updated package.json with new scripts`);
     }
   } catch (error) {
     console.error(`❌ Error updating package.json: ${error.message}`);

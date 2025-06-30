@@ -19,7 +19,8 @@
     "src/types.ts",
     "src/components",
     "src/scripts/generate-docs-manifest.js",
-    "scripts/create-config.js"
+    "scripts/create-config.js",
+    "server.js"
   ],
   "scripts": {
     "dev": "vite",
@@ -31,7 +32,7 @@
     "test:coverage": "vitest run --coverage",
     "test:ui": "vitest --ui",
     "prepublishOnly": "npm run build",
-    "postinstall": "node $INIT_CWD/node_modules/vue-atomic-docs/scripts/create-config.js",
+    "postinstall": "node ./scripts/create-config.js",
     "release": "npm run release:patch",
     "release:patch": "npm version patch && npm publish",
     "release:minor": "npm version minor && npm publish",
@@ -39,7 +40,8 @@
     "release:next": "npm version prepatch --preid=next && npm publish --tag next",
     "release:alpha": "npm version prerelease --preid=alpha && npm publish --tag alpha",
     "postrelease": "git push && git push --tags",
-    "generate-docs-manifest": "node src/scripts/generate-docs-manifest.js"
+    "generate-docs-manifest": "node src/scripts/generate-docs-manifest.js",
+    "start-server": "node server.js"
   },
   "peerDependencies": {
     "vue": "^3.2.0",
@@ -53,7 +55,9 @@
   "dependencies": {
     "glob": "^11.0.3",
     "markdown-it": "^14.1.0",
-    "prismjs": "^1.30.0"
+    "prismjs": "^1.30.0",
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
   },
   "devDependencies": {
     "@testing-library/vue": "^8.1.0",

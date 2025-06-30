@@ -193,6 +193,13 @@ export const exampleModules: Record<string, () => Promise<any>> = exampleCompone
 
   fs.writeFileSync(manifestOutputPath, manifestContent);
   console.log(`✅ Docs manifest generated successfully at ${manifestOutputPath}`);
+  return { manifestPath: manifestOutputPath };
 }
 
-generateDocsManifest().catch(console.error);
+// If this file is being run directly, execute the function
+if (require.main === module) {
+  generateDocsManifest().catch(console.error);
+}
+
+// Export the function for use in other modules
+module.exports = { generateDocsManifest };

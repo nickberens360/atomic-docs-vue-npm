@@ -31,11 +31,25 @@ const DOCS_MOUNT_ID = 'atomic-docs-app';
 const DOCS_ROUTE_PREFIX = '/atomic-docs';
 
 // Function to load config from atomic-docs.config.js if it exists
-function loadConfigFile() {
+async function loadConfigFile() {
   console.log('[ComponentDocsPlugin] DEBUG: Starting loadConfigFile function');
+
+  // If we're in a browser environment, try to fetch config from the API
   if (!isNode || !fs || !path) {
-    console.log('[ComponentDocsPlugin] Config file loading skipped in browser environment');
-    return {};
+    console.log('[ComponentDocsPlugin] Attempting to load config from API in browser environment');
+    try {
+      const response = await fetch('http://localhost:3000/api/atomic-docs/config');
+      if (!response.ok) {
+        throw new Error(`API responded with status: ${response.status}`);
+      }
+      const config = await response.json();
+      console.log('[ComponentDocsPlugin] Successfully loaded config from API:', config);
+      return config;
+    } catch (error) {
+      console.warn(`[ComponentDocsPlugin] Error loading config from API: ${error.message}`);
+      console.log('[ComponentDocsPlugin] Config file loading skipped in browser environment');
+      return {};
+    }
   }
 
   try {
@@ -110,7 +124,7 @@ function toggleElementDisplay(el: HTMLElement | null, show: boolean) {
 }
 
 const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
-  install(app: App, userOptions: ComponentDocOptions = {
+  async install(app: App, userOptions: ComponentDocOptions = {
     componentModules: {},
     exampleModules: {},
     componentsDirName: "",
@@ -122,7 +136,7 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
     try {
       // Load options from config file
       console.log('[ComponentDocsPlugin] DEBUG: Loading options from config file');
-      const fileOptions = loadConfigFile();
+      const fileOptions = await loadConfigFile();
       console.log('[ComponentDocsPlugin] DEBUG: File options loaded:', fileOptions);
 
       // Check for conflicting options and warn if found
@@ -182,7 +196,48 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
             console.warn(`[ComponentDocsPlugin] DEBUG: Manifest file does not exist at ${manifestFullPath}`);
           }
         } else {
-          console.log('[ComponentDocsPlugin] Manifest loading skipped in browser environment');
+          // In browser environment, try to fetch manifest modules from API
+          console.log('[ComponentDocsPlugin] Attempting to load manifest modules from API in browser environment');
+          try {
+            const response = await fetch('http://localhost:3000/api/atomic-docs/manifest-modules');
+            if (!response.ok) {
+              throw new Error(`API responded with status: ${response.status}`);
+            }
+            const data = await response.json();
+
+            if (data.success && data.modules) {
+              console.log('[ComponentDocsPlugin] Successfully loaded manifest modules from API');
+
+              // Convert the module strings to actual functions
+              const convertModulesToFunctions = (modules: Record<string, string>) => {
+                const result: Record<string, () => Promise<any>> = {};
+                for (const [key, value] of Object.entries(modules)) {
+                  // Create a function from the string representation
+                  // This is a simplified approach - in a real implementation, you might want to
+                  // use a more secure method to evaluate the code
+                  try {
+                    // Use Function constructor to create a function from the string
+                    result[key] = new Function(`return ${value}`)() as () => Promise<any>;
+                  } catch (error) {
+                    console.warn(`[ComponentDocsPlugin] Error converting module to function: ${error.message}`);
+                  }
+                }
+                return result;
+              };
+
+              manifestModules = {
+                componentModules: convertModulesToFunctions(data.modules.componentModules),
+                exampleModules: convertModulesToFunctions(data.modules.exampleModules),
+                rawComponentSourceModules: convertModulesToFunctions(data.modules.rawComponentSourceModules)
+              };
+
+              console.log('[ComponentDocsPlugin] Successfully converted manifest modules to functions');
+            } else {
+              console.warn('[ComponentDocsPlugin] API returned unsuccessful response or missing modules');
+            }
+          } catch (fetchError) {
+            console.warn(`[ComponentDocsPlugin] Error fetching manifest modules from API: ${fetchError.message}`);
+          }
         }
       } catch (error) {
         console.warn(`[ComponentDocsPlugin] Could not load modules from manifest: ${error.message}`);
