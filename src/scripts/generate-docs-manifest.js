@@ -23,6 +23,25 @@ function parseArgs() {
   return args;
 }
 
+// Function to load config from atomic-docs.config.js if it exists
+function loadConfigFile() {
+  const configPath = path.join(process.cwd(), 'atomic-docs.config.js');
+
+  if (fs.existsSync(configPath)) {
+    try {
+      console.log(`Loading configuration from ${configPath}`);
+      // Use require to load the JS config file
+      const config = require(configPath);
+      return config;
+    } catch (error) {
+      console.error(`Error loading config file: ${error.message}`);
+      return {};
+    }
+  }
+
+  return {};
+}
+
 // Available arguments:
 // --output: Path to output the atomic-docs-manifest.ts file (default: src/atomic-docs-manifest.ts in the current working directory)
 // --componentsDir: Path to the components directory (default: src/components)
@@ -30,7 +49,14 @@ function parseArgs() {
 // --pluginComponentsBaseName: Base name for components in the plugin (default: components)
 // --pluginExamplesBaseName: Base name for examples in the plugin (default: component-examples)
 
-const args = parseArgs();
+// Parse command line arguments
+const cliArgs = parseArgs();
+
+// Load config from file
+const fileConfig = loadConfigFile();
+
+// Merge configurations, with CLI args taking precedence
+const args = { ...fileConfig, ...cliArgs };
 
 // Default values:
 // 1. projectRoot: Defaults to the current working directory (where npm run is executed)
