@@ -19,6 +19,14 @@
     "src/types.ts",
     "src/components"
   ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/vue-atomic-docs.es.js",
+      "require": "./dist/vue-atomic-docs.umd.js"
+    },
+    "./package.json": "./package.json"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build && tsc --emitDeclarationOnly --declarationDir dist --project tsconfig.build.json --rootDir .",
