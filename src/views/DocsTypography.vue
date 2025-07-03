@@ -434,6 +434,8 @@ watch(typographyData, (newData) => {
   display: unset;
   margin: 0;
   padding: 0;
+  min-width: unset;
+  width: unset;
 }
 
 .atomic-docs-details-list {
