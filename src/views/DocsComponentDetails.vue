@@ -15,7 +15,6 @@
       <Component
         :is="currentComponent"
       />
-      <!--        :relative-path="props.relativePath"-->
       <template #fallback>
         Loading...
       </template>
@@ -24,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject } from 'vue';
+import { computed, inject, reactive } from 'vue'; // Added 'reactive'
 import DocsComponentNotDocumented from '../components/DocsComponentNotDocumented.vue';
 import { ComponentDocPlugin } from '../types';
 
@@ -42,9 +41,9 @@ interface Props {
   componentName: string;
 }
 const componentDocPlugin = inject('componentDocPlugin') as ComponentDocPlugin;
-const exampleComponents: Record<string, ExampleComponent> = {};
 
-// --- Start of Changes ---
+// Changed to a reactive object
+const exampleComponents = reactive<Record<string, ExampleComponent>>({});
 
 const examplesDirName = componentDocPlugin?.examplesDirName;
 const exampleModules = componentDocPlugin?.exampleModules;
@@ -69,8 +68,6 @@ if (exampleModules && examplesDirName) {
   await Promise.all(importComponentPromises);
 }
 
-// --- End of Changes ---
-
 const props = defineProps<Props>();
 
 const componentName = computed<string>(() => {
@@ -87,8 +84,6 @@ const currentComponent = computed<ComponentType>(() => {
   }
 });
 </script>
-
-
 
 <style lang="scss" scoped>
 

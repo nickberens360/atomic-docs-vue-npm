@@ -46,13 +46,7 @@
 </template>
 
 <script setup lang="ts">
-interface Header {
-  title: string;
-  key: string;
-  align?: 'start' | 'center' | 'end';
-  sortable?: boolean;
-  width?: string | number;
-}
+import { Header } from './tableTypes';
 
 interface Props {
   headers: Header[];

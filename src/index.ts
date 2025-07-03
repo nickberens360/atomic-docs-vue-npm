@@ -96,12 +96,13 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
       });
 
       if (plugins?.length) {
-        plugins.forEach(p => docsApp.use(p));
+        plugins.forEach((p: Plugin) => docsApp.use(p));
       }
+
 
       if (globalComponents) {
         Object.entries(globalComponents).forEach(([name, component]) => {
-          docsApp.component(name, component);
+          docsApp.component(name, component as Component);
         });
       }
 
@@ -112,7 +113,7 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
             !['RouterLink', 'RouterView', 'ExampleComponentUsage'].includes(name) &&
             !docsApp._context.components[name]
           ) {
-            docsApp.component(name, component);
+            docsApp.component(name, component as Component);
           }
         });
       }
