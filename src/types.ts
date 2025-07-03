@@ -45,7 +45,7 @@ export interface DocColor {
   color: string;
 }
 
-class DocTypography {
+export class DocTypography {
   name: string;
   fontFamily: string;
   fontSize: string;
