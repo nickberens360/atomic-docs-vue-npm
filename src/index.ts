@@ -3,8 +3,8 @@
 import { App, Plugin, Component, createApp } from 'vue';
 import ExampleComponent from './components/DocsExampleComponent.vue';
 import DocsComponentIndex from './views/DocsComponentIndex.vue';
-import { ComponentDocPlugin, ComponentDocOptions } from './types';
-import routesConfig from './routes';
+import { ComponentDocPlugin, ComponentDocOptions } from './types.ts';
+import routesConfig from './routes.ts';
 import { createRouter, createWebHistory } from 'vue-router';
 import './styles';
 
@@ -215,4 +215,4 @@ export { default as DocsChip } from './components/DocsChip.vue';
 export { default as DocsTabs } from './components/DocsTabs.vue';
 export { default as DocsColors } from './components/DocsColors.vue';
 export { default as DocsMarkdown } from './components/DocsMarkdown.vue';
-export { atomicDocsVitePlugin } from './vitePlugin';
+export { atomicDocsVitePlugin } from './vitePlugin.ts';
