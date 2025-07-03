@@ -332,18 +332,25 @@ const groupedExtractedColors = computed(() => {
 .atomic-docs-color-card:hover .atomic-docs-color-copy-btn {
   opacity: 1;
 }
-
+.atomic-docs-colors-group {
+  border: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.12));
+  //padding: var(--atomic-docs-spacing-md, 16px);
+  padding: 0;
+  border-radius: var(--atomic-docs-border-radius-md, 8px);
+  margin-bottom: var(--atomic-docs-spacing-lg, 24px);
+}
 .atomic-docs-colors-grid {
   margin-bottom: var(--atomic-docs-spacing-lg, 24px);
-  border: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.12));
-  padding: var(--atomic-docs-spacing-md, 16px);
-  border-radius: var(--atomic-docs-border-radius-md, 8px);
+  padding: 0 var(--atomic-docs-spacing-md, 24px)
 }
 
 .atomic-docs-colors-group-title {
   font-size: 1.1em;
   font-weight: 600;
-  margin-bottom: var(--atomic-docs-spacing-sm, 8px);
+  margin-bottom: var(--atomic-docs-spacing-md, 8px);
   color: var(--atomic-docs-primary-color, #1976d2);
+  background-color: var(--atomic-docs-surface-color, #f5f5f5);
+  padding: var(--atomic-docs-spacing-xs, 4px) var(--atomic-docs-spacing-md, 16px);
+  border-radius: var(--atomic-docs-border-radius-sm, 4px);
 }
 </style>
