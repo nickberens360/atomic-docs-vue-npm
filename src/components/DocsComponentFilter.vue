@@ -50,7 +50,7 @@
             'no-background': props.backgroundColor === false,
             'atomic-docs-menu--flat': props.flat
           }"
-          :style="props.backgroundColor !== false ? { backgroundColor: mappedBackgroundColor } : {}"
+          :style="props.backgroundColor !== false ? { backgroundColor: mappedBackgroundColor as string } : {}"
         >
           <DocsComponentNavigation
             :filter-text="filterText"

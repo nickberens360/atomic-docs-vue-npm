@@ -9,9 +9,8 @@
   setup
   lang="ts"
 >
-import { computed, onMounted, createApp, h, inject, ref } from 'vue'; // Removed watch, onUnmounted
+import { computed, onMounted, createApp, h, inject, ref, type Ref } from 'vue'; // Removed watch, onUnmounted
 import MarkdownIt from 'markdown-it';
-import type { Renderer, Token } from 'markdown-it';
 // Import Prism.js
 import Prism from 'prismjs';
 // Removed 'initPrismTheme' import as it's no longer used
@@ -42,7 +41,7 @@ const markdownItPrism = (md: MarkdownIt) => {
     }
 
     // Fall back to original highlight function if available
-    return highlight ? highlight(str, lang, {}) : str;
+    return highlight ? highlight(str, lang, '') : str;
   };
 };
 
@@ -57,7 +56,7 @@ markdownItPrism(md);
 
 // Customize the renderer to add copy buttons to code blocks
 const originalFence = md.renderer.rules.fence!;
-md.renderer.rules.fence = (tokens: Token[], idx: number, options: MarkdownIt.Options, env: any, slf: Renderer) => {
+md.renderer.rules.fence = (tokens: any[], idx: number, options: any, env: any, slf: any) => {
   const token = tokens[idx];
   const code = token.content.trim();
   const language = token.info || '';

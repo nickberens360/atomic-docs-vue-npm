@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref } from 'vue'; // Removed watch, onUnmounted
+import { computed, inject, ref, type Ref } from 'vue'; // Removed watch, onUnmounted
 // Import Prism.js
 import Prism from 'prismjs';
 // Import Vue language support
@@ -31,7 +31,7 @@ const props = defineProps({
   language: {
     type: String,
     default: 'markup',
-    validator: (value) => ['markup', 'javascript', 'css', 'vue'].includes(value)
+    validator: (value: any) => ['markup', 'javascript', 'css', 'vue'].includes(value)
   }
 });
 
