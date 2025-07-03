@@ -4,6 +4,7 @@
   "description": "A Vue plugin to automatically generate documentation for your components.",
   "author": "Nick Berens nickberens360@gmail.com",
   "license": "MIT",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nickberens360/atomic-docs-vue-npm.git"
