@@ -4,7 +4,7 @@ declare module './DocsDataTable.vue' {
 
   const component: DefineComponent<{
     headers: Header[];
-    items: any[];
+    items: Record<string, any>[];
     hideDefaultFooter?: boolean;
     mobileBreakpoint?: string;
   }>;
