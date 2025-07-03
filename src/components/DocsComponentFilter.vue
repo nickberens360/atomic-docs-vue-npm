@@ -39,7 +39,10 @@
         </div>
       </div>
 
-      <div class="atomic-docs-menu-container">
+      <div
+        v-if="props.asMenu"
+        class="atomic-docs-menu-container"
+      >
         <div
           v-show="isMenuOpen"
           class="atomic-docs-menu"
@@ -57,15 +60,26 @@
           />
         </div>
       </div>
+      <DocsComponentNavigation
+        v-else
+        :filter-text="filterText"
+        :on-nav-click="handleNavClick"
+        :force-expand-all="Boolean(filterText)"
+        bg-color="surface"
+      />
+
     </div>
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
-import { useRouter } from "vue-router";
+<script
+  setup
+  lang="ts"
+>
+import {ref, computed, onMounted, onBeforeUnmount} from 'vue';
+import {useRouter} from "vue-router";
 import DocsComponentNavigation from "@/components/DocsComponentNavigation.vue";
-import { ComponentItem } from '../types';
+import {ComponentItem} from '../types';
 
 // Define props
 interface Props {
@@ -76,6 +90,7 @@ interface Props {
   inputBgColor?: 'background' | 'surface' | 'surface-dark' | false;
   closeOnClick?: boolean;
   inputSize?: 'sm' | 'md' | 'lg';
+  asMenu?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -85,7 +100,8 @@ const props = withDefaults(defineProps<Props>(), {
   inputVariant: 'filled',
   inputBgColor: 'background',
   closeOnClick: false,
-  inputSize: 'md'
+  inputSize: 'md',
+  asMenu: true
 });
 
 // Computed properties to map color values to CSS variables
@@ -113,8 +129,8 @@ const componentRef = ref<HTMLElement | null>(null);
 function handleNavClick(arg: ComponentItem): void {
   router.push({
     name: 'componentDoc' as any,
-    params: { componentName: arg.exampleComponent },
-    query: { relativePath: arg.relativePath }
+    params: {componentName: arg.exampleComponent},
+    query: {relativePath: arg.relativePath}
   });
   // Only close the menu if persistOpen is false AND closeOnClick is true
   if (!props.persistOpen && props.closeOnClick) {
@@ -156,7 +172,10 @@ onBeforeUnmount(() => {
 });
 </script>
 
-<style scoped lang="scss">
+<style
+  scoped
+  lang="scss"
+>
 .atomic-docs-search-container {
   position: relative;
   //margin-right: 16px;
