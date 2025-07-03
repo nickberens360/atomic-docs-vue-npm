@@ -7,17 +7,15 @@
       These are the colors defined in your design system.
     </p>
 
-    <!-- Search input -->
     <div class="atomic-docs-colors-search">
       <input
-        type="text"
         v-model="searchTerm"
+        type="text"
         placeholder="Search by variable name..."
         class="atomic-docs-colors-search-input"
       />
     </div>
 
-    <!-- User-defined colors section -->
     <div v-if="filteredConfigColors.length > 0" class="atomic-docs-colors-section">
       <h3 class="atomic-docs-colors-section-title">User-Defined Colors</h3>
       <div class="atomic-docs-colors-grid">
@@ -52,38 +50,44 @@
       </div>
     </div>
 
-    <!-- Automatically extracted colors section -->
-    <div v-if="isUsingExtractedColors && filteredExtractedColors.length > 0" class="atomic-docs-colors-section">
+    <div v-if="isUsingExtractedColors && Object.keys(groupedExtractedColors).length > 0" class="atomic-docs-colors-section">
       <h3 class="atomic-docs-colors-section-title">Automatically Extracted Colors</h3>
       <p class="atomic-docs-colors-note">
         <em>Note: These colors are automatically extracted from CSS variables in your application.</em>
       </p>
-      <div class="atomic-docs-colors-grid">
-        <div
-          v-for="(colorItem, index) in filteredExtractedColors"
-          :key="'extracted-' + index"
-          class="atomic-docs-color-card"
-        >
+      <div
+        v-for="(colorItems, prefix) in groupedExtractedColors"
+        :key="prefix"
+        class="atomic-docs-colors-group"
+      >
+        <h4 class="atomic-docs-colors-group-title">{{ prefix }}</h4>
+        <div class="atomic-docs-colors-grid">
           <div
-            class="atomic-docs-color-preview"
-            :style="{ backgroundColor: colorItem.color }"
-          />
-          <div class="atomic-docs-color-info">
-            <div class="atomic-docs-color-name">
-              {{ colorItem.name }}
-              <DocsCopyToClipboard
-                :text="colorItem.name"
-                title="Copy variable name"
-                class="atomic-docs-color-copy-btn"
-              />
-            </div>
-            <div class="atomic-docs-color-value">
-              {{ colorItem.color }}
-              <DocsCopyToClipboard
-                :text="colorItem.color"
-                title="Copy color value"
-                class="atomic-docs-color-copy-btn"
-              />
+            v-for="(colorItem, index) in colorItems"
+            :key="'extracted-' + index"
+            class="atomic-docs-color-card"
+          >
+            <div
+              class="atomic-docs-color-preview"
+              :style="{ backgroundColor: colorItem.color }"
+            />
+            <div class="atomic-docs-color-info">
+              <div class="atomic-docs-color-name">
+                {{ colorItem.name }}
+                <DocsCopyToClipboard
+                  :text="colorItem.name"
+                  title="Copy variable name"
+                  class="atomic-docs-color-copy-btn"
+                />
+              </div>
+              <div class="atomic-docs-color-value">
+                {{ colorItem.color }}
+                <DocsCopyToClipboard
+                  :text="colorItem.color"
+                  title="Copy color value"
+                  class="atomic-docs-color-copy-btn"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -188,6 +192,29 @@ const filteredExtractedColors = computed(() => {
   return filtered.sort((a, b) => a.name.localeCompare(b.name));
 });
 
+const groupedExtractedColors = computed(() => {
+  const groups: Record<string, { name: string; color: string }[]> = {};
+  const filtered = filteredExtractedColors.value;
+
+  filtered.forEach((colorItem) => {
+    // Extract prefix from CSS variable name (e.g., '--vp-c-' from '--vp-c-brand')
+    const match = colorItem.name.match(/^(--[^-_]+[-_]?)/);
+    const prefix = match ? match[1] : 'other';
+
+    if (!groups[prefix]) {
+      groups[prefix] = [];
+    }
+    groups[prefix].push(colorItem);
+  });
+
+  // Optional: Sort groups by prefix
+  const sortedGroups: Record<string, { name: string; color: string }[]> = {};
+  Object.keys(groups).sort().forEach(key => {
+    sortedGroups[key] = groups[key];
+  });
+
+  return sortedGroups;
+});
 </script>
 
 <style scoped lang="scss">
@@ -305,5 +332,16 @@ const filteredExtractedColors = computed(() => {
 
 .atomic-docs-color-card:hover .atomic-docs-color-copy-btn {
   opacity: 1;
+}
+
+.atomic-docs-colors-group {
+  margin-bottom: var(--atomic-docs-spacing-lg, 24px);
+}
+
+.atomic-docs-colors-group-title {
+  font-size: 1.1em;
+  font-weight: 600;
+  margin-bottom: var(--atomic-docs-spacing-sm, 8px);
+  color: var(--atomic-docs-primary-color, #1976d2);
 }
 </style>
