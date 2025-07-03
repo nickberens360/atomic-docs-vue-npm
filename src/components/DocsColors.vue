@@ -52,9 +52,7 @@
 
     <div v-if="isUsingExtractedColors && Object.keys(groupedExtractedColors).length > 0" class="atomic-docs-colors-section">
       <h3 class="atomic-docs-colors-section-title">Automatically Extracted Colors</h3>
-      <p class="atomic-docs-colors-note">
-        <em>Note: These colors are automatically extracted from CSS variables in your application.</em>
-      </p>
+      <DocsNote content="These colors are automatically extracted from your CSS variables. They may not be defined in your design system but are present in your stylesheets." />
       <div
         v-for="(colorItems, prefix) in groupedExtractedColors"
         :key="prefix"
@@ -101,6 +99,7 @@ import { inject, computed, onUnmounted, ref } from 'vue';
 import { ComponentDocPlugin } from '../types';
 import { useExtractedColors } from '../utils/colorExtractor';
 import DocsCopyToClipboard from './DocsCopyToClipboard.vue';
+import DocsNote from "@/components/DocsNote.vue";
 
 // Inject the component doc plugin
 const componentDocPlugin = inject<ComponentDocPlugin>('componentDocPlugin');
