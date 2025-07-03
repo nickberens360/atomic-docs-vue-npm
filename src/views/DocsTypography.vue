@@ -5,11 +5,10 @@
       The following styles are dynamically extracted by parsing your application's loaded stylesheets.
     </p>
 
-    <!-- Search input -->
     <div class="atomic-docs-typography-search">
       <input
-        type="text"
         v-model="searchTerm"
+        type="text"
         placeholder="Search by class name..."
         class="atomic-docs-typography-search-input"
       />
@@ -24,6 +23,57 @@
       v-else
       class="atomic-docs-typography-sections"
     >
+      <section
+        v-if="filteredConfigTypography.length > 0"
+        class="atomic-docs-typography-section"
+      >
+        <h3 class="atomic-docs-section-title">User-Defined Typography</h3>
+        <div
+          v-for="typographyItem in filteredConfigTypography"
+          :key="typographyItem.name"
+          class="atomic-docs-typography-example"
+        >
+          <div class="atomic-docs-example-header">
+            <p
+              :style="{
+                fontFamily: typographyItem.fontFamily,
+                fontSize: typographyItem.fontSize,
+                fontWeight: typographyItem.fontWeight,
+                lineHeight: typographyItem.lineHeight,
+              }"
+              class="atomic-docs-element-preview"
+            >
+              {{ typographyItem.name }}
+            </p>
+            <DocsCopyToClipboard
+              :text="typographyItem.name"
+              title="Copy class name"
+              aria-label="Copy class name"
+              :show-text="false"
+              button-text="Copy class"
+            />
+          </div>
+          <div class="atomic-docs-details-list">
+            <div class="atomic-docs-detail-item">
+              <span class="atomic-docs-type-key">font-family:</span>
+              <code class="atomic-docs-type-value">{{ typographyItem.fontFamily }}</code>
+            </div>
+            <div class="atomic-docs-detail-item">
+              <span class="atomic-docs-type-key">font-size:</span>
+              <code class="atomic-docs-type-value">{{ typographyItem.fontSize }}</code>
+            </div>
+            <div class="atomic-docs-detail-item">
+              <span class="atomic-docs-type-key">font-weight:</span>
+              <code class="atomic-docs-type-value">{{ typographyItem.fontWeight }}</code>
+            </div>
+            <div class="atomic-docs-detail-item">
+              <span class="atomic-docs-type-key">line-height:</span>
+              <code class="atomic-docs-type-value">{{ typographyItem.lineHeight }}</code>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section
         v-if="Object.keys(groupedUtilityClasses).length"
         class="atomic-docs-typography-section"
@@ -83,8 +133,8 @@
         >
           <div class="atomic-docs-example-header">
             <component
-              v-if="tag !== 'body'"
               :is="tag"
+              v-if="tag !== 'body'"
               class="atomic-docs-element-preview"
             >
               {{ tag.charAt(0).toUpperCase() + tag.slice(1) }} Default Style
@@ -138,12 +188,19 @@
   setup
   lang="ts"
 >
-import {computed, ref, watch} from 'vue';
-import {useExtractedTypography} from '../utils/typographyExtractor';
+import { computed, ref, watch, inject } from 'vue';
+import { useExtractedTypography } from '../utils/typographyExtractor';
 import DocsCopyToClipboard from '../components/DocsCopyToClipboard.vue';
+import { ComponentDocPlugin, DocTypography } from '../types';
 
-const {extractedTypography: typographyData} = useExtractedTypography();
+const { extractedTypography: typographyData } = useExtractedTypography();
 const isLoading = ref(true);
+
+// Inject the component doc plugin
+const componentDocPlugin = inject<ComponentDocPlugin>('componentDocPlugin');
+
+// Get typography from plugin options
+const configTypography = computed(() => componentDocPlugin?.options?.typography || []);
 
 // Search term
 const searchTerm = ref('');
@@ -189,6 +246,14 @@ const fuzzyMatch = (text: string, pattern: string): boolean => {
 
   return patternIdx === lowerPattern.length && maxConsecutive >= 2;
 };
+
+// Filtered config typography
+const filteredConfigTypography = computed(() => {
+  if (!normalizedSearchTerm.value) return configTypography.value;
+  return configTypography.value.filter(typography => {
+    return fuzzyMatch(typography.name, normalizedSearchTerm.value);
+  });
+});
 
 // Filtered utility classes
 const filteredUtilityClasses = computed(() => {
@@ -280,7 +345,7 @@ watch(typographyData, (newData) => {
   if (newData.utilityClasses.length || Object.keys(newData.variables).length || Object.keys(newData.elementStyles).length) {
     isLoading.value = false;
   }
-}, {immediate: true, deep: true});
+}, { immediate: true, deep: true });
 </script>
 
 <style

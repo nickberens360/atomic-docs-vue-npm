@@ -45,6 +45,22 @@ export interface DocColor {
   color: string;
 }
 
+class DocTypography {
+  name: string;
+  fontFamily: string;
+  fontSize: string;
+  fontWeight: string;
+  lineHeight: string;
+
+  constructor(name: string, fontFamily: string, fontSize: string, fontWeight: string, lineHeight: string) {
+    this.name = name;
+    this.fontFamily = fontFamily;
+    this.fontSize = fontSize;
+    this.fontWeight = fontWeight;
+    this.lineHeight = lineHeight;
+  }
+}
+
 /**
  * Configuration options for the component docs plugin.
  */
@@ -56,6 +72,7 @@ export interface ComponentDocOptions {
   examplesDirName: string;
   rawComponentSourceModules?: Record<string, () => Promise<string>>;
   colors?: DocColor[];
+  typography?: DocTypography[];
   autoExtractColors?: boolean;
   componentFont?: string;
   history?: RouterHistory;
