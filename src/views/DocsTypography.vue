@@ -85,12 +85,12 @@
           :key="prefix"
           class="atomic-docs-typography-group"
         >
-          <h4 class="atomic-docs-group-title">{{ prefix }}</h4>
           <div
             v-for="rule in rules"
             :key="rule.selector"
             class="atomic-docs-typography-example"
           >
+          <h4 class="atomic-docs-group-title">{{ prefix }}</h4>
             <div class="atomic-docs-example-header">
               <p
                 :class="rule.selector.substring(1)"
@@ -408,14 +408,17 @@ watch(typographyData, (newData) => {
 }
 
 .atomic-docs-group-title {
-  font-size: 16px;
+  font-size: 1.1em;
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: var(--atomic-docs-spacing-md, 8px);
   color: var(--atomic-docs-primary-color, #1976d2);
+  background-color: var(--atomic-docs-surface-color, #f5f5f5);
+  padding: var(--atomic-docs-spacing-xs, 4px) var(--atomic-docs-spacing-md, 16px);
+  border-radius: var(--atomic-docs-border-radius-sm, 4px);
 }
 
 .atomic-docs-typography-example {
-  padding: 16px;
+  padding: 0;
   border: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.12));
   border-radius: 4px;
   margin-bottom: 8px;
@@ -433,15 +436,16 @@ watch(typographyData, (newData) => {
   position: unset;
   display: unset;
   margin: 0;
-  padding: 0;
   min-width: unset;
   width: unset;
+  padding: 8px 12px;
 }
 
 .atomic-docs-details-list {
   background-color: var(--atomic-docs-surface-color, #f5f5f5);
   padding: 12px;
   border-radius: 4px;
+  margin: 0 12px 12px;
 }
 
 .atomic-docs-detail-item {
