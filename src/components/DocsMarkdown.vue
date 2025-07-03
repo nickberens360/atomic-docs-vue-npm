@@ -9,7 +9,7 @@
   setup
   lang="ts"
 >
-import { computed, onMounted, createApp, h, inject, ref, type Ref } from 'vue'; // Removed watch, onUnmounted
+import { computed, onMounted, createApp, h } from 'vue'; // Removed watch, onUnmounted
 import MarkdownIt from 'markdown-it';
 // Import Prism.js
 import Prism from 'prismjs';
@@ -82,11 +82,6 @@ const props = defineProps({
     required: true
   }
 });
-
-// Inject the isDark theme state (still available if needed for other Markdown styling)
-const isDark = inject<Ref<boolean>>('isDark', ref(false));
-
-// Removed activeThemeStylesheet ref and watch/onUnmounted logic
 
 const renderedContent = computed(() => {
   return md.render(props.content);
