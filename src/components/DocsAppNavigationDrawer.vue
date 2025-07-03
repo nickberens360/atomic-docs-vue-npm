@@ -18,28 +18,12 @@
         ]"
       >
         <template #[`section-0`]>
-          <div class="atomic-docs-text-field">
-            <div class="atomic-docs-input-wrapper">
-              <span class="atomic-docs-prepend-icon">🔍</span>
-              <input
-                v-model="filterText"
-                name="filter-components"
-                placeholder="Search Components"
-                class="atomic-docs-input"
-                autocomplete="one-time-code"
-              >
-              <span
-                v-if="filterText"
-                class="atomic-docs-append-icon"
-                @click="filterText = ''"
-              >
-                ✕
-              </span>
-            </div>
-          </div>
-          <DocsComponentNavigation
-            :filter-text="filterText"
-            :force-expand-all="Boolean(filterText)" />
+          <DocsComponentFilter
+            input-variant="solo"
+            background-color="background"
+            :close-on-click="false"
+            :as-menu="false"
+          />
         </template>
 
         <template #[`section-1`]>
@@ -74,12 +58,11 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import DocsComponentNavigation from "./DocsComponentNavigation.vue";
 import DocsAccordion from "./DocsAccordion.vue";
+import DocsComponentFilter from "@/components/DocsComponentFilter.vue";
 
 // Define refs
-const filterText = ref('');
-const activeComponentsSection = ref<number | null>(0); // Initialize Components section as open
+const activeComponentsSection = ref<number | null>(); // Initialize Components section as open
 
 // Define props
 const props = defineProps<{
@@ -88,15 +71,6 @@ const props = defineProps<{
 }>();
 
 const isExpanded = ref(false);
-
-// Watch filterText to automatically open/close the Components accordion section
-watch(filterText, (newValue) => {
-  if (newValue.length > 0) {
-    activeComponentsSection.value = 0; // Open Components section if filterText is not empty
-  } else {
-    activeComponentsSection.value = null; // Close Components section if filterText is empty
-  }
-});
 
 
 // Handle expand-on-hover functionality

@@ -211,7 +211,7 @@ const handleClick = () => {
 
 ## Routing
 
-Atomic Docs handles its own routes and will display the docs UI at `/component-docs`. When you navigate away, your main app resumes as normal.
+Atomic Docs handles its own routes and will display the docs UI at `/atomic-docs`. When you navigate away, your main app resumes as normal.
 
 ## Styling & Customization
 

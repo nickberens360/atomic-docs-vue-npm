@@ -35,6 +35,7 @@
     "release:major": "npm version major && npm publish",
     "release:next": "npm version prepatch --preid=next && npm publish --tag next",
     "release:alpha": "npm version prerelease --preid=alpha && npm publish --tag alpha",
+    "release:dev": "npm version prerelease --preid=dev && npm publish --tag dev",
     "postrelease": "git push && git push --tags"
   },
   "peerDependencies": {
