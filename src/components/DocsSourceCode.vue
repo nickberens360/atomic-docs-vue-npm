@@ -31,7 +31,7 @@ const props = defineProps({
   language: {
     type: String,
     default: 'markup',
-    validator: (value: any) => ['markup', 'javascript', 'css', 'vue'].includes(value)
+    validator: (value: string) => ['markup', 'javascript', 'css', 'vue'].includes(value)
   }
 });
 
