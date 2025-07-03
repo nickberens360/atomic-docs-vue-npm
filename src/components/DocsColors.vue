@@ -334,7 +334,7 @@ const groupedExtractedColors = computed(() => {
   opacity: 1;
 }
 
-.atomic-docs-colors-group {
+.atomic-docs-colors-grid {
   margin-bottom: var(--atomic-docs-spacing-lg, 24px);
   border: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.12));
   padding: var(--atomic-docs-spacing-md, 16px);
