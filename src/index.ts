@@ -3,8 +3,8 @@
 import { App, Plugin, Component, createApp } from 'vue';
 import ExampleComponent from './components/DocsExampleComponent.vue';
 import DocsComponentIndex from './views/DocsComponentIndex.vue';
-import { ComponentDocPlugin, ComponentDocOptions } from './types.ts';
-import routesConfig from './routes.ts';
+import { ComponentDocPlugin, ComponentDocOptions } from './types';
+import routesConfig from './routes';
 import { createRouter, createWebHistory } from 'vue-router';
 import './styles';
 
@@ -96,12 +96,13 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
       });
 
       if (plugins?.length) {
-        plugins.forEach(p => docsApp.use(p));
+        plugins.forEach((p: Plugin) => docsApp.use(p));
       }
+
 
       if (globalComponents) {
         Object.entries(globalComponents).forEach(([name, component]) => {
-          docsApp.component(name, component);
+          docsApp.component(name, component as Component);
         });
       }
 
@@ -112,7 +113,7 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
             !['RouterLink', 'RouterView', 'ExampleComponentUsage'].includes(name) &&
             !docsApp._context.components[name]
           ) {
-            docsApp.component(name, component);
+            docsApp.component(name, component as Component);
           }
         });
       }
@@ -215,4 +216,4 @@ export { default as DocsChip } from './components/DocsChip.vue';
 export { default as DocsTabs } from './components/DocsTabs.vue';
 export { default as DocsColors } from './components/DocsColors.vue';
 export { default as DocsMarkdown } from './components/DocsMarkdown.vue';
-export { atomicDocsVitePlugin } from './vitePlugin.ts';
+export { atomicDocsVitePlugin } from './vitePlugin';
