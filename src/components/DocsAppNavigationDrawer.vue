@@ -11,13 +11,11 @@
   >
     <div class="atomic-docs-navigation-content">
       <DocsAccordion
-        v-model="activeComponentsSection" :sections="[
-          { title: 'Components' },
-          { title: 'Colors' },
-          { title: 'Typography' }
-        ]"
+        v-model="activeComponentsSection"
+        :sections="navigationSections"
       >
-        <template #[`section-0`]>
+        <!-- Static slot for the component filter -->
+        <template #section-0>
           <DocsComponentFilter
             input-variant="solo"
             background-color="background"
@@ -26,28 +24,18 @@
           />
         </template>
 
-        <template #[`section-1`]>
-          <div class="atomic-docs-nav-item">
+        <!-- The v-for loop is now cleaner, iterating over the new computed property -->
+        <template v-for="section in dynamicNavigationSections" :key="section.title" #[section.slotName]>
+          <!-- Loop directly over the routes that were grouped in the script -->
+          <div v-for="route in section.routes" :key="route.name" class="atomic-docs-nav-item">
             <router-link
-              to="/atomic-docs/colors"
+              :to="route.path"
               class="atomic-docs-nav-link"
               active-class="atomic-docs-nav-link--active"
             >
-              <span class="atomic-docs-icon atomic-docs-file-icon">🎨</span>
-              <span class="atomic-docs-title">Color System</span>
-            </router-link>
-          </div>
-        </template>
-
-        <template #[`section-2`]>
-          <div class="atomic-docs-nav-item">
-            <router-link
-              to="/atomic-docs/typography"
-              class="atomic-docs-nav-link"
-              active-class="atomic-docs-nav-link--active"
-            >
-              <span class="atomic-docs-icon atomic-docs-file-icon">🔤</span>
-              <span class="atomic-docs-title">Typography System</span>
+              <!-- Data comes directly from the route's 'meta' object -->
+              <span class="atomic-docs-icon atomic-docs-file-icon">{{ route.meta.icon || '📄' }}</span>
+              <span class="atomic-docs-title">{{ route.meta.title }}</span>
             </router-link>
           </div>
         </template>
@@ -57,9 +45,49 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
+import { useRouter, RouteRecordRaw } from 'vue-router';
 import DocsAccordion from "./DocsAccordion.vue";
 import DocsComponentFilter from "@/components/DocsComponentFilter.vue";
+
+// Initialize router
+const router = useRouter();
+
+// This computed property builds the full list of sections for the accordion component.
+const navigationSections = computed(() => {
+  const navigableRoutes = router.options.routes
+    .flatMap(route => route.children || [])
+    .filter(route => route.meta && route.meta.section);
+
+  const groupedBySection = navigableRoutes.reduce((acc, route) => {
+    const sectionTitle = route.meta.section as string;
+    if (!acc[sectionTitle]) {
+      acc[sectionTitle] = [];
+    }
+    acc[sectionTitle].push(route as RouteRecordRaw);
+    return acc;
+  }, {} as Record<string, RouteRecordRaw[]>);
+
+  const dynamicSections = Object.entries(groupedBySection).map(([title, routes]) => ({
+    title,
+    routes,
+  }));
+
+  return [
+    { title: 'Components', routes: [] },
+    ...dynamicSections,
+  ];
+});
+
+// ✨ NEW: This computed property prepares the dynamic sections specifically for the v-for loop.
+// It handles slicing and adds the dynamic slot name needed by the template.
+const dynamicNavigationSections = computed(() => {
+  return navigationSections.value.slice(1).map((section, index) => ({
+    ...section,
+    slotName: `section-${index + 1}` // e.g., 'section-1', 'section-2'
+  }));
+});
+
 
 // Define refs
 const activeComponentsSection = ref<number | null>(); // Initialize Components section as open
@@ -71,7 +99,6 @@ const props = defineProps<{
 }>();
 
 const isExpanded = ref(false);
-
 
 // Handle expand-on-hover functionality
 const handleMouseEnter = () => {

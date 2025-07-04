@@ -8,8 +8,7 @@ interface ComponentDocRouteParams {
 
 const routes: RouteRecordRaw[] = [
   {
-    // This new route handles the root path '/' to prevent initialization warnings.
-    // It renders nothing and has no effect on your application.
+    // This root path prevents initialization warnings and does not need meta data.
     path: '/',
     name: 'docsRoot',
     component: { render: () => null },
@@ -20,6 +19,8 @@ const routes: RouteRecordRaw[] = [
     component: () => import('./views/DocsHomeView.vue'),
     children: [
       {
+        // This is a dynamic route for component details, so it doesn't need to be in the main navigation.
+        // No meta data is needed here.
         path: ':componentName',
         name: 'componentDoc',
         component: () => import('./views/DocsComponentDetails.vue'),
@@ -31,12 +32,24 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'colors',
         name: 'colors',
-        component: () => import('./views/DocsColorsView.vue')
+        component: () => import('./views/DocsColorsView.vue'),
+        // ✨ META DATA ADDED HERE
+        meta: {
+          section: 'Design System', // Groups this link under the "Design System" header
+          title: 'Color System',    // The user-friendly display name
+          icon: '🎨',               // The icon for the navigation link
+        }
       },
       {
         path: 'typography',
         name: 'typography',
-        component: () => import('./views/DocsTypography.vue')
+        component: () => import('./views/DocsTypography.vue'),
+        // ✨ META DATA ADDED HERE
+        meta: {
+          section: 'Design System',
+          title: 'Typography',
+          icon: '🔤',
+        }
       },
     ]
   }
