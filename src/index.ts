@@ -172,7 +172,11 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
 
             if (!mainAppContainer) {
               console.error(
-                '[ComponentDocsPlugin] Could not determine main app container. Please provide mainAppID in plugin options to enable toggling visibility.'
+                '[ComponentDocsPlugin] Could not determine main app container. app._container is:',
+                app._container,
+                'Available elements with common IDs:',
+                ['app', 'main', 'root'].map(id => document.getElementById(id)).filter(Boolean),
+                'Please provide mainAppID in plugin options to enable toggling visibility.'
               );
               return;
             }
