@@ -8,8 +8,6 @@ interface ComponentDocRouteParams {
 
 const routes: RouteRecordRaw[] = [
   {
-    // This new route handles the root path '/' to prevent initialization warnings.
-    // It renders nothing and has no effect on your application.
     path: '/',
     name: 'docsRoot',
     component: { render: () => null },
@@ -29,14 +27,24 @@ const routes: RouteRecordRaw[] = [
         })
       },
       {
-        path: 'colors',
+        path: 'design-system/colors',
         name: 'colors',
-        component: () => import('./views/DocsColorsView.vue')
+        component: () => import('./views/DocsColorsView.vue'),
+        meta: {
+          section: 'Design System', // Groups this link under the "Design System" header
+          title: 'Color System',    // The user-friendly display name
+          icon: '🎨',               // The icon for the navigation link
+        }
       },
       {
-        path: 'typography',
+        path: 'design-system/typography',
         name: 'typography',
-        component: () => import('./views/DocsTypography.vue')
+        component: () => import('./views/DocsTypography.vue'),
+        meta: {
+          section: 'Design System',
+          title: 'Typography',
+          icon: '🔤',
+        }
       },
     ]
   }

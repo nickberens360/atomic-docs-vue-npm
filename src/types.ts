@@ -1,6 +1,6 @@
 // src/types.ts
 
-import type { RouterHistory } from 'vue-router';
+import type { RouterHistory, RouteRecordRaw } from 'vue-router'; // Import RouteRecordRaw
 import type { Plugin, Component } from 'vue';
 
 export interface ComponentItem {
@@ -84,6 +84,10 @@ export interface ComponentDocOptions {
    * Used by the plugin to hide/show the main app when toggling docs.
    */
   mainAppID?: string;
+  /**
+   * An array of custom routes to add to the documentation site.
+   */
+  customRoutes?: RouteRecordRaw[]; // ✨ NEW: Added customRoutes option
 }
 
 /**
