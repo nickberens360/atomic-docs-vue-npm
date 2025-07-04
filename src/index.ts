@@ -50,7 +50,7 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
     componentModules: {},
     componentsDirName: "",
     exampleModules: {},
-    examplesDirName: ""
+    examplesDirName: "",
   }) {
     try {
       const {

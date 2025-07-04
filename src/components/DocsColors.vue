@@ -7,17 +7,15 @@
       These are the colors defined in your design system.
     </p>
 
-    <!-- Search input -->
     <div class="atomic-docs-colors-search">
       <input
-        type="text"
         v-model="searchTerm"
+        type="text"
         placeholder="Search by variable name..."
         class="atomic-docs-colors-search-input"
       />
     </div>
 
-    <!-- User-defined colors section -->
     <div v-if="filteredConfigColors.length > 0" class="atomic-docs-colors-section">
       <h3 class="atomic-docs-colors-section-title">User-Defined Colors</h3>
       <div class="atomic-docs-colors-grid">
@@ -52,38 +50,42 @@
       </div>
     </div>
 
-    <!-- Automatically extracted colors section -->
-    <div v-if="isUsingExtractedColors && filteredExtractedColors.length > 0" class="atomic-docs-colors-section">
+    <div v-if="isUsingExtractedColors && Object.keys(groupedExtractedColors).length > 0" class="atomic-docs-colors-section">
       <h3 class="atomic-docs-colors-section-title">Automatically Extracted Colors</h3>
-      <p class="atomic-docs-colors-note">
-        <em>Note: These colors are automatically extracted from CSS variables in your application.</em>
-      </p>
-      <div class="atomic-docs-colors-grid">
-        <div
-          v-for="(colorItem, index) in filteredExtractedColors"
-          :key="'extracted-' + index"
-          class="atomic-docs-color-card"
-        >
+      <DocsNote content="These colors are automatically extracted from your CSS variables. They may not be defined in your design system but are present in your stylesheets." />
+      <div
+        v-for="(colorItems, prefix) in groupedExtractedColors"
+        :key="prefix"
+        class="atomic-docs-colors-group"
+      >
+        <h4 class="atomic-docs-colors-group-title">{{ prefix }}</h4>
+        <div class="atomic-docs-colors-grid">
           <div
-            class="atomic-docs-color-preview"
-            :style="{ backgroundColor: colorItem.color }"
-          />
-          <div class="atomic-docs-color-info">
-            <div class="atomic-docs-color-name">
-              {{ colorItem.name }}
-              <DocsCopyToClipboard
-                :text="colorItem.name"
-                title="Copy variable name"
-                class="atomic-docs-color-copy-btn"
-              />
-            </div>
-            <div class="atomic-docs-color-value">
-              {{ colorItem.color }}
-              <DocsCopyToClipboard
-                :text="colorItem.color"
-                title="Copy color value"
-                class="atomic-docs-color-copy-btn"
-              />
+            v-for="(colorItem, index) in colorItems"
+            :key="'extracted-' + index"
+            class="atomic-docs-color-card"
+          >
+            <div
+              class="atomic-docs-color-preview"
+              :style="{ backgroundColor: colorItem.color }"
+            />
+            <div class="atomic-docs-color-info">
+              <div class="atomic-docs-color-name">
+                {{ colorItem.name }}
+                <DocsCopyToClipboard
+                  :text="colorItem.name"
+                  title="Copy variable name"
+                  class="atomic-docs-color-copy-btn"
+                />
+              </div>
+              <div class="atomic-docs-color-value">
+                {{ colorItem.color }}
+                <DocsCopyToClipboard
+                  :text="colorItem.color"
+                  title="Copy color value"
+                  class="atomic-docs-color-copy-btn"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -97,6 +99,7 @@ import { inject, computed, onUnmounted, ref } from 'vue';
 import { ComponentDocPlugin } from '../types';
 import { useExtractedColors } from '../utils/colorExtractor';
 import DocsCopyToClipboard from './DocsCopyToClipboard.vue';
+import DocsNote from "@/components/DocsNote.vue";
 
 // Inject the component doc plugin
 const componentDocPlugin = inject<ComponentDocPlugin>('componentDocPlugin');
@@ -188,6 +191,24 @@ const filteredExtractedColors = computed(() => {
   return filtered.sort((a, b) => a.name.localeCompare(b.name));
 });
 
+const groupedExtractedColors = computed(() => {
+  const groups = filteredExtractedColors.value.reduce<Record<string, { name: string; color: string }[]>>((acc, colorItem) => {
+    // Extract prefix from CSS variable name (e.g., '--vp-c-' from '--vp-c-brand')
+    const match = colorItem.name.match(/^(--[^-_]+[-_]?)/);
+    const prefix = match ? match[1] : 'other';
+
+    (acc[prefix] = acc[prefix] || []).push(colorItem);
+    return acc;
+  }, {});
+
+  // Sort groups by prefix and return a new object with sorted keys
+  return Object.keys(groups)
+    .sort()
+    .reduce((sorted, key) => {
+      sorted[key] = groups[key];
+      return sorted;
+    }, {} as Record<string, { name: string; color: string }[]>);
+});
 </script>
 
 <style scoped lang="scss">
@@ -266,6 +287,7 @@ const filteredExtractedColors = computed(() => {
 .atomic-docs-color-info {
   padding: var(--atomic-docs-spacing-md, 16px);
   background-color: var(--atomic-docs-background-color, white);
+  border-top: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.12));
 }
 
 .atomic-docs-color-name {
@@ -305,5 +327,26 @@ const filteredExtractedColors = computed(() => {
 
 .atomic-docs-color-card:hover .atomic-docs-color-copy-btn {
   opacity: 1;
+}
+.atomic-docs-colors-group {
+  border: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.12));
+  //padding: var(--atomic-docs-spacing-md, 16px);
+  padding: 0;
+  border-radius: var(--atomic-docs-border-radius-md, 8px);
+  margin-bottom: var(--atomic-docs-spacing-lg, 24px);
+}
+.atomic-docs-colors-grid {
+  margin-bottom: var(--atomic-docs-spacing-lg, 24px);
+  padding: 0 var(--atomic-docs-spacing-md, 24px)
+}
+
+.atomic-docs-colors-group-title {
+  font-size: 1.1em;
+  font-weight: 600;
+  margin-bottom: var(--atomic-docs-spacing-md, 8px);
+  color: var(--atomic-docs-primary-color, #1976d2);
+  background-color: var(--atomic-docs-surface-color, #f5f5f5);
+  padding: var(--atomic-docs-spacing-xs, 4px) var(--atomic-docs-spacing-md, 16px);
+  border-radius: var(--atomic-docs-border-radius-sm, 4px);
 }
 </style>
