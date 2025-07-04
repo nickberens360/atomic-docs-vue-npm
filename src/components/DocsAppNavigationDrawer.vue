@@ -55,8 +55,8 @@ const router = useRouter();
 
 // This computed property builds the full list of sections for the accordion component.
 const navigationSections = computed(() => {
-  const navigableRoutes = router.options.routes
-    .flatMap(route => route.children || [])
+  // ✅ CORRECTED: Use router.getRoutes() to include dynamically added routes
+  const navigableRoutes = router.getRoutes()
     .filter(route => route.meta && route.meta.section);
 
   const groupedBySection = navigableRoutes.reduce((acc, route) => {

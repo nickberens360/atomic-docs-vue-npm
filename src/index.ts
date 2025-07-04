@@ -5,7 +5,7 @@ import ExampleComponent from './components/DocsExampleComponent.vue';
 import DocsComponentIndex from './views/DocsComponentIndex.vue';
 import { ComponentDocPlugin, ComponentDocOptions } from './types';
 import routesConfig from './routes';
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'; // Import RouteRecordRaw
 import './styles';
 
 // Centralized constants
@@ -65,6 +65,7 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
         globalComponents,
         autoRegisterComponents,
         history: customHistory,
+        customRoutes, // ✨ NEW: Destructure the new option
       } = options;
 
       if (!enableDocs) return;
@@ -94,6 +95,13 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
         history: customHistory || createWebHistory(),
         routes: routesConfig
       });
+
+      // ✅ NEW: Internal logic to handle the customRoutes option
+      if (customRoutes && Array.isArray(customRoutes)) {
+        customRoutes.forEach((route: RouteRecordRaw) => {
+          docsRouter.addRoute('componentDocs', route);
+        });
+      }
 
       if (plugins?.length) {
         plugins.forEach((p: Plugin) => docsApp.use(p));
@@ -131,19 +139,16 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
         const docsElement = document.getElementById(DOCS_MOUNT_ID);
 
         if (!mainAppContainer) {
-          // 1️⃣ If mainAppID is provided, try to find it
           if (mainAppID) {
             mainAppContainer = document.getElementById(mainAppID);
             if (!mainAppContainer) {
               console.error(
                 `[ComponentDocsPlugin] mainAppID "${mainAppID}" was provided but no matching element was found in the DOM.`
               );
-              return; // Exit early if explicit mainAppID fails
+              return;
             }
           }
-          // 2️⃣ If mainAppID is NOT provided, try multiple fallback strategies
           else {
-            // Strategy 1: Try app._container
             const rootEl = app._container as HTMLElement;
             if (rootEl && rootEl.nodeType === Node.ELEMENT_NODE) {
               console.warn(
@@ -151,7 +156,6 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
               );
               mainAppContainer = rootEl;
             }
-            // Strategy 2: Try common Vue app container IDs
             else {
               const commonIds = ['app', '#app', 'main', 'root'];
               for (const id of commonIds) {
@@ -166,14 +170,9 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
               }
             }
 
-            // If all strategies failed
             if (!mainAppContainer) {
               console.error(
-                '[ComponentDocsPlugin] Could not determine main app container. app._container is:',
-                app._container,
-                'Available elements with common IDs:',
-                ['app', 'main', 'root'].map(id => document.getElementById(id)).filter(Boolean),
-                'Please provide mainAppID in plugin options to enable toggling visibility.'
+                '[ComponentDocsPlugin] Could not determine main app container. Please provide mainAppID in plugin options to enable toggling visibility.'
               );
               return;
             }
