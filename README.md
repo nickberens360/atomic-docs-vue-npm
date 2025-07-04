@@ -89,7 +89,7 @@ export default defineConfig({
 
 For each component (`/components/MyButton.vue`), create an example file (`/component-examples/MyButton.vue`):
 
-```markup
+```vue
 <template>
   <ExampleComponentUsage
     :event-items="eventItems"
