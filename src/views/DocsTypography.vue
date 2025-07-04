@@ -80,6 +80,7 @@
       >
         <p class="atomic-docs-section-subtitle">Classes grouped by shared prefixes, sorted by font size.</p>
         <h3 class="atomic-docs-section-title">Utility Classes</h3>
+        <DocsNote content="These typography styles are automatically extracted from your CSS variables. They may not be defined in your design system but are present in your stylesheets." />
         <div
           v-for="(rules, prefix) in groupedUtilityClasses"
           :key="prefix"
@@ -192,6 +193,7 @@ import { computed, ref, watch, inject } from 'vue';
 import { useExtractedTypography } from '../utils/typographyExtractor';
 import DocsCopyToClipboard from '../components/DocsCopyToClipboard.vue';
 import { ComponentDocPlugin, DocTypography } from '../types';
+import DocsNote from "@/components/DocsNote.vue";
 
 const { extractedTypography: typographyData } = useExtractedTypography();
 const isLoading = ref(true);
