@@ -92,12 +92,10 @@ onUnmounted(() => {
   left: 0;
   right: 0;
   z-index: 1000; /* Ensure it stays above other content */
-  //box-shadow: var(--atomic-docs-shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.1));
   display: flex;
   align-items: center;
   height: var(--atomic-docs-appbar-height);
   width: 100%;
-  //background-color: var(--atomic-docs-surface-color-dark, #f5f5f5);
   padding: 0 16px 0 0;
 }
 
@@ -116,6 +114,7 @@ onUnmounted(() => {
   padding: 0 16px;
   display: flex;
   align-items: center;
+  background: red;
 }
 
 .atomic-docs-nav-icon-button {
