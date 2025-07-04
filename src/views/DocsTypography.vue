@@ -78,19 +78,19 @@
         v-if="Object.keys(groupedUtilityClasses).length"
         class="atomic-docs-typography-section"
       >
-        <h3 class="atomic-docs-section-title">Utility Classes</h3>
         <p class="atomic-docs-section-subtitle">Classes grouped by shared prefixes, sorted by font size.</p>
+        <h3 class="atomic-docs-section-title">Utility Classes</h3>
         <div
           v-for="(rules, prefix) in groupedUtilityClasses"
           :key="prefix"
           class="atomic-docs-typography-group"
         >
+          <h4 class="atomic-docs-group-title">{{ prefix }}</h4>
           <div
             v-for="rule in rules"
             :key="rule.selector"
             class="atomic-docs-typography-example"
           >
-          <h4 class="atomic-docs-group-title">{{ prefix }}</h4>
             <div class="atomic-docs-example-header">
               <p
                 :class="rule.selector.substring(1)"
