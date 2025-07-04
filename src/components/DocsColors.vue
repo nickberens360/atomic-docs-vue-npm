@@ -287,6 +287,7 @@ const groupedExtractedColors = computed(() => {
 .atomic-docs-color-info {
   padding: var(--atomic-docs-spacing-md, 16px);
   background-color: var(--atomic-docs-background-color, white);
+  border-top: 1px solid var(--atomic-docs-border-color, rgba(0, 0, 0, 0.12));
 }
 
 .atomic-docs-color-name {
