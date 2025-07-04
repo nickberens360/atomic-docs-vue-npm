@@ -70,19 +70,7 @@ function toggleTheme(value: boolean | null) {
 
   // Emit the theme change event
   emit('toggle-theme', isDarkValue);
-
-  // No direct DOM manipulation - theme will be handled by class binding in parent
 }
-
-
-// No event listeners needed for onMounted and onUnmounted
-onMounted(() => {
-  // No direct DOM manipulation for theme initialization
-});
-
-onUnmounted(() => {
-  // No event listeners to remove
-});
 </script>
 
 <style scoped lang="scss">
