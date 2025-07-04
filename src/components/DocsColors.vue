@@ -192,27 +192,22 @@ const filteredExtractedColors = computed(() => {
 });
 
 const groupedExtractedColors = computed(() => {
-  const groups: Record<string, { name: string; color: string }[]> = {};
-  const filtered = filteredExtractedColors.value;
-
-  filtered.forEach((colorItem) => {
+  const groups = filteredExtractedColors.value.reduce<Record<string, { name: string; color: string }[]>>((acc, colorItem) => {
     // Extract prefix from CSS variable name (e.g., '--vp-c-' from '--vp-c-brand')
     const match = colorItem.name.match(/^(--[^-_]+[-_]?)/);
     const prefix = match ? match[1] : 'other';
 
-    if (!groups[prefix]) {
-      groups[prefix] = [];
-    }
-    groups[prefix].push(colorItem);
-  });
+    (acc[prefix] = acc[prefix] || []).push(colorItem);
+    return acc;
+  }, {});
 
-  // Optional: Sort groups by prefix
-  const sortedGroups: Record<string, { name: string; color: string }[]> = {};
-  Object.keys(groups).sort().forEach(key => {
-    sortedGroups[key] = groups[key];
-  });
-
-  return sortedGroups;
+  // Sort groups by prefix and return a new object with sorted keys
+  return Object.keys(groups)
+    .sort()
+    .reduce((sorted, key) => {
+      sorted[key] = groups[key];
+      return sorted;
+    }, {} as Record<string, { name: string; color: string }[]>);
 });
 </script>
 
