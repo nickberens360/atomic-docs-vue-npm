@@ -34,8 +34,8 @@
               active-class="atomic-docs-nav-link--active"
             >
               <!-- Data comes directly from the route's 'meta' object -->
-              <span class="atomic-docs-icon atomic-docs-file-icon">{{ route.meta.icon || '📄' }}</span>
-              <span class="atomic-docs-title">{{ route.meta.title }}</span>
+              <span class="atomic-docs-icon atomic-docs-file-icon">{{ route?.meta?.icon || '📄' }}</span>
+              <span class="atomic-docs-title">{{ route?.meta?.title || 'Section' }}</span>
             </router-link>
           </div>
         </template>

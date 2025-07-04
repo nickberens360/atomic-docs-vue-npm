@@ -218,5 +218,6 @@ export { default as DocsMenu } from './components/DocsMenu.vue';
 export { default as DocsChip } from './components/DocsChip.vue';
 export { default as DocsTabs } from './components/DocsTabs.vue';
 export { default as DocsColors } from './components/DocsColors.vue';
+export { default as DocsDataTable } from './components/DocsDataTable.vue';
 export { default as DocsMarkdown } from './components/DocsMarkdown.vue';
 export { atomicDocsVitePlugin } from './vitePlugin';
