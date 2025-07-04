@@ -110,11 +110,9 @@ onUnmounted(() => {
 .atomic-docs-app-bar-title {
   width: var(--atomic-docs-drawer-width);
   height: 100%;
-  //background: var(--atomic-docs-primary-color);
   padding: 0 16px;
   display: flex;
   align-items: center;
-  background: red;
 }
 
 .atomic-docs-nav-icon-button {
