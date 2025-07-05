@@ -51,13 +51,11 @@ const directoryStructure = computed<Record<string, NavigationItem>>(() => {
     // Safely split the path and default to an empty string if the result is unexpected
     const relativePath = filePath.split(`${componentsDirName}/`)[1] || '';
 
-    // --- START: CORRECTED Logic ---
     const examplesDirName = componentDocPlugin.examplesDirName;
     const isDocumented = Object.keys(componentDocPlugin.exampleModules).some(examplePath => {
       const exampleRelativePath = examplePath.split(`${examplesDirName}/`)[1] || '';
       return exampleRelativePath === relativePath;
     });
-    // --- END: CORRECTED Logic ---
 
     const exampleComponent = componentDocPlugin.convertPathToExampleName(relativePath);
     const pathSegments = relativePath.split('/');
@@ -76,6 +74,45 @@ const directoryStructure = computed<Record<string, NavigationItem>>(() => {
     return accumulator;
   }, {});
 });
+
+/**
+ * Sorts a nested structure of navigation items.
+ * Directories are placed before components, and both are sorted alphabetically.
+ * The sorting is applied recursively to all children.
+ * @param {Record<string, NavigationItem>} structure - The navigation structure to sort.
+ * @returns {Record<string, NavigationItem>} The sorted navigation structure.
+ */
+function sortNestedStructure(
+  structure: Record<string, NavigationItem>
+): Record<string, NavigationItem> {
+  // Convert the object to an array of [key, value] pairs to sort them
+  const sortedEntries = Object.entries(structure).sort(([, a], [, b]) => {
+    // If types are different, directories come first
+    if (a.type === 'directory' && b.type === 'component') {
+      return -1;
+    }
+    if (a.type === 'component' && b.type === 'directory') {
+      return 1;
+    }
+
+    // If types are the same, sort alphabetically by label
+    return a.label.localeCompare(b.label);
+  });
+
+  // Map over the sorted entries to apply sorting recursively
+  const recursivelySortedEntries = sortedEntries.map(([key, value]) => {
+    // If it's a directory with children, sort its children recursively
+    if (value.type === 'directory' && value.children) {
+      return [key, { ...value, children: sortNestedStructure(value.children) }];
+    }
+    // Otherwise, return the item as is
+    return [key, value];
+  });
+
+  // Convert the sorted array of entries back into an object
+  return Object.fromEntries(recursivelySortedEntries);
+}
+
 
 function filterNestedStructure(
   structure: Record<string, NavigationItem>,
@@ -97,7 +134,9 @@ function filterNestedStructure(
 }
 
 const finalStructure = computed<Record<string, NavigationItem>>(() => {
-  return filterNestedStructure(directoryStructure.value, props.filterText);
+  const filteredStructure = filterNestedStructure(directoryStructure.value, props.filterText);
+  // After filtering, apply the recursive sorting
+  return sortNestedStructure(filteredStructure);
 });
 
 
