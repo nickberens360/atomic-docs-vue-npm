@@ -19,7 +19,6 @@
       <DocsTabs :tabs="tabsExample">
         <template #[`tab-0`]>
           <div class="tab-content">
-            <!-- Universal Search Input for Tables -->
             <div class="atomic-docs-table-search">
               <DocsTextField
                 v-model="searchTerm"
@@ -344,11 +343,11 @@ const basePropItems = computed(() => {
   }
   // Otherwise, generate the props from the component if it's provided
   if (props.component) {
-    return generatePropsItems(props.component);
+    return generatePropsItems(props.component, scriptSource.value || '');
   }
   // If neither propItems nor component is provided, use the loaded component
   if (loadedComponent.value) {
-    return generatePropsItems(loadedComponent.value);
+    return generatePropsItems(loadedComponent.value, scriptSource.value || '');
   }
   return [];
 });
