@@ -57,8 +57,7 @@ src/
 
 ```
 
-3. Document your components in `components-examples` using the `<ExampleComponentUsage>` component provided by vue-atomic-docs. For example, in `BoxDemo.vue`:
-
+3. Document your components in `component-examples` using the `<ExampleComponentUsage>` component provided by vue-atomic-docs. For example, in `BoxDemo.vue`:
 ```markup
 <template>
   <ExampleComponentUsage
