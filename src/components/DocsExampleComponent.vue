@@ -208,10 +208,7 @@
   </div>
 </template>
 
-<script
-  setup
-  lang="ts"
->
+<script setup lang="ts">
 import {computed, inject, ref, onMounted, watch} from 'vue';
 import {useRoute} from 'vue-router';
 import {
@@ -226,26 +223,25 @@ import {
   extractScriptContent,
   extractStyleContent
 } from '../utils/sourceCodeExtractors';
-import { fuzzyMatch, debounce } from '../utils/stringUtils'; // Import the extracted functions
+import { fuzzyMatch, debounce } from '../utils/stringUtils';
 import DocsDataTable from './DocsDataTable.vue';
 import DocsTabs from './DocsTabs.vue';
 import DocsSourceCode from './DocsSourceCode.vue';
 import DocsComponentIsolation from './DocsComponentIsolation.vue';
 import {ComponentDocPlugin} from '../types';
-// Removed unused import DocsIcon from "./DocsIcon.vue";
 import DocsCopyToClipboard from './DocsCopyToClipboard.vue';
-import DocsTextField from './DocsTextField.vue'; // Import the DocsTextField component
+import DocsTextField from './DocsTextField.vue';
 
 const route = useRoute();
-// Inject the plugin
 const componentDocPlugin = inject('componentDocPlugin') as ComponentDocPlugin;
 const templateSource = ref<string | null>(null);
 const scriptSource = ref<string | null>(null);
 const styleSource = ref<string | null>(null);
-const loadedComponent = ref<any>(null); // New ref to store the loaded component
+const loadedComponent = ref<any>(null);
+const searchTerm = ref('');
+const debouncedSearchTerm = ref('');
 
-
-// Define props directly without TypeScript
+// Define props
 const props = defineProps({
   component: {
     type: Object,
@@ -269,7 +265,6 @@ const props = defineProps({
   },
 });
 
-
 const relativePath = computed(() => route.query.relativePath as string);
 
 // Example data for DocsTabs
@@ -280,20 +275,15 @@ const tabsExample = [
   { title: 'Styles' },
 ];
 
-// --- Search Filter Logic ---
-const searchTerm = ref('');
-const debouncedSearchTerm = ref('');
-
 // Create a debounced function to update the debouncedSearchTerm
 const updateDebouncedSearchTerm = debounce((value: string) => {
   debouncedSearchTerm.value = value;
-}, 300); // 300ms debounce delay
+}, 300);
 
 // Watch for changes to searchTerm and update debouncedSearchTerm with debounce
 watch(searchTerm, (newValue) => {
   updateDebouncedSearchTerm(newValue);
 });
-
 
 // Load and process the raw component source and component module
 onMounted(async () => {
@@ -327,7 +317,7 @@ onMounted(async () => {
       if (componentPath) {
         try {
           const componentModule = await componentDocPlugin.componentModules[componentPath]();
-          loadedComponent.value = componentModule.default; // Assuming the component is the default export
+          loadedComponent.value = componentModule.default;
         } catch (error) {
           console.error('Failed to load component module:', error);
         }
@@ -336,35 +326,7 @@ onMounted(async () => {
   }
 });
 
-// Computed properties for filtered data
-const basePropItems = computed(() => {
-  // Use the propItems prop if it's provided and not empty
-  if (props.propItems && props.propItems.length > 0) {
-    return props.propItems;
-  }
-  // Otherwise, generate the props from the component if it's provided
-  if (props.component) {
-    return generatePropsItems(props.component);
-  }
-  // If neither propItems nor component is provided, use the loaded component
-  if (loadedComponent.value) {
-    return generatePropsItems(loadedComponent.value);
-  }
-  return [];
-});
-
-const filteredPropItems = computed(() => {
-  if (!debouncedSearchTerm.value) {
-    return basePropItems.value;
-  }
-  return (basePropItems.value as PropItem[]).filter((item) => {
-    // Search across relevant string fields in prop items
-    return fuzzyMatch(item.name, debouncedSearchTerm.value) ||
-      fuzzyMatch(item.type, debouncedSearchTerm.value) ||
-      fuzzyMatch(item.default, debouncedSearchTerm.value);
-  });
-});
-
+// Define interfaces
 interface EventItem {
   event: string;
   payload?: string;
@@ -377,31 +339,7 @@ interface SlotItem {
   description?: string;
 }
 
-const filteredEventItems = computed(() => {
-  if (!debouncedSearchTerm.value) {
-    return props.eventItems as EventItem[];
-  }
-  return (props.eventItems as EventItem[]).filter((item) => {
-    // Assuming event items have 'event', 'payload', 'description' fields
-    return fuzzyMatch(item.event, debouncedSearchTerm.value) ||
-      fuzzyMatch(item.payload ?? '', debouncedSearchTerm.value) ||
-      fuzzyMatch(item.description ?? '', debouncedSearchTerm.value);
-  });
-});
-
-const filteredSlotItems = computed(() => {
-  if (!debouncedSearchTerm.value) {
-    return props.slotItems as SlotItem[];
-  }
-  return (props.slotItems as SlotItem[]).filter((item) => {
-    // Assuming slot items have 'name', 'content', 'description' fields
-    return fuzzyMatch(item.name, debouncedSearchTerm.value) ||
-      fuzzyMatch(item.content ?? '', debouncedSearchTerm.value) ||
-      fuzzyMatch(item.description ?? '', debouncedSearchTerm.value);
-  });
-});
-
-
+// Computed properties
 const propHeaders = computed(() => {
   return getPropsHeaders();
 });
@@ -414,6 +352,18 @@ const slotHeaders = computed(() => {
   return getSlotHeaders();
 });
 
+// Simplified computed properties for filtering
+const filteredPropItems = computed(() => {
+  return props.propItems || [];
+});
+
+const filteredEventItems = computed(() => {
+  return props.eventItems as EventItem[];
+});
+
+const filteredSlotItems = computed(() => {
+  return props.slotItems as SlotItem[];
+});
 </script>
 
 <style
