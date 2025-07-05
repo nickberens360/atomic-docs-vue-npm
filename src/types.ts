@@ -74,6 +74,7 @@ export interface ComponentDocOptions {
   colors?: DocColor[];
   typography?: DocTypography[];
   autoExtractColors?: boolean;
+  autoExtractTypography?: boolean;
   componentFont?: string;
   history?: RouterHistory;
   plugins?: Plugin[];
