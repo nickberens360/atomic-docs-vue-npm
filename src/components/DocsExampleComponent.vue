@@ -19,7 +19,6 @@
       <DocsTabs :tabs="tabsExample">
         <template #[`tab-0`]>
           <div class="tab-content">
-            <!-- Universal Search Input for Tables -->
             <div class="atomic-docs-table-search">
               <DocsTextField
                 v-model="searchTerm"
@@ -243,6 +242,7 @@ const templateSource = ref<string | null>(null);
 const scriptSource = ref<string | null>(null);
 const styleSource = ref<string | null>(null);
 const loadedComponent = ref<any>(null); // New ref to store the loaded component
+const rawSource = ref<string>('');
 
 
 // Define props directly without TypeScript
@@ -294,25 +294,18 @@ watch(searchTerm, (newValue) => {
   updateDebouncedSearchTerm(newValue);
 });
 
-
-// Load and process the raw component source and component module
-onMounted(async () => {
+async function loadComponentData() {
   if (relativePath.value && componentDocPlugin) {
     // Load raw component source for code display
     if (componentDocPlugin.rawComponentSourceModules) {
-      // Find the matching raw source module
-      const rawSourcePath = Object.keys(componentDocPlugin.rawComponentSourceModules)
-        .find(path => path.includes(relativePath.value));
-
+      const rawSourcePath = Object.keys(componentDocPlugin.rawComponentSourceModules).find(path => path.includes(relativePath.value));
       if (rawSourcePath) {
         try {
-          const rawSource = await componentDocPlugin.rawComponentSourceModules[rawSourcePath]();
-
-          // Use the imported extractor functions directly
-          templateSource.value = extractTemplateContent(rawSource);
-          scriptSource.value = extractScriptContent(rawSource);
-          styleSource.value = extractStyleContent(rawSource);
-
+          const rawSourceModule = await componentDocPlugin.rawComponentSourceModules[rawSourcePath]();
+          rawSource.value = rawSourceModule;
+          templateSource.value = extractTemplateContent(rawSource.value);
+          scriptSource.value = extractScriptContent(rawSource.value);
+          styleSource.value = extractStyleContent(rawSource.value);
         } catch (error) {
           console.error('Failed to load raw component source:', error);
         }
@@ -321,34 +314,39 @@ onMounted(async () => {
 
     // Load component module for documentation generation
     if (componentDocPlugin.componentModules) {
-      const componentPath = Object.keys(componentDocPlugin.componentModules)
-        .find(path => path.includes(relativePath.value));
-
+      const componentPath = Object.keys(componentDocPlugin.componentModules).find(path => path.includes(relativePath.value));
       if (componentPath) {
         try {
           const componentModule = await componentDocPlugin.componentModules[componentPath]();
-          loadedComponent.value = componentModule.default; // Assuming the component is the default export
+          loadedComponent.value = componentModule.default;
         } catch (error) {
           console.error('Failed to load component module:', error);
         }
       }
     }
   }
-});
+}
+
+// Watch for changes in relativePath and reload data
+watch(relativePath, loadComponentData, { immediate: true });
+
+if (import.meta.hot) {
+  import.meta.hot.accept(async () => {
+    await loadComponentData();
+  });
+}
+
 
 // Computed properties for filtered data
 const basePropItems = computed(() => {
-  // Use the propItems prop if it's provided and not empty
   if (props.propItems && props.propItems.length > 0) {
     return props.propItems;
   }
-  // Otherwise, generate the props from the component if it's provided
   if (props.component) {
-    return generatePropsItems(props.component);
+    return generatePropsItems(props.component, rawSource.value);
   }
-  // If neither propItems nor component is provided, use the loaded component
   if (loadedComponent.value) {
-    return generatePropsItems(loadedComponent.value);
+    return generatePropsItems(loadedComponent.value, rawSource.value);
   }
   return [];
 });
@@ -413,7 +411,6 @@ const eventHeaders = computed(() => {
 const slotHeaders = computed(() => {
   return getSlotHeaders();
 });
-
 </script>
 
 <style
