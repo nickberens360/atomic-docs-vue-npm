@@ -352,17 +352,75 @@ const slotHeaders = computed(() => {
   return getSlotHeaders();
 });
 
-// Simplified computed properties for filtering
+// Computed properties for filtered data
+const basePropItems = computed(() => {
+  // Use the propItems prop if it's provided and not empty
+  if (props.propItems && props.propItems.length > 0) {
+    return props.propItems;
+  }
+  // Otherwise, generate the props from the component if it's provided
+  if (props.component) {
+    // If we have raw source, pass it to generatePropsItems
+    if (templateSource.value) {
+      const fullSource = [
+        templateSource.value ? `<template>${templateSource.value}</template>` : '',
+        scriptSource.value ? `<script>${scriptSource.value}</script>` : '',
+        styleSource.value ? `<style>${styleSource.value}</style>` : ''
+      ].join('\n');
+      return generatePropsItems(props.component, fullSource);
+    }
+    return generatePropsItems(props.component);
+  }
+  // If neither propItems nor component is provided, use the loaded component
+  if (loadedComponent.value) {
+    // If we have raw source, pass it to generatePropsItems
+    if (templateSource.value) {
+      const fullSource = [
+        templateSource.value ? `<template>${templateSource.value}</template>` : '',
+        scriptSource.value ? `<script>${scriptSource.value}</script>` : '',
+        styleSource.value ? `<style>${styleSource.value}</style>` : ''
+      ].join('\n');
+      return generatePropsItems(loadedComponent.value, fullSource);
+    }
+    return generatePropsItems(loadedComponent.value);
+  }
+  return [];
+});
+
 const filteredPropItems = computed(() => {
-  return props.propItems || [];
+  if (!debouncedSearchTerm.value) {
+    return basePropItems.value;
+  }
+  return (basePropItems.value as PropItem[]).filter((item) => {
+    // Search across relevant string fields in prop items
+    return fuzzyMatch(item.name, debouncedSearchTerm.value) ||
+      fuzzyMatch(item.type, debouncedSearchTerm.value) ||
+      fuzzyMatch(item.default, debouncedSearchTerm.value);
+  });
 });
 
 const filteredEventItems = computed(() => {
-  return props.eventItems as EventItem[];
+  if (!debouncedSearchTerm.value) {
+    return props.eventItems as EventItem[];
+  }
+  return (props.eventItems as EventItem[]).filter((item) => {
+    // Assuming event items have 'event', 'payload', 'description' fields
+    return fuzzyMatch(item.event, debouncedSearchTerm.value) ||
+      fuzzyMatch(item.payload ?? '', debouncedSearchTerm.value) ||
+      fuzzyMatch(item.description ?? '', debouncedSearchTerm.value);
+  });
 });
 
 const filteredSlotItems = computed(() => {
-  return props.slotItems as SlotItem[];
+  if (!debouncedSearchTerm.value) {
+    return props.slotItems as SlotItem[];
+  }
+  return (props.slotItems as SlotItem[]).filter((item) => {
+    // Assuming slot items have 'name', 'content', 'description' fields
+    return fuzzyMatch(item.name, debouncedSearchTerm.value) ||
+      fuzzyMatch(item.content ?? '', debouncedSearchTerm.value) ||
+      fuzzyMatch(item.description ?? '', debouncedSearchTerm.value);
+  });
 });
 </script>
 
