@@ -7,13 +7,6 @@ import type { ComponentDocOptions } from '../types';
  * @returns Partial configuration object
  */
 export async function loadConfig(): Promise<Partial<ComponentDocOptions>> {
-  // Check if running in browser
-  if (typeof window !== 'undefined') {
-    console.warn('[atomic-docs] Running in browser environment, config file loading skipped');
-    return {};
-  }
-
-  // Original Node.js code
   const configPath = path.resolve(process.cwd(), 'atomic-docs.config.js');
 
   try {
@@ -34,13 +27,6 @@ export async function loadConfig(): Promise<Partial<ComponentDocOptions>> {
  * @returns Partial configuration object
  */
 export function loadPackageConfig(): Partial<ComponentDocOptions> {
-  // Check if running in browser
-  if (typeof window !== 'undefined') {
-    console.warn('[atomic-docs] Running in browser environment, package.json loading skipped');
-    return {};
-  }
-
-  // Original Node.js code
   try {
     const packagePath = path.resolve(process.cwd(), 'package.json');
     if (fs.existsSync(packagePath)) {
@@ -60,13 +46,6 @@ export function loadPackageConfig(): Partial<ComponentDocOptions> {
  * @param outputPath Path where to save the configuration file
  */
 export function createConfigFile(options: Partial<ComponentDocOptions>, outputPath: string = './atomic-docs.config.js'): void {
-  // Check if running in browser
-  if (typeof window !== 'undefined') {
-    console.warn('[atomic-docs] Running in browser environment, config file creation skipped');
-    return;
-  }
-
-  // Original Node.js code
   try {
     // Extract relevant options for the watcher
     const config = {
