@@ -1,3 +1,5 @@
+// src/utils/docGenerator.ts
+
 interface PropType {
   name: string;
 }
@@ -6,6 +8,7 @@ interface Prop {
   type: PropType | PropType[];
   required?: boolean;
   default?: any;
+  name?: string; // Add name to the prop interface for easier access
 }
 
 interface Props {
@@ -36,6 +39,33 @@ export interface Header {
   key: string;
 }
 
+/**
+ * Extracts the default values from a withDefaults call in a script.
+ * @param scriptContent - The raw content of the <script> block.
+ * @returns A record mapping prop names to their default values.
+ */
+function extractWithDefaults(scriptContent: string): Record<string, any> {
+  // Regex to find withDefaults and capture the defaults object
+  const defaultsRegex = /withDefaults\s*\(\s*defineProps<[^>]+>\(\)\s*,\s*({[\s\S]*?})\s*\)/;
+  const match = scriptContent.match(defaultsRegex);
+
+  if (match && match[1]) {
+    try {
+      // The captured group is the defaults object string.
+      // We can use a Function constructor to safely parse this object.
+      // This is safer than eval() and works well for object literals.
+      const defaultsObjectString = match[1];
+      const func = new Function(`return ${defaultsObjectString}`);
+      return func();
+    } catch (e) {
+      console.error("Could not parse withDefaults object from script:", e);
+      return {};
+    }
+  }
+  return {};
+}
+
+
 export function getPropType(prop: Prop): string {
   try {
     if (Array.isArray(prop.type)) {
@@ -52,7 +82,13 @@ export function getPropType(prop: Prop): string {
   }
 }
 
-export function getPropDefault(prop: Prop): string {
+export function getPropDefault(prop: Prop, extractedDefaults: Record<string, any> = {}): string {
+  // Prioritize the default value extracted from withDefaults
+  if (prop.name && extractedDefaults[prop.name] !== undefined) {
+    return JSON.stringify(extractedDefaults[prop.name]);
+  }
+
+  // Fallback to existing logic if not found in withDefaults
   try {
     if (prop.default === undefined) {
       return 'undefined';
@@ -72,129 +108,36 @@ export function getPropDefault(prop: Prop): string {
   }
 }
 
-export function generatePropsItems(component: Component): PropItem[] {
+export function generatePropsItems(component: Component, scriptContent: string = ''): PropItem[] {
   try {
     if (!component) return [];
 
-    // Try to extract props from various possible locations in the component object
-    let extractedProps: PropItem[] = [];
+    // Extract defaults from the script content first
+    const extractedDefaults = scriptContent ? extractWithDefaults(scriptContent) : {};
 
-    try {
-      // For Vue 3 components, try to access the component's __vccOpts which might contain props
-      if (component.__vccOpts && component.__vccOpts.props) {
-        const props = component.__vccOpts.props;
-        extractedProps = Object.keys(props).map(propName => {
-          try {
-            const prop = props[propName];
-            return {
-              name: propName,
-              type: getPropType(prop),
-              required: prop.required ? 'true' : 'false',
-              default: getPropDefault(prop),
-            };
-          } catch (error) {
-            if (error instanceof Error) {
-              console.warn(`Could not process prop ${propName}: ${error.message}`);
-            } else {
-              console.warn(`An unknown error occurred while processing prop ${propName}: ${String(error)}`);
-            }
-            return {
-              name: propName,
-              type: 'Unknown',
-              required: 'false',
-              default: 'undefined',
-            };
-          }
-        });
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        console.warn(`Error accessing __vccOpts props: ${error.message}`);
-      } else {
-        console.warn(`An unknown error occurred while accessing __vccOpts props: ${String(error)}`);
-      }
+    let propsDefinition: Props | undefined;
+
+    // Consolidate where to find the props definition
+    if (component.__vccOpts && component.__vccOpts.props) {
+      propsDefinition = component.__vccOpts.props;
+    } else if (component.props) {
+      propsDefinition = component.props;
     }
 
-    // If no props extracted yet, try other methods
-    if (extractedProps.length === 0) {
-      try {
-        // Check if component has a setup function (Vue 3 Composition API)
-        if (typeof component.setup === 'function') {
-          // Try to extract props from component.props (might be available in some cases)
-          if (component.props) {
-            extractedProps = Object.entries(component.props).map(([propName, prop]: [string, any]) => {
-              try {
-                return {
-                  name: propName,
-                  type: typeof prop.type === 'function' ? prop.type.name : 'Unknown',
-                  required: prop.required ? 'true' : 'false',
-                  default: prop.default !== undefined ? JSON.stringify(prop.default) : 'undefined',
-                };
-              } catch (error) {
-                if (error instanceof Error) {
-                  console.warn(`Could not process prop ${propName} from setup component: ${error.message}`);
-                } else {
-                  console.warn(`An unknown error occurred while processing prop ${propName} from setup component: ${String(error)}`);
-                }
-                return {
-                  name: propName,
-                  type: 'Unknown',
-                  required: 'false',
-                  default: 'undefined',
-                };
-              }
-            });
-          }
-        }
-      } catch (error) {
-        if (error instanceof Error) {
-          console.warn(`Error processing component with setup function: ${error.message}`);
-        } else {
-          console.warn(`An unknown error occurred while processing component with setup function: ${String(error)}`);
-        }
-      }
+    if (propsDefinition) {
+      return Object.keys(propsDefinition).map(propName => {
+        const prop = propsDefinition![propName];
+        return {
+          name: propName,
+          type: getPropType(prop),
+          required: prop.required ? 'true' : 'false',
+          // Pass the extracted defaults to getPropDefault
+          default: getPropDefault({ ...prop, name: propName }, extractedDefaults),
+        };
+      });
     }
 
-    // If still no props extracted, try Options API approach
-    if (extractedProps.length === 0) {
-      try {
-        // Check if component has props (Options API)
-        if (component.props) {
-          const props = component.props;
-          extractedProps = Object.keys(props).map(propName => {
-            try {
-              const prop = props[propName];
-              return {
-                name: propName,
-                type: getPropType(prop),
-                required: prop.required ? 'true' : 'false',
-                default: getPropDefault(prop),
-              };
-            } catch (error) {
-              if (error instanceof Error) {
-                console.warn(`Could not process prop ${propName} from options API: ${error.message}`);
-              } else {
-                console.warn(`An unknown error occurred while processing prop ${propName} from options API: ${String(error)}`);
-              }
-              return {
-                name: propName,
-                type: 'Unknown',
-                required: 'false',
-                default: 'undefined',
-              };
-            }
-          });
-        }
-      } catch (error) {
-        if (error instanceof Error) {
-          console.warn(`Error processing component with options API props: ${error.message}`);
-        } else {
-          console.warn(`An unknown error occurred while processing component with options API props: ${String(error)}`);
-        }
-      }
-    }
-
-    return extractedProps;
+    return [];
   } catch (error) {
     if (error instanceof Error) {
       console.warn(`Could not analyze component props: ${error.message}`);
@@ -204,6 +147,7 @@ export function generatePropsItems(component: Component): PropItem[] {
     return [];
   }
 }
+
 
 export function getPropsHeaders(additionalHeaders: Header[] = []): Header[] {
   return [
@@ -225,15 +169,6 @@ export function getEventHeaders(additionalHeaders: Header[] = []): Header[] {
   ];
 }
 
-//TODO: No longer working
-// export function generateEventItems(definitions) {
-//   return definitions.map(({ name, payload = 'None', description = 'No description provided' }) => ({
-//     event: name,
-//     payload,
-//     description,
-//   }));
-// }
-
 export function getSlotHeaders(additionalHeaders: Header[] = []): Header[] {
   return [
     { title: 'Name', key: 'name' },
@@ -242,14 +177,6 @@ export function getSlotHeaders(additionalHeaders: Header[] = []): Header[] {
     ...additionalHeaders
   ];
 }
-//TODO: No longer working
-// export function generateSlotItems(definitions) {
-//   return definitions.map(({ name, defaultContent = 'None', description = 'No description provided' }) => ({
-//     name,
-//     defaultContent,
-//     description,
-//   }));
-// }
 
 interface ComponentDocumentationOptions {
   component?: Component;
@@ -261,8 +188,6 @@ interface ComponentDocumentationOptions {
 export function generateComponentDocumentation(options: ComponentDocumentationOptions = {}) {
   const {
     component,
-    // slotDefinitions = [],
-    // eventDefinitions = [],
     propsAdditionalHeaders = [],
     eventsAdditionalHeaders = [],
     slotsAdditionalHeaders = []
@@ -274,11 +199,9 @@ export function generateComponentDocumentation(options: ComponentDocumentationOp
     },
     events: {
       headers: getEventHeaders(eventsAdditionalHeaders),
-      // items: generateEventItems(eventDefinitions)
     },
     slots: {
       headers: getSlotHeaders(slotsAdditionalHeaders),
-      // items: generateSlotItems(slotDefinitions)
     }
   };
 }
