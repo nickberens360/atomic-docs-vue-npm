@@ -208,7 +208,10 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script
+  setup
+  lang="ts"
+>
 import {computed, inject, ref, onMounted, watch} from 'vue';
 import {useRoute} from 'vue-router';
 import {
@@ -223,25 +226,26 @@ import {
   extractScriptContent,
   extractStyleContent
 } from '../utils/sourceCodeExtractors';
-import { fuzzyMatch, debounce } from '../utils/stringUtils';
+import { fuzzyMatch, debounce } from '../utils/stringUtils'; // Import the extracted functions
 import DocsDataTable from './DocsDataTable.vue';
 import DocsTabs from './DocsTabs.vue';
 import DocsSourceCode from './DocsSourceCode.vue';
 import DocsComponentIsolation from './DocsComponentIsolation.vue';
 import {ComponentDocPlugin} from '../types';
+// Removed unused import DocsIcon from "./DocsIcon.vue";
 import DocsCopyToClipboard from './DocsCopyToClipboard.vue';
-import DocsTextField from './DocsTextField.vue';
+import DocsTextField from './DocsTextField.vue'; // Import the DocsTextField component
 
 const route = useRoute();
+// Inject the plugin
 const componentDocPlugin = inject('componentDocPlugin') as ComponentDocPlugin;
 const templateSource = ref<string | null>(null);
 const scriptSource = ref<string | null>(null);
 const styleSource = ref<string | null>(null);
-const loadedComponent = ref<any>(null);
-const searchTerm = ref('');
-const debouncedSearchTerm = ref('');
+const loadedComponent = ref<any>(null); // New ref to store the loaded component
 
-// Define props
+
+// Define props directly without TypeScript
 const props = defineProps({
   component: {
     type: Object,
@@ -265,6 +269,7 @@ const props = defineProps({
   },
 });
 
+
 const relativePath = computed(() => route.query.relativePath as string);
 
 // Example data for DocsTabs
@@ -275,15 +280,20 @@ const tabsExample = [
   { title: 'Styles' },
 ];
 
+// --- Search Filter Logic ---
+const searchTerm = ref('');
+const debouncedSearchTerm = ref('');
+
 // Create a debounced function to update the debouncedSearchTerm
 const updateDebouncedSearchTerm = debounce((value: string) => {
   debouncedSearchTerm.value = value;
-}, 300);
+}, 300); // 300ms debounce delay
 
 // Watch for changes to searchTerm and update debouncedSearchTerm with debounce
 watch(searchTerm, (newValue) => {
   updateDebouncedSearchTerm(newValue);
 });
+
 
 // Load and process the raw component source and component module
 onMounted(async () => {
@@ -317,39 +327,13 @@ onMounted(async () => {
       if (componentPath) {
         try {
           const componentModule = await componentDocPlugin.componentModules[componentPath]();
-          loadedComponent.value = componentModule.default;
+          loadedComponent.value = componentModule.default; // Assuming the component is the default export
         } catch (error) {
           console.error('Failed to load component module:', error);
         }
       }
     }
   }
-});
-
-// Define interfaces
-interface EventItem {
-  event: string;
-  payload?: string;
-  description?: string;
-}
-
-interface SlotItem {
-  name: string;
-  content?: string;
-  description?: string;
-}
-
-// Computed properties
-const propHeaders = computed(() => {
-  return getPropsHeaders();
-});
-
-const eventHeaders = computed(() => {
-  return getEventHeaders();
-});
-
-const slotHeaders = computed(() => {
-  return getSlotHeaders();
 });
 
 // Computed properties for filtered data
@@ -360,28 +344,10 @@ const basePropItems = computed(() => {
   }
   // Otherwise, generate the props from the component if it's provided
   if (props.component) {
-    // If we have raw source, pass it to generatePropsItems
-    if (templateSource.value) {
-      const fullSource = [
-        templateSource.value ? `<template>${templateSource.value}</template>` : '',
-        scriptSource.value ? `<script>${scriptSource.value}</script>` : '',
-        styleSource.value ? `<style>${styleSource.value}</style>` : ''
-      ].join('\n');
-      return generatePropsItems(props.component, fullSource);
-    }
     return generatePropsItems(props.component);
   }
   // If neither propItems nor component is provided, use the loaded component
   if (loadedComponent.value) {
-    // If we have raw source, pass it to generatePropsItems
-    if (templateSource.value) {
-      const fullSource = [
-        templateSource.value ? `<template>${templateSource.value}</template>` : '',
-        scriptSource.value ? `<script>${scriptSource.value}</script>` : '',
-        styleSource.value ? `<style>${styleSource.value}</style>` : ''
-      ].join('\n');
-      return generatePropsItems(loadedComponent.value, fullSource);
-    }
     return generatePropsItems(loadedComponent.value);
   }
   return [];
@@ -398,6 +364,18 @@ const filteredPropItems = computed(() => {
       fuzzyMatch(item.default, debouncedSearchTerm.value);
   });
 });
+
+interface EventItem {
+  event: string;
+  payload?: string;
+  description?: string;
+}
+
+interface SlotItem {
+  name: string;
+  content?: string;
+  description?: string;
+}
 
 const filteredEventItems = computed(() => {
   if (!debouncedSearchTerm.value) {
@@ -422,6 +400,20 @@ const filteredSlotItems = computed(() => {
       fuzzyMatch(item.description ?? '', debouncedSearchTerm.value);
   });
 });
+
+
+const propHeaders = computed(() => {
+  return getPropsHeaders();
+});
+
+const eventHeaders = computed(() => {
+  return getEventHeaders();
+});
+
+const slotHeaders = computed(() => {
+  return getSlotHeaders();
+});
+
 </script>
 
 <style
