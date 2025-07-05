@@ -7,6 +7,7 @@ import { ComponentDocPlugin, ComponentDocOptions } from './types';
 import routesConfig from './routes';
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'; // Import RouteRecordRaw
 import './styles';
+import { loadConfig, loadPackageConfig, createConfigFile } from './utils/configLoader';
 
 // Centralized constants
 const DOCS_MOUNT_ID = 'atomic-docs-app';
@@ -46,13 +47,27 @@ function toggleElementDisplay(el: HTMLElement | null, show: boolean) {
 }
 
 const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
-  install(app: App, options: ComponentDocOptions = {
+  async install(app: App, options: ComponentDocOptions = {
     componentModules: {},
     componentsDirName: "",
     exampleModules: {},
     examplesDirName: "",
   }) {
     try {
+      // Load configuration from different sources
+      const fileConfig = await loadConfig();
+      const packageConfig = loadPackageConfig();
+
+      // Merge configurations with priority: options > fileConfig > packageConfig
+      const mergedOptions: ComponentDocOptions = {
+        ...packageConfig,
+        ...fileConfig,
+        ...options,
+        // Ensure required properties are present
+        componentModules: options.componentModules || {},
+        exampleModules: options.exampleModules || {},
+      };
+
       const {
         componentModules,
         componentsDirName,
@@ -66,7 +81,7 @@ const componentDocsPlugin: Plugin<[ComponentDocOptions]> = {
         autoRegisterComponents,
         history: customHistory,
         customRoutes, // ✨ NEW: Destructure the new option
-      } = options;
+      } = mergedOptions;
 
       if (!enableDocs) return;
 
@@ -221,3 +236,4 @@ export { default as DocsColors } from './components/DocsColors.vue';
 export { default as DocsDataTable } from './components/DocsDataTable.vue';
 export { default as DocsMarkdown } from './components/DocsMarkdown.vue';
 export { atomicDocsVitePlugin } from './vitePlugin';
+export { createConfigFile } from './utils/configLoader';

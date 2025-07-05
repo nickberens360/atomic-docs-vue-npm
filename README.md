@@ -88,7 +88,7 @@ src/
   import SimpleTest from "../components/SimpleTest.vue";
   const text = ref('Hello World');
   const message = ref('Yooooooo');
-  
+
 // Define event items and slot items for the ExampleComponentUsage. The documentation tables will be generated automatically based on these items.
 const eventItems = [
   {
@@ -264,6 +264,113 @@ plugins: [
   fontawesome,
 ]
 ```
+
+## Configuration File
+
+Instead of passing all options directly to the plugin, you can use a configuration file to centralize your settings. This is especially useful when you want to share configuration between the Vue plugin and other tools like the component watcher.
+
+### Creating a Configuration File
+
+You can create an `atomic-docs.config.js` file in your project root:
+
+```javascript
+// atomic-docs.config.js
+export default {
+  componentsDirName: 'components',
+  examplesDirName: 'component-examples',
+  enableDocs: process.env.NODE_ENV === 'development',
+  colors: [
+    {
+      name: 'primary',
+      color: '#1976d2',
+    },
+    {
+      name: 'secondary',
+      color: '#424242',
+    },
+  ],
+  typography: [
+    {
+      name: 'Headline 1',
+      fontFamily: '"Roboto", sans-serif',
+      fontSize: '2.5rem',
+      fontWeight: '700',
+      lineHeight: '1.5',
+    },
+  ],
+  autoExtractColors: true,
+  autoExtractTypography: true,
+  componentFont: 'Times, serif',
+  mainAppID: 'app',
+}
+```
+
+Alternatively, you can use the `createConfigFile` helper to generate this file based on your plugin options:
+
+```javascript
+import { createConfigFile } from 'vue-atomic-docs';
+
+// Same options you pass to the plugin
+const options = {
+  componentsDirName: 'components',
+  examplesDirName: 'component-examples',
+  // other options...
+};
+
+// Create the config file
+createConfigFile(options);
+```
+
+### Configuration Priority
+
+When using the plugin, configuration is loaded with the following priority:
+
+1. Options passed directly to the plugin (highest priority)
+2. Configuration from atomic-docs.config.js file
+3. Configuration from package.json (atomicDocs section)
+
+This allows you to override specific options when needed while keeping most configuration centralized.
+
+## Component Watcher
+
+Vue Atomic Docs includes a component watcher script that can monitor your component files for changes. This is useful for automatically regenerating documentation or triggering other actions when components are modified.
+
+### Using the Component Watcher
+
+You can add a script to your package.json:
+
+```json
+{
+  "scripts": {
+    "watch-components": "node node_modules/vue-atomic-docs/dist/watch-components.js"
+  }
+}
+```
+
+Then run it with:
+
+```bash
+npm run watch-components
+```
+
+The watcher uses the same configuration sources as the Vue plugin, with the following priority:
+
+1. Command-line arguments (e.g., `npm run watch-components -- ./src/my-components`)
+2. Configuration from atomic-docs.config.js file
+3. Configuration from package.json (atomicDocs section)
+4. Environment variables (e.g., `ATOMIC_DOCS_COMPONENTS_DIR=./src/components`)
+5. Default values
+
+### Watcher Configuration Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| componentsDir | Directory to watch for component changes | ./src/components |
+| patterns | File patterns to watch | ['**/*.vue'] |
+| watchForNew | Whether to watch for new files | true |
+| watchForChanges | Whether to watch for file changes | true |
+| watchForDeletions | Whether to watch for file deletions | true |
+| ignoreInitial | Whether to ignore initial scan | false |
 
 ## Options Type Definitions
 
