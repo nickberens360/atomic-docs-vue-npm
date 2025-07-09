@@ -58,7 +58,7 @@ src/
 ```
 
 3. Document your components in `component-examples` using the `<ExampleComponentUsage>` component provided by vue-atomic-docs. For example, in `BoxDemo.vue`:
-```markup
+```vue
 <template>
   <ExampleComponentUsage
     :event-items="eventItems"
@@ -88,7 +88,7 @@ src/
   import SimpleTest from "../components/SimpleTest.vue";
   const text = ref('Hello World');
   const message = ref('Yooooooo');
-  
+
 // Define event items and slot items for the ExampleComponentUsage. The documentation tables will be generated automatically based on these items.
 const eventItems = [
   {
@@ -108,6 +108,45 @@ const slotItems = [
 ```
 
 3. Access your component documentation at the `/atomic-docs` route in your application.
+
+## Router Integration
+
+Vue Atomic Docs comes with its own router to handle documentation navigation. However, when integrating with your main application, you may need to create a "routing bridge" to ensure both routers coexist without conflicts.
+
+Add the following catch-all route to your main application router configuration:
+
+```javascript
+{
+  path: '/atomic-docs/:pathMatch(.*)*',
+  name: 'componentDocsHandler',
+  component: { render: () => null }, // Empty component
+  meta: {
+    authNotRequired: true
+  }
+}
+```
+
+You can also conditionally include the route based on the same environment variable used to enable the documentation system:
+
+```javascript
+...(import.meta.env.VITE_ENABLE_ATOMIC_DOCS !== 'true' ? [] : [
+  {
+    path: '/atomic-docs/:pathMatch(.*)*',
+    name: 'componentDocsHandler',
+    component: { render: () => null } // Empty component
+  }
+])
+```
+
+This approach ensures that the documentation routes are only added when the documentation system is enabled, which is particularly useful for production environments where you might want to disable the documentation.
+
+This catch-all route acts as a bridge between your main application router and the vue-atomic-docs router. It ensures that:
+
+1. Any route starting with `/atomic-docs/` is properly handled
+2. The vue-atomic-docs router takes control of the routing within its namespace
+3. Authentication or other route guards in your main application don't interfere with documentation access
+
+Without this routing bridge, you might experience navigation issues or conflicts between the two routers when trying to access nested documentation routes.
 
 ## Configuration Options
 
