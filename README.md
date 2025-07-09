@@ -58,7 +58,7 @@ src/
 ```
 
 3. Document your components in `component-examples` using the `<ExampleComponentUsage>` component provided by vue-atomic-docs. For example, in `BoxDemo.vue`:
-```vue
+```markup
 <template>
   <ExampleComponentUsage
     :event-items="eventItems"
