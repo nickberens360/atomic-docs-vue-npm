@@ -118,6 +118,21 @@ export function useExtractedTypography() {
   onMounted(() => {
     setTimeout(updateTypography, 200);
 
+    // Add a fallback timeout to prevent infinite loading
+    const loadingTimeout = setTimeout(() => {
+      if (Object.keys(extractedTypography.value.variables).length === 0 &&
+          Object.keys(extractedTypography.value.elementStyles).length === 0 &&
+          extractedTypography.value.utilityClasses.length === 0) {
+        console.warn('Typography analysis timed out. Some styles may not be displayed.');
+        // Add some fallback data to ensure the loading state changes
+        extractedTypography.value = {
+          variables: { '--fallback': 'Could not access stylesheets' },
+          elementStyles: {},
+          utilityClasses: []
+        };
+      }
+    }, 5000); // 5 seconds should be enough
+
     const appRoot = document.getElementById('app');
     if (appRoot) {
       const observer = new MutationObserver(updateTypography);
@@ -127,8 +142,15 @@ export function useExtractedTypography() {
         subtree: true,
         attributeFilter: ['style', 'class'],
       });
-      return () => observer.disconnect();
+      return () => {
+        clearTimeout(loadingTimeout);
+        observer.disconnect();
+      };
     }
+
+    return () => {
+      clearTimeout(loadingTimeout);
+    };
   });
 
   return { extractedTypography };
