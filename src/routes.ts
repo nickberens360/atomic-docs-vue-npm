@@ -39,7 +39,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'design-system/typography',
         name: 'typography',
-        component: () => import('./views/DocsTypography.vue'),
+        component: () => import('./views/DocsTypographyView.vue'),
         meta: {
           section: 'Design System',
           title: 'Typography',
