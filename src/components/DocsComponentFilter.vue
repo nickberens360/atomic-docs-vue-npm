@@ -182,7 +182,7 @@ onBeforeUnmount(() => {
 }
 
 .atomic-docs-text-field {
-  width: 300px;
+  max-width: 300px;
   background-color: var(--atomic-docs-surface-color, white);
   border-radius: var(--atomic-docs-border-radius-sm, 4px);
   box-shadow: var(--atomic-docs-shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.1));
