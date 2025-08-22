@@ -90,7 +90,7 @@ const dynamicNavigationSections = computed(() => {
 
 
 // Define refs
-const activeComponentsSection = ref<number | null>(); // Initialize Components section as open
+const activeComponentsSection = ref<number | null>(0); // Initialize Components section as open
 
 // Define props
 const props = defineProps<{
