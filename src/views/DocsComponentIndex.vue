@@ -45,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, inject, provide, watch } from 'vue';
+import { ref, computed, inject, provide, watch, onMounted, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import DocsAppBar from '../components/DocsAppBar.vue';
 import DocsAppNavigationDrawer from '../components/DocsAppNavigationDrawer.vue';
@@ -73,7 +73,17 @@ const isDark = ref(localStorage.getItem('theme') === 'dark');
 provide('isDark', isDark);
 
 const isRailOpen = ref(false);
-const isNavDrawerOpen = ref(true);
+const isNavDrawerOpen = ref(window.innerWidth > 767);
+const windowWidth = ref(window.innerWidth);
+
+// Computed property for mobile detection
+const isMobile = computed(() => windowWidth.value <= 767);
+
+// Function to close drawer
+function closeDrawer() {
+  isNavDrawerOpen.value = false;
+  isRailOpen.value = false;
+}
 
 // Function to toggle theme
 function toggleTheme(value: boolean) {
@@ -89,9 +99,54 @@ function toggleTheme(value: boolean) {
 
 // Function to toggle drawer
 function toggleDrawer() {
-  isRailOpen.value = !isRailOpen.value;
-  isNavDrawerOpen.value = !isNavDrawerOpen.value;
+  console.log('Toggle drawer called - current state:', isNavDrawerOpen.value);
+  if (windowWidth.value > 767) {
+    // Desktop: toggle between fully open and rail mode
+    isRailOpen.value = !isRailOpen.value;
+    isNavDrawerOpen.value = !isNavDrawerOpen.value;
+  } else {
+    // Mobile: toggle between open overlay and closed
+    isNavDrawerOpen.value = !isNavDrawerOpen.value;
+    isRailOpen.value = false;
+  }
+  console.log('Toggle drawer - new state, rail:', isRailOpen.value, 'nav:', isNavDrawerOpen.value);
 }
+
+// Handle responsive drawer behavior
+let resizeTimer: ReturnType<typeof setTimeout>;
+function handleResize() {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    const width = window.innerWidth;
+    windowWidth.value = width;
+    console.log('Resize handler - window width:', width);
+    
+    if (width <= 767) {
+      if (isNavDrawerOpen.value) {
+        isNavDrawerOpen.value = false;
+        isRailOpen.value = false;
+        console.log('Side drawer closed - viewport width:', width);
+      }
+    } else {
+      if (!isNavDrawerOpen.value) {
+        isNavDrawerOpen.value = true;
+        isRailOpen.value = false;
+        console.log('Side drawer opened - viewport width:', width);
+      }
+    }
+  }, 100); // Debounce resize events
+}
+
+// Set up media query listener
+onMounted(() => {
+  console.log('Component mounted - initial width:', window.innerWidth);
+  window.addEventListener('resize', handleResize);
+  handleResize(); // Check initial state
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize);
+});
 
 // Computed property to check if the current route is 'componentDocs'
 const isComponentDocsRoute = computed(() => {
@@ -170,4 +225,5 @@ html, body {
 .readme-content {
   max-width: 900px;
 }
+
 </style>

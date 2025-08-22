@@ -36,7 +36,13 @@ defineProps<Props>();
     max-width: 100%;
   }
 
-  // Responsive padding
+  // Mobile optimization
+  @media (max-width: 767px) {
+    padding: var(--atomic-docs-spacing-xs, 8px);
+    height: calc(90vh + 20px); // Account for smaller mobile padding
+  }
+  
+  // Responsive padding for larger screens
   @media (min-width: 960px) {
     padding: var(--atomic-docs-spacing-lg, 24px);
   }
